@@ -8,7 +8,7 @@ class Empresa(models.Model):
 
 
 class DNS(models.Model):
-    empresa = models.ForeignKey(Empresa, null=True, blank=True, on_delete=models.SET_NULL)
+    empresa = models.ForeignKey(Empresa, null=True, blank=True, on_delete=models.SET_NULL, related_name='nameservers')
     dominio = models.CharField(max_length=240)
 
     def assign_empresa(self):

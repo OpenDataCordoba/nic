@@ -1,3 +1,6 @@
 from django.contrib import admin
+from .models import Registrante
 
-# Register your models here.
+@admin.register(Registrante)
+class RegistranteAdmin(admin.ModelAdmin):
+    list_display = ['name', 'legal_uid', 'created', 'changed']

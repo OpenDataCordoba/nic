@@ -1,32 +1,48 @@
 from django.db import models
-import whois
+from whoare.whoare import WhoAre
+
 
 class Dominio(models.Model):
     nombre = models.CharField(max_length=240)
-    zona = models.ForeignKey('zonas.Zona', on_delete=models.CASCADE, help_text="Lo que va al final y no es parte del dominio")
-    # registrante = models.ForeignKey('registrantes.Registrante', null=True, blank=True, on_delete=models.SET_NULL)
+    zona = models.ForeignKey('zonas.Zona', on_delete=models.CASCADE, related_name='dominios', help_text="Lo que va al final y no es parte del dominio")
+    registrante = models.ForeignKey('registrantes.Registrante', null=True, blank=True, on_delete=models.SET_NULL, related_name='dominios')
+    
+    registered = models.DateTimeField(null=True, blank=True)
+    changed = models.DateTimeField(null=True, blank=True)
+    expire = models.DateTimeField(null=True, blank=True)
+    
     extras = models.JSONField(null=True, blank=True)
 
 
     @classmethod
-    def create_from_whois(cls, domain, zone):
+    def create_from_whois(cls, domain):
         from zonas.models import Zona
-        zona = Zona.objects.get_or_create(nombre=zone)
-        full_domain = f'{domain}.{zona.nombre}'
-        wdomain = whois.query(full_domain)
+        from registrantes.models import Registrante
+        from dnss.models import DNS
 
-        assert wdomain.name == full_domain
-
-
-        """
+        wa = WhoAre()
+        wa.load(domain)
         
+        # wa.domain.registered datetime.datetime(2020, 5, 7, 10, 44, 4, 210977)
+        # wa.domain.expire datetime.datetime(2021, 5, 7, 0, 0)
+        # wa.registrant.name 'XXXX jose XXXXX'
+        # wa.registrant.legal_uid '20XXXXXXXX9'
+        # wa.dnss[0].name 'ns2.sedoparking.com'
+        # wa.dnss[1].name 'ns1.sedoparking.com'
+        
+        zona = Zona.objects.get_or_create(nombre=wa.domain.zone)
+        dominio = Dominio.objects.get_or_create(nombre=wa.domain.base_name, zona=zona)
 
-        self.registrar = data['registrar'][0].strip()
-        self.registrant_country = data['registrant_country'][0].strip()
-        self.creation_date = str_to_date(data['creation_date'][0])
-        self.expiration_date = str_to_date(data['expiration_date'][0])
-        self.last_updated = str_to_date(data['updated_date'][0])
-        self.status = data['status'][0].strip()
-        self.statuses = list(set([s.strip() for s in data['status']])) # list(set(...))) to deduplicate
-        self.dnssec = BOOLEAN
-        """
+        # TODO
+        # for dns in wa.dnss:
+        #     dns = DNS
+
+        return dominio
+        
+class DNSDominio(models.Model):
+    dominio = models.ForeignKey(Dominio, on_delete=models.RESTRICT, related_name='dnss')
+    dns = models.ForeignKey('dnss.DNS', on_delete=models.RESTRICT, related_name='dominios')
+    orden = models.IntegerField()
+    
+    class Meta:
+        unique_together = (('dominio', 'dns', 'orden'), )
