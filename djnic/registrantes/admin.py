@@ -4,3 +4,4 @@ from .models import Registrante
 @admin.register(Registrante)
 class RegistranteAdmin(admin.ModelAdmin):
     list_display = ['name', 'legal_uid', 'created', 'changed']
+    list_per_page = 10

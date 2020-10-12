@@ -20,9 +20,13 @@ class Command(BaseCommand):
 
     def add_arguments(self, parser):
         parser.add_argument('--limit', nargs='?', type=int, default=100)
+        parser.add_argument('--offset', nargs='?', type=int, default=0)
+
 
     def handle(self, *args, **options):
         limit = options['limit']
+        offset = options['offset']
+
         tz = pytz.timezone('America/Argentina/Cordoba')
 
         # create a SSH tunnel
@@ -51,11 +55,11 @@ class Command(BaseCommand):
             port=3307  # I create a SSH tunnel here
             )
 
-
         # https://dev.mysql.com/doc/connector-python/en/connector-python-example-cursor-select.html
         cursor = connection.cursor(dictionary=True)  # sin el dictionary=True son tuplas sin nombres de campo
+        cursor.execute("SET SESSION MAX_EXECUTION_TIME=100000000;")
         
-        query = f'Select * from dominios order by lastUpdated limit {limit};'
+        query = f'Select * from dominios order by lastUpdated limit {limit} offset {offset};'
         
         self.stdout.write(self.style.SUCCESS(f'Query {query}'))
         cursor.execute(query)
@@ -75,7 +79,14 @@ class Command(BaseCommand):
             parts = d['dominio'].lower().strip().split('.')
             base_name = parts[0]
             zone = '.'.join(parts[1:])
-            self.stdout.write(self.style.SUCCESS(f"\t {c} Procesndo dominio {base_name} {zone} \n\t\t{d}"))
+
+            if d['lastUpdated'] is None:
+                skipped += 1
+                continue            
+            reg_name = d['registrante'].lower().strip()
+            reg_uid = d['reg_documento'].lower().strip()
+            
+            self.stdout.write(self.style.SUCCESS(f"\t {c} Procesndo dominio {d['lastUpdated']} {base_name} {zone} {d['estado']} {reg_name}"))
             
             zona, created = Zona.objects.get_or_create(nombre=zone)
 
@@ -83,15 +94,10 @@ class Command(BaseCommand):
             if created:
                 nuevos_dominios += 1
 
-            if d['lastUpdated'] is None:
-                skipped += 1
-                continue
             dominio.data_updated = tz.localize(d["lastUpdated"], is_dst=True)
             if d["dominio_changed"] is not None:
                 dominio.changed = tz.localize(d["dominio_changed"], is_dst=True)
 
-            reg_name = d['registrante'].lower().strip()
-            reg_uid = d['reg_documento'].lower().strip()
             if d['estado'] == "no disponible":
                 if d["desde"] is not None:
                     dominio.registered = tz.localize(d["desde"], is_dst=True)
@@ -125,7 +131,8 @@ class Command(BaseCommand):
             for ns in [d["DNS1"], d["DNS2"], d["DNS3"], d["DNS4"], d["DNS5"]]:
                 if ns is not None and ns != '':
                     ns = ns.lower().strip()
-                    dns, created = DNS.objects.get_or_create(dominio=ns)
+                    parts = ns.split()
+                    dns, created = DNS.objects.get_or_create(dominio=parts[0])
                     if dns in [d.dns for d in dominio.dnss.all()]:
                         continue
                     DNSDominio.objects.create(dominio=dominio, dns=dns, orden=orden)
