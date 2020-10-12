@@ -94,6 +94,7 @@ class Command(BaseCommand):
             if created:
                 nuevos_dominios += 1
 
+            dominio.uid_anterior = d['id']
             dominio.data_updated = tz.localize(d["lastUpdated"], is_dst=True)
             if d["dominio_changed"] is not None:
                 dominio.changed = tz.localize(d["dominio_changed"], is_dst=True)

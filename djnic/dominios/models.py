@@ -14,6 +14,8 @@ class Dominio(models.Model):
     
     extras = models.JSONField(null=True, blank=True)
 
+    uid_anterior = models.IntegerField(default=0, help_text="to be deleted after migration")
+    
     @classmethod
     def create_from_whois(cls, domain):
         from zonas.models import Zona
