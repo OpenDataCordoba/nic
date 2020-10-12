@@ -4,7 +4,7 @@ import whois
 class Dominio(models.Model):
     nombre = models.CharField(max_length=240)
     zona = models.ForeignKey('zonas.Zona', on_delete=models.CASCADE, help_text="Lo que va al final y no es parte del dominio")
-    registrante = models.ForeignKey('registrantes.Registrante', null=True, blank=True, on_delete=models.SET_NULL)
+    # registrante = models.ForeignKey('registrantes.Registrante', null=True, blank=True, on_delete=models.SET_NULL)
     extras = models.JSONField(null=True, blank=True)
 
 
@@ -19,23 +19,7 @@ class Dominio(models.Model):
 
 
         """
-        domain:		data99.com.ar
-        registrant:	20264536538
-        registrar:	nicar
-        registered:	2010-04-12 00:00:00
-        changed:	2020-03-24 08:26:01.899786
-        expire:		2021-04-12 00:00:00
-
-        contact:	20264536538
-        name:		VAZQUEZ FLEXES ANDRES
-        registrar:	nicar
-        created:	2013-08-20 00:00:00
-        changed:	2020-05-04 19:34:57.928489
-
-        nserver:	ns2.cluster311.com ()
-        nserver:	ns1.cluster311.com ()
-        registrar:	nicar
-        created:	2016-06-30 23:14:21.131083
+        
 
         self.registrar = data['registrar'][0].strip()
         self.registrant_country = data['registrant_country'][0].strip()

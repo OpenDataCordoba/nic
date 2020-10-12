@@ -37,6 +37,11 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+
+    'dominios',
+    'registrantes',
+    'dnss',
+    'zonas'
 ]
 
 MIDDLEWARE = [
@@ -118,3 +123,18 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/3.1/howto/static-files/
 
 STATIC_URL = '/static/'
+
+OLD_SSH_HOST = ''
+OLD_SSH_PORT = 0
+OLD_SSH_USER = ''
+OLD_SSH_PASS = ''
+
+OLD_DB_USER = ''
+OLD_DB_PASS = ''
+OLD_DB_NAME = ''
+
+
+try:
+    from .local_settings import *
+except:
+    pass
