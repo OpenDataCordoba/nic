@@ -7,3 +7,6 @@ class Registrante(models.Model):
     legal_uid = models.CharField(max_length=90, unique=True)
     created = models.DateTimeField(null=True, blank=True)
     changed = models.DateTimeField(null=True, blank=True)
+
+    def __str__(self):
+        return f'{self.name} {self.legal_uid}'

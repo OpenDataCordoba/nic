@@ -1,10 +1,12 @@
+from datetime import datetime
 import logging
 import mysql.connector
+import pytz
 # from sshtunnel import SSHTunnelForwarder
 from django.core.management.base import BaseCommand, CommandError
 from django.conf import settings
 
-from dominios.models import Dominio
+from dominios.models import Dominio, DNSDominio
 from zonas.models import Zona
 from registrantes.models import Registrante
 from dnss.models import DNS
@@ -21,6 +23,7 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         limit = options['limit']
+        tz = pytz.timezone('America/Argentina/Cordoba')
 
         # create a SSH tunnel
         # https://support.cloud.engineyard.com/hc/en-us/articles/205408088-Access-Your-Database-Remotely-Through-an-SSH-Tunnel
@@ -52,7 +55,7 @@ class Command(BaseCommand):
         # https://dev.mysql.com/doc/connector-python/en/connector-python-example-cursor-select.html
         cursor = connection.cursor(dictionary=True)  # sin el dictionary=True son tuplas sin nombres de campo
         
-        query = f'Select * from dominios limit {limit};'
+        query = f'Select * from dominios order by lastUpdated limit {limit};'
         
         self.stdout.write(self.style.SUCCESS(f'Query {query}'))
         cursor.execute(query)
@@ -65,22 +68,72 @@ class Command(BaseCommand):
         """
         c = 0
         nuevos_dominios = 0
+        nuevos_registrantes = 0
+        skipped = 0
         for d in cursor:
             c += 1
-            parts = d['dominio'].split('.')
+            parts = d['dominio'].lower().strip().split('.')
             base_name = parts[0]
             zone = '.'.join(parts[1:])
+            self.stdout.write(self.style.SUCCESS(f"\t {c} Procesndo dominio {base_name} {zone} \n\t\t{d}"))
+            
             zona, created = Zona.objects.get_or_create(nombre=zone)
+
             dominio, created = Dominio.objects.get_or_create(zona=zona, nombre=base_name)
             if created:
                 nuevos_dominios += 1
 
-            self.stdout.write(self.style.SUCCESS(f"\tDominio {dominio}"))
+            if d['lastUpdated'] is None:
+                skipped += 1
+                continue
+            dominio.data_updated = tz.localize(d["lastUpdated"], is_dst=True)
+            if d["dominio_changed"] is not None:
+                dominio.changed = tz.localize(d["dominio_changed"], is_dst=True)
+
+            reg_name = d['registrante'].lower().strip()
+            reg_uid = d['reg_documento'].lower().strip()
+            if d['estado'] == "no disponible":
+                if d["desde"] is not None:
+                    dominio.registered = tz.localize(d["desde"], is_dst=True)
+                
+                if d["hasta"] is not None:
+                    dominio.expire = tz.localize(d["hasta"], is_dst=True)
+            
+                registrante, created = Registrante.objects.get_or_create(legal_uid=reg_uid)
+                if created:
+                    nuevos_registrantes += 1
+
+                if d['persona_changed'] is not None:
+                    registrante.created = tz.localize(d["persona_changed"], is_dst=True)
+                if d['persona_created'] is not None:
+                    registrante.changed = tz.localize(d["persona_created"], is_dst=True)
+                
+                registrante.name = reg_name  # necesito laultima version de su nombre, por eso debo ordenar bien
+                registrante.save()
+
+                dominio.registrante = registrante
+            else:
+                if reg_name is not None and reg_name != '':
+                    raise Exception('Registrante pero dominio en estado no esperado')
+                if d["desde"] is not None:
+                    raise Exception('Valor no esperado')
+                if d["hasta"] is not None:
+                    raise Exception('Valor no esperado')
+            dominio.save()
+
+            orden = 1
+            for ns in [d["DNS1"], d["DNS2"], d["DNS3"], d["DNS4"], d["DNS5"]]:
+                if ns is not None and ns != '':
+                    ns = ns.lower().strip()
+                    dns, created = DNS.objects.get_or_create(dominio=ns)
+                    if dns in [d.dns for d in dominio.dnss.all()]:
+                        continue
+                    DNSDominio.objects.create(dominio=dominio, dns=dns, orden=orden)
+                    orden += 1
 
         cursor.close()
         connection.close()
 
         # server.stop()
 
-        self.stdout.write(self.style.SUCCESS(f"{c} procesados, {nuevos_dominios} nuevos dominios"))
-        
+        self.stdout.write(self.style.SUCCESS(f"{c} procesados, {nuevos_dominios} nuevos dominios. Nuevos registrantes: {nuevos_registrantes}. Skipped: {skipped}"))

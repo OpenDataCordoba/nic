@@ -6,13 +6,13 @@ class Dominio(models.Model):
     nombre = models.CharField(max_length=240)
     zona = models.ForeignKey('zonas.Zona', on_delete=models.CASCADE, related_name='dominios', help_text="Lo que va al final y no es parte del dominio")
     registrante = models.ForeignKey('registrantes.Registrante', null=True, blank=True, on_delete=models.SET_NULL, related_name='dominios')
-    
+    data_updated = models.DateTimeField(null=True, blank=True, help_text='When this record was updated')
+
     registered = models.DateTimeField(null=True, blank=True)
     changed = models.DateTimeField(null=True, blank=True)
     expire = models.DateTimeField(null=True, blank=True)
     
     extras = models.JSONField(null=True, blank=True)
-
 
     @classmethod
     def create_from_whois(cls, domain):
