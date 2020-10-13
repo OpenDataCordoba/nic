@@ -41,7 +41,8 @@ INSTALLED_APPS = [
     'dominios',
     'registrantes',
     'dnss',
-    'zonas'
+    'zonas',
+    'cambios',
 ]
 
 MIDDLEWARE = [
