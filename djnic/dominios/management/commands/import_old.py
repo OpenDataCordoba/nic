@@ -16,10 +16,10 @@ logger = logging.getLogger(__name__)
 
 
 class Command(BaseCommand):
-    help = 'Importar dominiod'
+    help = 'Importar dominios'
 
     def add_arguments(self, parser):
-        parser.add_argument('--limit', nargs='?', type=int, default=100)
+        parser.add_argument('--limit', nargs='?', type=int, default=0)
         parser.add_argument('--offset', nargs='?', type=int, default=0)
 
 
@@ -59,10 +59,13 @@ class Command(BaseCommand):
         cursor = connection.cursor(dictionary=True)  # sin el dictionary=True son tuplas sin nombres de campo
         cursor.execute("SET SESSION MAX_EXECUTION_TIME=100000000;")
         
-        query = f'''Select * from dominios 
-                    where dominio like "k%" 
-                    order by lastUpdated 
-                    limit {limit} offset {offset};'''
+        if limit == 0:
+            limit = 2000000
+        query = f'Select * from dominios order by lastUpdated limit {limit}'
+        
+        if offset > 0:
+            query += f' offset {offset}'
+        query += ';'
         
         self.stdout.write(self.style.SUCCESS(f'Query {query}'))
         cursor.execute(query)
@@ -73,7 +76,7 @@ class Command(BaseCommand):
         "188","e.com.ar", "disponible",   "2017-07-15 13:29:56", "0000-00-00 00:00:00", "0000-00-00 00:00:00",                                                                                            "0000-00-00 00:00:00", "0000-00-00 00:00:00", "0000-00-00 00:00:00", "0000-00-00 00:00:00"
 
         """
-        c = 0
+        c = offset
         nuevos_dominios = 0
         nuevos_registrantes = 0
         skipped = 0
@@ -89,7 +92,7 @@ class Command(BaseCommand):
             reg_name = d['registrante'].lower().strip()
             reg_uid = d['reg_documento'].lower().strip()
             
-            self.stdout.write(self.style.SUCCESS(f"\t {c} Procesndo dominio {d['lastUpdated']} {base_name} {zone} {d['estado']} {reg_name}"))
+            self.stdout.write(self.style.SUCCESS(f"{c} Procesndo dominio {d['lastUpdated']} {base_name} {zone} {d['estado']} {reg_name}"))
             
             zona, created = Zona.objects.get_or_create(nombre=zone)
 

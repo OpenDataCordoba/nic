@@ -20,7 +20,7 @@ class Dominio(models.Model):
     extras = models.JSONField(null=True, blank=True)
 
     # fields to be deleted
-    uid_anterior = models.IntegerField(default=0, help_text="to be deleted after migration")
+    uid_anterior = models.IntegerField(default=0, db_index=True, help_text="to be deleted after migration")
     # 0 es no empezado, 1 es empezado, 2 es terminado OK
     changes_migrated = models.IntegerField(default=0)
     
@@ -43,6 +43,9 @@ class Dominio(models.Model):
 
     def __str__(self):
         return self.full_domain()
+    
+    def last_change(self):
+        return self.cambios.order_by('-momento').first()
         
     @classmethod
     def add_from_whois(cls, domain, mock_from_txt_file=None):
@@ -64,13 +67,14 @@ class Dominio(models.Model):
         
         dominio.estado = STATUS_DISPONIBLE if wa.domain.is_free else STATUS_NO_DISPONIBLE
 
-        registrante, created = Registrante.objects.get_or_create(legal_uid=wa.registrant.legal_uid)
-        registrante.name = wa.registrant.name
-        registrante.legal_uid = wa.registrant.legal_uid
-        registrante.created = wa.registrant.created
-        registrante.changed = wa.registrant.changed
-        registrante.save()
-        dominio.registrante = registrante
+        if wa.registrant is not None:
+            registrante, created = Registrante.objects.get_or_create(legal_uid=wa.registrant.legal_uid)
+            registrante.name = wa.registrant.name
+            registrante.legal_uid = wa.registrant.legal_uid
+            registrante.created = wa.registrant.created
+            registrante.changed = wa.registrant.changed
+            registrante.save()
+            dominio.registrante = registrante
         
         dominio.data_updated = timezone.now()
     

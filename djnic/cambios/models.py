@@ -17,7 +17,7 @@ class CampoCambio(models.Model):
     anterior = models.CharField(max_length=240, null=True)
     nuevo = models.CharField(max_length=240, null=True)
 
-    uid_anterior = models.IntegerField(default=0, help_text="to be deleted after migration")
+    uid_anterior = models.IntegerField(default=0, db_index=True, help_text="to be deleted after migration")
 
     def __str__(self):
         return f'{self.campo} from {self.anterior} to {self.nuevo}'

@@ -1,0 +1,31 @@
+% La información a la que estás accediendo se provee exclusivamente para
+% fines relacionados con operaciones sobre nombres de dominios y DNS,
+% quedando absolutamente prohibido su uso para otros fines.
+%
+% La DIRECCIÓN NACIONAL DEL REGISTRO DE DOMINIOS DE INTERNET es depositaria
+% de la información que los usuarios declaran con la sola finalidad de
+% registrar nombres de dominio en ‘.ar’, para ser publicada en el sitio web
+% de NIC Argentina.
+%
+% La información personal que consta en la base de datos generada a partir
+% del sistema de registro de nombres de dominios se encuentra amparada por
+% la Ley N° 25326 “Protección de Datos Personales” y el Decreto
+% Reglamentario 1558/01.
+
+domain:		free.com.ar
+registrant:	20XXXXXXX70
+registrar:	nicar
+registered:	1998-02-28 23:59:04
+changed:	2020-09-27 14:34:10.828423
+expire:		2024-02-07 09:00:00
+
+contact:	20XXXXXXX70
+name:		Fernandez Gonzalo
+registrar:	nicar
+created:	1996-01-19 00:00:00
+changed:	1996-10-11 07:37:54
+
+nserver:	ns1.free.com ()
+nserver:	ns2.free.com ()
+registrar:	nicar
+created:	2010-05-07 14:34:40.385561
