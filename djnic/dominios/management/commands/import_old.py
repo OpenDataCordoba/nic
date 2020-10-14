@@ -19,7 +19,7 @@ class Command(BaseCommand):
     help = 'Importar dominiod'
 
     def add_arguments(self, parser):
-        parser.add_argument('--limit', nargs='?', type=int, default=100)
+        parser.add_argument('--limit', nargs='?', type=int, default=0)
         parser.add_argument('--offset', nargs='?', type=int, default=0)
 
 
@@ -59,10 +59,12 @@ class Command(BaseCommand):
         cursor = connection.cursor(dictionary=True)  # sin el dictionary=True son tuplas sin nombres de campo
         cursor.execute("SET SESSION MAX_EXECUTION_TIME=100000000;")
         
-        query = f'''Select * from dominios 
-                    where dominio like "k%" 
-                    order by lastUpdated 
-                    limit {limit} offset {offset};'''
+        query = 'Select * from dominios order by lastUpdated '
+        if limit > 0:
+            query += f'limit {limit}'
+        if offset > 0:
+            query += f'offset {offset};'
+        query += ';'
         
         self.stdout.write(self.style.SUCCESS(f'Query {query}'))
         cursor.execute(query)
