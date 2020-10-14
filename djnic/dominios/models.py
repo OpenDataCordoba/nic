@@ -1,4 +1,4 @@
-
+import pytz
 from django.db import models
 from django.utils import timezone
 from whoare.whoare import WhoAre
@@ -24,6 +24,20 @@ class Dominio(models.Model):
     # 0 es no empezado, 1 es empezado, 2 es terminado OK
     changes_migrated = models.IntegerField(default=0)
     
+    def get_zoned_date(self, field):
+        """ put a datetime in the rigth timezone before move to string """
+        
+        if field == 'registered':
+            timefield = self.registered
+        elif field == 'changed':
+            timefield = self.changed
+        elif field == 'expire':
+            timefield = self.expire
+        else:
+            raise Exception('Bad field date')
+
+        return timezone.localtime(timefield, pytz.timezone(self.zona.tz))
+
     def full_domain(self):
         f'{self.nombre}.{self.zona.nombre}'
 
@@ -91,6 +105,8 @@ class Dominio(models.Model):
         
         # delete exceding DNSs from previous version
         DNSDominio.objects.filter(dominio=dominio, orden__gt=len(wa.dnss)).delete()
+
+        return dominio
             
 
     def apply_new_version(self, whoare_object):
@@ -109,25 +125,25 @@ class Dominio(models.Model):
             cambios.append({"campo": "estado", "anterior": STATUS_DISPONIBLE, "nuevo": STATUS_NO_DISPONIBLE})
             
         if wa.domain.registered != self.registered:
-            r_val = '' if self.registered is None else self.registered.strftime("%Y-%m-%d %H:%M:%S")
+            r_val = '' if self.registered is None else self.get_zoned_date('registered').strftime("%Y-%m-%d %H:%M:%S")
             w_val = '' if wa.domain.registered is None else wa.domain.registered.strftime("%Y-%m-%d %H:%M:%S")
             cambios.append({"campo": "dominio_registered", "anterior": r_val, "nuevo": w_val})
 
         if wa.domain.changed != self.changed:
-            r_val = '' if self.changed is None else self.changed.strftime("%Y-%m-%d %H:%M:%S")
+            r_val = '' if self.changed is None else self.get_zoned_date('changed').strftime("%Y-%m-%d %H:%M:%S")
             w_val = '' if wa.domain.changed is None else wa.domain.changed.strftime("%Y-%m-%d %H:%M:%S")
             cambios.append({"campo": "dominio_changed", "anterior": r_val, "nuevo": w_val})
 
         if wa.domain.expire != self.expire:
-            r_val = '' if self.expire is None else self.expire.strftime("%Y-%m-%d %H:%M:%S")
+            r_val = '' if self.expire is None else self.get_zoned_date('expire').strftime("%Y-%m-%d %H:%M:%S")
             w_val = '' if wa.domain.expire is None else wa.domain.expire.strftime("%Y-%m-%d %H:%M:%S")
             cambios.append({"campo": "dominio_expire", "anterior": r_val, "nuevo": w_val})
         
         if self.registrante is not None:
             r_name = self.registrante.name
             r_legal_uid = self.registrante.legal_uid
-            r_created = self.registrante.created.strftime("%Y-%m-%d %H:%M:%S")
-            r_changed = self.registrante.changed.strftime("%Y-%m-%d %H:%M:%S")
+            r_created = self.registrante.get_zoned_date('created', self.zona.tz).strftime("%Y-%m-%d %H:%M:%S")
+            r_changed = self.registrante.get_zoned_date('changed', self.zona.tz).strftime("%Y-%m-%d %H:%M:%S")
         else:
             r_name, r_legal_uid, r_created, r_changed = ('', '', '', '') 
 
