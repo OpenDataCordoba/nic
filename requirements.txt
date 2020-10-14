@@ -1,4 +1,4 @@
 django==3.1.2
-whoare>=0.1.17
+whoare>=0.1.23
 mysql-connector-python>=8.0.21
 sshtunnel>=0.1.5

@@ -3,6 +3,10 @@ from .models import Dominio
 
 @admin.register(Dominio)
 class DominioAdmin(admin.ModelAdmin):
-    list_display = ['nombre', 'zona', 'data_updated', 'registrante', 'registered', 'changed', 'expire']
+
+    def nameservers(self, obj):
+        return ' '.join([f'{dns.orden}: {dns.dns.dominio}' for dns in obj.dnss.order_by('orden')])
+
+    list_display = ['nombre', 'zona', 'data_updated', 'registrante', 'registered', 'changed', 'expire', 'nameservers']
     list_per_page = 10
     list_select_related = ('zona', 'registrante')

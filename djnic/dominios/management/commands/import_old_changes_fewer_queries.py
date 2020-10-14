@@ -30,8 +30,8 @@ class Command(BaseCommand):
 
         cursor = connection.cursor(dictionary=True)  # sin el dictionary=True son tuplas sin nombres de campo
         cursor.execute("SET SESSION MAX_EXECUTION_TIME=100000000;")
-        # 'cambios_2011', 
-        tables = ['cambios_2012', 'cambios_2013', 'cambios_2014',
+        
+        tables = ['cambios_2011', 'cambios_2012', 'cambios_2013', 'cambios_2014',
                   'cambios_2015', 'cambios_2016', 'cambios_2017', 'cambios_2018',
                   'cambios_2019', 'cambios']
 
@@ -48,11 +48,15 @@ class Command(BaseCommand):
             last_id_dominio = None
             main_cambio = None
             for cambio in cursor:
+                # skipif already migrated
+                if CampoCambio.objects.filter(uid_anterior=cambio['id']).count() > 0:
+                    continue
+                
                 c += 1
                 if last_id_dominio is None or last_id_dominio != cambio['idDominio']:
                     dominios = Dominio.objects.filter(uid_anterior=cambio['idDominio'])
                     if dominios.count() == 0:
-                        self.stdout.write(self.style.ERROR(f"IGNORED idDominio {cambio['idDominio']}"))
+                        # self.stdout.write(self.style.ERROR(f"IGNORED idDominio {cambio['idDominio']}"))
                         continue
                     elif dominios.count() > 1:
                         raise('WHAT!')
@@ -75,7 +79,8 @@ class Command(BaseCommand):
                     cambio=main_cambio,
                     campo=cambio['campo'],
                     anterior=cambio['anterior'],
-                    nuevo=cambio['nuevo']
+                    nuevo=cambio['nuevo'],
+                    uid_anterior=cambio['id']
                     )
 
                 

@@ -6,7 +6,7 @@ import pytz
 from django.core.management.base import BaseCommand, CommandError
 from django.conf import settings
 
-from dominios.models import Dominio, DNSDominio
+from dominios.models import Dominio, DNSDominio, STATUS_DISPONIBLE, STATUS_NO_DISPONIBLE
 from zonas.models import Zona
 from registrantes.models import Registrante
 from dnss.models import DNS
@@ -103,6 +103,8 @@ class Command(BaseCommand):
                 dominio.changed = tz.localize(d["dominio_changed"], is_dst=True)
 
             if d['estado'] == "no disponible":
+                dominio.estado = STATUS_NO_DISPONIBLE
+            
                 if d["desde"] is not None:
                     dominio.registered = tz.localize(d["desde"], is_dst=True)
                 
@@ -123,6 +125,8 @@ class Command(BaseCommand):
 
                 dominio.registrante = registrante
             else:
+                dominio.estado = STATUS_DISPONIBLE
+                
                 if reg_name is not None and reg_name != '':
                     raise Exception('Registrante pero dominio en estado no esperado')
                 if d["desde"] is not None:

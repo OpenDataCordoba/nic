@@ -1,13 +1,18 @@
+
 from django.db import models
+from django.utils import timezone
 from whoare.whoare import WhoAre
 
+STATUS_DISPONIBLE = 'disponible'
+STATUS_NO_DISPONIBLE = 'no disponible'
 
 class Dominio(models.Model):
     nombre = models.CharField(max_length=240)
     zona = models.ForeignKey('zonas.Zona', on_delete=models.CASCADE, related_name='dominios', help_text="Lo que va al final y no es parte del dominio")
     registrante = models.ForeignKey('registrantes.Registrante', null=True, blank=True, on_delete=models.SET_NULL, related_name='dominios')
     data_updated = models.DateTimeField(null=True, blank=True, help_text='When this record was updated')
-
+    
+    estado = models.CharField(null=True, max_length=90, db_index=True)
     registered = models.DateTimeField(null=True, blank=True)
     changed = models.DateTimeField(null=True, blank=True)
     expire = models.DateTimeField(null=True, blank=True)
@@ -19,33 +24,155 @@ class Dominio(models.Model):
     # 0 es no empezado, 1 es empezado, 2 es terminado OK
     changes_migrated = models.IntegerField(default=0)
     
+    def full_domain(self):
+        f'{self.nombre}.{self.zona.nombre}'
+
     def __str__(self):
-        return f'{self.nombre}.{self.zona.nombre}'
+        return self.full_domain()
         
     @classmethod
-    def create_from_whois(cls, domain):
+    def add_from_whois(cls, domain, mock_from_txt_file=None):
         from zonas.models import Zona
         from registrantes.models import Registrante
         from dnss.models import DNS
 
         wa = WhoAre()
-        wa.load(domain)
+        domain_name, zone = wa.detect_zone(domain)
+        zona, _ = Zona.objects.get_or_create(nombre=zone)
         
-        # wa.domain.registered datetime.datetime(2020, 5, 7, 10, 44, 4, 210977)
-        # wa.domain.expire datetime.datetime(2021, 5, 7, 0, 0)
-        # wa.registrant.name 'XXXX jose XXXXX'
-        # wa.registrant.legal_uid '20XXXXXXXX9'
-        # wa.dnss[0].name 'ns2.sedoparking.com'
-        # wa.dnss[1].name 'ns1.sedoparking.com'
+        dominio, dominio_created = Dominio.objects.get_or_create(nombre=domain_name, zona=zona)
         
-        zona = Zona.objects.get_or_create(nombre=wa.domain.zone)
-        dominio = Dominio.objects.get_or_create(nombre=wa.domain.base_name, zona=zona)
+        wa.load(domain, mock_from_txt_file=mock_from_txt_file)
 
-        # TODO
-        # for dns in wa.dnss:
-        #     dns = DNS
+        # is already exist analyze and register changes
+        if not dominio_created:
+            dominio.apply_new_version(whoare_object=wa)
+        
+        dominio.estado = STATUS_DISPONIBLE if wa.domain.is_free else STATUS_NO_DISPONIBLE
 
-        return dominio
+        registrante, created = Registrante.objects.get_or_create(legal_uid=wa.registrant.legal_uid)
+        registrante.name = wa.registrant.name
+        registrante.legal_uid = wa.registrant.legal_uid
+        registrante.created = wa.registrant.created
+        registrante.changed = wa.registrant.changed
+        registrante.save()
+        dominio.registrante = registrante
+        
+        dominio.data_updated = timezone.now()
+    
+        dominio.registered = wa.domain.registered
+        dominio.changed = wa.domain.changed
+        dominio.expire = wa.domain.expire
+
+        dominio.save()
+
+        orden = 1
+        for ns in wa.dnss:
+            new_dns, dns_created = DNS.objects.get_or_create(dominio=ns.name)
+            
+            # get previous DNS in this order
+            previous = DNSDominio.objects.filter(dominio=dominio, orden=orden)
+            if previous.count() > 0:
+            
+                dns_found = False
+                for prev in previous:
+                    if prev.dns != new_dns:
+                        # delete all 
+                        prev.delete()
+                    else:
+                        dns_found = True
+                if not dns_found:
+                    DNSDominio.objects.create(dominio=dominio, dns=new_dns, orden=orden)
+
+            elif previous.count() == 0:    
+                DNSDominio.objects.create(dominio=dominio, dns=new_dns, orden=orden)
+                    
+            orden += 1
+        
+        # delete exceding DNSs from previous version
+        DNSDominio.objects.filter(dominio=dominio, orden__gt=len(wa.dnss)).delete()
+            
+
+    def apply_new_version(self, whoare_object):
+        """ Get a new version of domain, check differences and register changes """
+        
+        wa = whoare_object
+        
+        # ensure is the same
+        assert self.nombre == wa.domain.base_name
+        assert self.zona.nombre == wa.domain.zone
+
+        cambios = []
+        if self.estado == STATUS_NO_DISPONIBLE and wa.domain.is_free:
+            cambios.append({"campo": "estado", "anterior": STATUS_NO_DISPONIBLE, "nuevo": STATUS_DISPONIBLE})
+        elif self.estado == STATUS_DISPONIBLE and not wa.domain.is_free:
+            cambios.append({"campo": "estado", "anterior": STATUS_DISPONIBLE, "nuevo": STATUS_NO_DISPONIBLE})
+            
+        if wa.domain.registered != self.registered:
+            r_val = '' if self.registered is None else self.registered.strftime("%Y-%m-%d %H:%M:%S")
+            w_val = '' if wa.domain.registered is None else wa.domain.registered.strftime("%Y-%m-%d %H:%M:%S")
+            cambios.append({"campo": "dominio_registered", "anterior": r_val, "nuevo": w_val})
+
+        if wa.domain.changed != self.changed:
+            r_val = '' if self.changed is None else self.changed.strftime("%Y-%m-%d %H:%M:%S")
+            w_val = '' if wa.domain.changed is None else wa.domain.changed.strftime("%Y-%m-%d %H:%M:%S")
+            cambios.append({"campo": "dominio_changed", "anterior": r_val, "nuevo": w_val})
+
+        if wa.domain.expire != self.expire:
+            r_val = '' if self.expire is None else self.expire.strftime("%Y-%m-%d %H:%M:%S")
+            w_val = '' if wa.domain.expire is None else wa.domain.expire.strftime("%Y-%m-%d %H:%M:%S")
+            cambios.append({"campo": "dominio_expire", "anterior": r_val, "nuevo": w_val})
+        
+        if self.registrante is not None:
+            r_name = self.registrante.name
+            r_legal_uid = self.registrante.legal_uid
+            r_created = self.registrante.created.strftime("%Y-%m-%d %H:%M:%S")
+            r_changed = self.registrante.changed.strftime("%Y-%m-%d %H:%M:%S")
+        else:
+            r_name, r_legal_uid, r_created, r_changed = ('', '', '', '') 
+
+        if wa.registrant is not None:
+            w_name = wa.registrant.name
+            w_legal_uid = wa.registrant.legal_uid
+            w_created = wa.registrant.created.strftime("%Y-%m-%d %H:%M:%S")
+            w_changed = wa.registrant.changed.strftime("%Y-%m-%d %H:%M:%S")
+        else:
+            w_name, w_legal_uid, w_created, w_changed = ('', '', '', '') 
+        
+        if r_name != w_name:
+            cambios.append({"campo": "registrant_name", "anterior": r_name, "nuevo": w_name})
+        
+        if r_legal_uid != w_legal_uid:
+            cambios.append({"campo": "registrant_legal_uid", "anterior": r_legal_uid, "nuevo": w_legal_uid})
+        
+        if r_created != w_created:
+            cambios.append({"campo": "registrant_created", "anterior": r_created, "nuevo": w_created})
+        
+        if r_changed != w_changed:
+            cambios.append({"campo": "registrant_changed", "anterior": r_changed, "nuevo": w_changed})
+        
+        r_dnss = [d.dns.dominio for d in self.dnss.all()]
+        w_dnss = [d.name for d in wa.dnss]
+        
+        max_len = max(len(r_dnss), len(w_dnss))
+        for n in range(max_len):
+            r_val = '' if (n+1) > len(r_dnss) else r_dnss[n]
+            w_val = '' if (n+1) > len(w_dnss) else w_dnss[n]
+
+            if r_val != w_val:
+                cambios.append({"campo": f"DNS{n+1}", "anterior": r_val, "nuevo": w_val})
+
+        
+        if len(cambios) > 0:
+            from cambios.models import CambiosDominio, CampoCambio
+            main_change = CambiosDominio.objects.create(dominio=self, momento=timezone.now())
+            
+            for cambio in cambios:
+                CampoCambio.objects.create(
+                    cambio=main_change,
+                    campo=cambio['campo'],
+                    anterior=cambio['anterior'],
+                    nuevo=cambio['nuevo'])
         
 class DNSDominio(models.Model):
     dominio = models.ForeignKey(Dominio, on_delete=models.RESTRICT, related_name='dnss')
