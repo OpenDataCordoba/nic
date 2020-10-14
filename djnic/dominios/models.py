@@ -20,7 +20,7 @@ class Dominio(models.Model):
     extras = models.JSONField(null=True, blank=True)
 
     # fields to be deleted
-    uid_anterior = models.IntegerField(default=0, help_text="to be deleted after migration")
+    uid_anterior = models.IntegerField(default=0, db_index=True, help_text="to be deleted after migration")
     # 0 es no empezado, 1 es empezado, 2 es terminado OK
     changes_migrated = models.IntegerField(default=0)
     
