@@ -44,7 +44,7 @@ class Dominio(models.Model):
     def full_domain(self):
         nombre = self.nombre if self.nombre is not None else ''
         zona = '' if self.zona is None else self.zona.nombre
-        f'{nombre}.{zona}'
+        return f'{nombre}.{zona}'
 
     def __str__(self):
         return self.full_domain()
