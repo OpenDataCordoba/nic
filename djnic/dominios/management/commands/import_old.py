@@ -59,11 +59,12 @@ class Command(BaseCommand):
         cursor = connection.cursor(dictionary=True)  # sin el dictionary=True son tuplas sin nombres de campo
         cursor.execute("SET SESSION MAX_EXECUTION_TIME=100000000;")
         
-        query = 'Select * from dominios order by lastUpdated '
-        if limit > 0:
-            query += f'limit {limit}'
+        if limit == 0:
+            limit = 2000000
+        query = f'Select * from dominios order by lastUpdated limit {limit}'
+        
         if offset > 0:
-            query += f'offset {offset} rows'
+            query += f' offset {offset}'
         query += ';'
         
         self.stdout.write(self.style.SUCCESS(f'Query {query}'))
