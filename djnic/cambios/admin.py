@@ -4,7 +4,10 @@ from .models import CambiosDominio, CampoCambio
 
 @admin.register(CambiosDominio)
 class CambiosDominioAdmin(admin.ModelAdmin):
-    list_display = ['dominio', 'momento']
+    def dominio_cambiado(self, obj):
+        return obj.dominio.full_domain()
+
+    list_display = ['dominio_cambiado', 'momento']
     list_per_page = 10
     list_select_related = ('dominio', )
 
@@ -12,7 +15,7 @@ class CambiosDominioAdmin(admin.ModelAdmin):
 @admin.register(CampoCambio)
 class CampoCambioAdmin(admin.ModelAdmin):
     def dominio(self, obj):
-        return obj.cambio.dominio
+        return obj.cambio.dominio.full_domain()
 
     def momento(self, obj):
         return obj.cambio.momento
