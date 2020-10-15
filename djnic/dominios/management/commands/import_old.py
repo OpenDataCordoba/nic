@@ -76,7 +76,7 @@ class Command(BaseCommand):
         "188","e.com.ar", "disponible",   "2017-07-15 13:29:56", "0000-00-00 00:00:00", "0000-00-00 00:00:00",                                                                                            "0000-00-00 00:00:00", "0000-00-00 00:00:00", "0000-00-00 00:00:00", "0000-00-00 00:00:00"
 
         """
-        c = 0
+        c = offset
         nuevos_dominios = 0
         nuevos_registrantes = 0
         skipped = 0
