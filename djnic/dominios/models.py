@@ -7,7 +7,7 @@ STATUS_DISPONIBLE = 'disponible'
 STATUS_NO_DISPONIBLE = 'no disponible'
 
 class Dominio(models.Model):
-    nombre = models.CharField(max_length=240)
+    nombre = models.CharField(max_length=240, db_index=True, help_text='Nombre solo sin la zona')
     zona = models.ForeignKey('zonas.Zona', on_delete=models.CASCADE, related_name='dominios', help_text="Lo que va al final y no es parte del dominio")
     registrante = models.ForeignKey('registrantes.Registrante', null=True, blank=True, on_delete=models.SET_NULL, related_name='dominios')
     data_updated = models.DateTimeField(null=True, blank=True, help_text='When this record was updated')
@@ -24,6 +24,9 @@ class Dominio(models.Model):
     # 0 es no empezado, 1 es empezado, 2 es terminado OK
     changes_migrated = models.IntegerField(default=0)
     
+    class Meta:
+        unique_together = (('nombre', 'zona'), )
+        
     def get_zoned_date(self, field):
         """ put a datetime in the rigth timezone before move to string """
         
