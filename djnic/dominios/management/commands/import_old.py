@@ -16,7 +16,7 @@ logger = logging.getLogger(__name__)
 
 
 class Command(BaseCommand):
-    help = 'Importar dominiod'
+    help = 'Importar dominios'
 
     def add_arguments(self, parser):
         parser.add_argument('--limit', nargs='?', type=int, default=0)
@@ -63,7 +63,7 @@ class Command(BaseCommand):
         if limit > 0:
             query += f'limit {limit}'
         if offset > 0:
-            query += f'offset {offset};'
+            query += f'offset {offset} rows'
         query += ';'
         
         self.stdout.write(self.style.SUCCESS(f'Query {query}'))
@@ -91,7 +91,7 @@ class Command(BaseCommand):
             reg_name = d['registrante'].lower().strip()
             reg_uid = d['reg_documento'].lower().strip()
             
-            self.stdout.write(self.style.SUCCESS(f"\t {c} Procesndo dominio {d['lastUpdated']} {base_name} {zone} {d['estado']} {reg_name}"))
+            self.stdout.write(self.style.SUCCESS(f"{c} Procesndo dominio {d['lastUpdated']} {base_name} {zone} {d['estado']} {reg_name}"))
             
             zona, created = Zona.objects.get_or_create(nombre=zone)
 
