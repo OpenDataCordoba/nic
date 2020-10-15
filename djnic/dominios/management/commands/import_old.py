@@ -76,7 +76,7 @@ class Command(BaseCommand):
             cursor.execute(query)
 
             # preparar la pagina que sigue 
-            offset += chunks - 1 
+            offset += chunks 
 
             """ sample data 
             "id", "dominio",  "estado",       "lastUpdated",         "desde",               "hasta",              "registrante",        "reg_documento", "DNS1",                 "DNS2","DNS3","DNS4","DNS5", "dominio_changed",     "persona_changed",     "persona_created",     "server_created"
