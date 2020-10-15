@@ -17,6 +17,8 @@ class Command(BaseCommand):
 
     def add_arguments(self, parser):
         parser.add_argument('--year', nargs='?', type=int)
+        parser.add_argument('--offset', nargs='?', type=int, default=0)
+        parser.add_argument('--chunks', nargs='?', type=int, default=5000)
 
     def handle(self, *args, **options):
 
@@ -39,6 +41,8 @@ class Command(BaseCommand):
         #           'cambios_2019', 'cambios']
 
         year = options['year']
+        offset = options['offset']
+        chunks = options['chunks']
         
         if year > 2010 and year < 2020:
             table = f'cambios_{year}'
@@ -48,48 +52,56 @@ class Command(BaseCommand):
             raise Exception('Bad Year')
 
         self.stdout.write(self.style.SUCCESS(f'Table {table}'))
-        query = f'''SELECT * FROM {table} order by id ASC;'''
 
-        cursor.execute(query)
-
-        c = 0
+        c = offset
+        
         last_id_dominio = None
         main_cambio = None
-        for cambio in cursor:
-            # skipif already migrated
-            if CampoCambio.objects.filter(uid_anterior=cambio['id']).count() > 0:
-                continue
-            
-            c += 1
-            if last_id_dominio is None or last_id_dominio != cambio['idDominio']:
-                dominios = Dominio.objects.filter(uid_anterior=cambio['idDominio'])
-                if dominios.count() == 0:
-                    # self.stdout.write(self.style.ERROR(f"IGNORED idDominio {cambio['idDominio']}"))
-                    continue
-                elif dominios.count() > 1:
-                    raise('WHAT!')
-                last_id_dominio = cambio['idDominio']
-                dominio = dominios[0]    
-                main_cambio = None
-            
-            self.stdout.write(self.style.SUCCESS(f"[{table}]:{c} Procesndo cambio {cambio['campo']} from {cambio['anterior']} to {cambio['nuevo']}"))
-            momento = tz.localize(cambio['fecha'], is_dst=True)
-            if main_cambio is None:
-                main_cambio = CambiosDominio.objects.create(dominio=dominio, momento=momento)
-            else:
-                # ver si estan muy separados o no
-                diff = momento - main_cambio.momento
-                if diff.total_seconds() > 3600:
-                    # crear uno nuevo
-                    main_cambio = CambiosDominio.objects.create(dominio=dominio, momento=momento)
 
-            CampoCambio.objects.create(
-                cambio=main_cambio,
-                campo=cambio['campo'],
-                anterior=cambio['anterior'],
-                nuevo=cambio['nuevo'],
-                uid_anterior=cambio['id']
-                )
+        for n in range(0, 130000000, chunks):
+
+            query = f'''SELECT * FROM {table} order by id ASC limit {chunks} offset {offset};'''
+
+            cursor.execute(query)
+
+            # preparar la pagina que sigue 
+            offset += chunks 
+
+            for cambio in cursor:
+                # skipif already migrated
+                if CampoCambio.objects.filter(uid_anterior=cambio['id']).count() > 0:
+                    continue
+                
+                c += 1
+                if last_id_dominio is None or last_id_dominio != cambio['idDominio']:
+                    dominios = Dominio.objects.filter(uid_anterior=cambio['idDominio'])
+                    if dominios.count() == 0:
+                        # self.stdout.write(self.style.ERROR(f"IGNORED idDominio {cambio['idDominio']}"))
+                        continue
+                    elif dominios.count() > 1:
+                        raise('WHAT!')
+                    last_id_dominio = cambio['idDominio']
+                    dominio = dominios[0]    
+                    main_cambio = None
+                
+                self.stdout.write(self.style.SUCCESS(f"[{table}]:{c} Procesndo cambio {cambio['campo']} from {cambio['anterior']} to {cambio['nuevo']}"))
+                momento = tz.localize(cambio['fecha'], is_dst=True)
+                if main_cambio is None:
+                    main_cambio = CambiosDominio.objects.create(dominio=dominio, momento=momento)
+                else:
+                    # ver si estan muy separados o no
+                    diff = momento - main_cambio.momento
+                    if diff.total_seconds() > 3600:
+                        # crear uno nuevo
+                        main_cambio = CambiosDominio.objects.create(dominio=dominio, momento=momento)
+
+                CampoCambio.objects.create(
+                    cambio=main_cambio,
+                    campo=cambio['campo'],
+                    anterior=cambio['anterior'],
+                    nuevo=cambio['nuevo'],
+                    uid_anterior=cambio['id']
+                    )
 
                 
             self.stdout.write(self.style.SUCCESS(f'Finished Table {table}'))
@@ -97,6 +109,4 @@ class Command(BaseCommand):
         cursor.close()
         connection.close()
 
-        # server.stop()
-
-        self.stdout.write(self.style.SUCCESS(f"{c} procesados, {nuevos_dominios} nuevos dominios. Nuevos registrantes: {nuevos_registrantes}. Skipped: {skipped}"))
+        self.stdout.write(self.style.SUCCESS(f"{c} procesados"))
