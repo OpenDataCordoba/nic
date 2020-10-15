@@ -42,7 +42,9 @@ class Dominio(models.Model):
         return timezone.localtime(timefield, pytz.timezone(self.zona.tz))
 
     def full_domain(self):
-        f'{self.nombre}.{self.zona.nombre}'
+        nombre = self.nombre if self.nombre is not None else ''
+        zona = '' if self.zona is None else self.zona.nombre
+        f'{nombre}.{zona}'
 
     def __str__(self):
         return self.full_domain()

@@ -19,6 +19,8 @@ class Command(BaseCommand):
         parser.add_argument('--year', nargs='?', type=int)
         parser.add_argument('--offset', nargs='?', type=int, default=0)
         parser.add_argument('--chunks', nargs='?', type=int, default=5000)
+        parser.add_argument('--limit', nargs='?', type=int, default=5000000)
+        
 
     def handle(self, *args, **options):
 
@@ -43,6 +45,7 @@ class Command(BaseCommand):
         year = options['year']
         offset = options['offset']
         chunks = options['chunks']
+        limit = options['limit']
         
         if year > 2010 and year < 2020:
             table = f'cambios_{year}'
@@ -66,6 +69,8 @@ class Command(BaseCommand):
 
             # preparar la pagina que sigue 
             offset += chunks 
+            if offset > limit:
+                break
 
             for cambio in cursor:
                 # skipif already migrated
