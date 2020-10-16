@@ -106,7 +106,7 @@ class Command(BaseCommand):
                             anterior={cambio['anterior']}, {type(cambio['anterior'])}
                             nuevo={cambio['nuevo']}, {type(cambio['nuevo'])} 
                             uid_anterior={cambio['id']} {type(cambio['id'])}'''
-                self.stdout.write(self.style.SUCCESS(lg))
+                # self.stdout.write(self.style.SUCCESS(lg))
                 
                 try:
                     CampoCambio.objects.create(
