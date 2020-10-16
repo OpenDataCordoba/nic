@@ -57,7 +57,8 @@ class Command(BaseCommand):
         self.stdout.write(self.style.SUCCESS(f'Table {table}'))
 
         c = offset
-        
+        errors = []
+
         last_id_dominio = None
         main_cambio = None
 
@@ -107,14 +108,19 @@ class Command(BaseCommand):
                             uid_anterior={cambio['id']} {type(cambio['id'])}'''
                 self.stdout.write(self.style.SUCCESS(lg))
                 
-                CampoCambio.objects.create(
-                    cambio=main_cambio,
-                    campo=cambio['campo'],
-                    anterior=cambio['anterior'],
-                    nuevo=cambio['nuevo'],
-                    uid_anterior=cambio['id']
-                    )
-
+                try:
+                    CampoCambio.objects.create(
+                        cambio=main_cambio,
+                        campo=cambio['campo'],
+                        anterior=cambio['anterior'],
+                        nuevo=cambio['nuevo'],
+                        uid_anterior=cambio['id']
+                        )
+                except Exception as e:
+                    errors.append(f'Error {e} while saving {lg}')
+                
+                if len(errors) > 3:
+                    raise Exception(f'Too many errors {errors}')
                 
             self.stdout.write(self.style.SUCCESS(f'Finished Table {table}'))
     
