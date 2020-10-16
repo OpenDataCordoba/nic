@@ -7,9 +7,10 @@ class CambiosDominioAdmin(admin.ModelAdmin):
     def dominio_cambiado(self, obj):
         return obj.dominio.full_domain()
 
-    list_display = ['dominio_cambiado', 'momento']
+    list_display = ['dominio_cambiado', 'momento', 'have_changes']
     list_per_page = 10
     list_select_related = ('dominio', )
+    list_filter = ['have_changes']
 
 
 @admin.register(CampoCambio)

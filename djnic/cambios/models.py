@@ -2,8 +2,11 @@ from django.db import models
 
 
 class CambiosDominio(models.Model):
+    """ a domain is checks (having or no aby changes) """
     dominio = models.ForeignKey('dominios.Dominio', on_delete=models.CASCADE, related_name='cambios')
     momento = models.DateTimeField()
+    # to import "vistos" table and merge with this already imported (thats why the default at True) table
+    have_changes = models.BooleanField(default=True)
 
     # def __str__(self):
     #     dominio = self.dominio if self.dominio is not None else ''
