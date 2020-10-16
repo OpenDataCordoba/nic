@@ -100,6 +100,13 @@ class Command(BaseCommand):
                         # crear uno nuevo
                         main_cambio = CambiosDominio.objects.create(dominio=dominio, momento=momento)
 
+                lg = f'''PreSave {main_cambio.dominio} {main_cambio.momento}
+                            campo={cambio['campo']}, {type(cambio['campo'])}
+                            anterior={cambio['anterior']}, {type(cambio['anterior'])}
+                            nuevo={cambio['nuevo']}, {type(cambio['nuevo'])} 
+                            uid_anterior={cambio['id']} {type(cambio['id'])}'''
+                self.stdout.write(self.style.SUCCESS(lg))
+                
                 CampoCambio.objects.create(
                     cambio=main_cambio,
                     campo=cambio['campo'],
