@@ -1,3 +1,4 @@
+from datetime import timedelta
 import pytz
 from django.db import models
 from django.utils import timezone
@@ -5,6 +6,7 @@ from whoare.whoare import WhoAre
 
 STATUS_DISPONIBLE = 'disponible'
 STATUS_NO_DISPONIBLE = 'no disponible'
+
 
 class Dominio(models.Model):
     nombre = models.CharField(max_length=240, db_index=True, help_text='Nombre solo sin la zona')
@@ -17,6 +19,8 @@ class Dominio(models.Model):
     changed = models.DateTimeField(null=True, blank=True)
     expire = models.DateTimeField(null=True, blank=True)
     
+    priority_to_update = models.IntegerField(default=0, help_text='How mamy important is to update this domain')
+    next_update_priority = models.DateTimeField(default=timezone.now, help_text='Next time I need to update the "priority"')
     extras = models.JSONField(null=True, blank=True)
 
     # fields to be deleted
@@ -199,33 +203,42 @@ class Dominio(models.Model):
                     anterior=cambio['anterior'],
                     nuevo=cambio['nuevo'])
 
-    def priority_to_update(self):
+    def calculate_priority(self):
         """ We need a way to know how to use resources
-            We can't update all domains every day
+            We can't update all domains every day.
+
+            Define a priority value and a next_update date for this domain
             """
         day_seconds = 86400
         max_expired = 90  # assume it's a fail
-        min_expired = 30  # days before expire
-
-        updated_since = timezone.now() - self.data_updated
-        expired_since = timezone.now() - self.expire  # negative is still not expired
-
-        exp = expired_since.total_seconds() / day_seconds
-        up = updated_since.total_seconds() / day_seconds
-
-        if self.estado == STATUS_DISPONIBLE and up > 90:
-            # muertos en la base de datos
-            return 0
+        
+        updated_since = int((timezone.now() - self.data_updated).total_seconds() / day_seconds)
+        updated_since = min(updated_since, 180)
+        
+        expired_since = 0 if self.estado == STATUS_DISPONIBLE else int((timezone.now() - self.expire).total_seconds() / day_seconds)  # negative is still not expired
+        
+        if self.estado == STATUS_DISPONIBLE and updated_since > max_expired:
+            # muertos en la base de datos. Lo vuelvo a evaluar en 180 dias
+            self.priority_to_update = 0
+            self.next_update_priority = timezone.now() + timedelta(days=180)
+            self.save()
+            return self
 
         # si vencio hace mucho y no pasa nada lo doy por perdido por un tiempo
-        if exp > max_expired:
-            if up < 30:
-                exp = -50
+        if expired_since > max_expired:
+            if updated_since < 30:
+                self.priority_to_update = 1
+                self.next_update_priority = timezone.now() + timedelta(days=150)
+                self.save()
+                return self
         
-        up = min(up, 90)
         
         # magick
-        return ((exp + min_expired) * 7 ) + (up ^ 3) 
+        self.priority_to_update = (expired_since * 7) + (updated_since ** 3)
+        # volver a calcularlo en varios dias
+        self.next_update_priority = timezone.now() + timedelta(days=3)
+        self.save()
+        return self
         
 class DNSDominio(models.Model):
     dominio = models.ForeignKey(Dominio, on_delete=models.RESTRICT, related_name='dnss')
