@@ -67,7 +67,11 @@ class Command(BaseCommand):
                 desde = momento - max_diff
                 hasta = momento + max_diff
 
-                dominio = Dominio.objects.get(uid_anterior=cambio['idDominio'])
+                dominios = Dominio.objects.filter(uid_anterior=cambio['idDominio'])
+                if dominios.count == 0:
+                    continue
+                dominio = dominios[0]
+                
                 # ver si estan muy separados o no
                 closest_changes = CambiosDominio.objects.filter(
                     dominio=dominio,
