@@ -198,6 +198,34 @@ class Dominio(models.Model):
                     campo=cambio['campo'],
                     anterior=cambio['anterior'],
                     nuevo=cambio['nuevo'])
+
+    def priority_to_update(self):
+        """ We need a way to know how to use resources
+            We can't update all domains every day
+            """
+        day_seconds = 86400
+        max_expired = 90  # assume it's a fail
+        min_expired = 30  # days before expire
+
+        updated_since = timezone.now() - self.data_updated
+        expired_since = timezone.now() - self.expire  # negative is still not expired
+
+        exp = expired_since.total_seconds() / day_seconds
+        up = updated_since.total_seconds() / day_seconds
+
+        if self.estado == STATUS_DISPONIBLE and up > 90:
+            # muertos en la base de datos
+            return 0
+
+        # si vencio hace mucho y no pasa nada lo doy por perdido por un tiempo
+        if exp > max_expired:
+            if up < 30:
+                exp = -50
+        
+        up = min(up, 90)
+        
+        # magick
+        return ((exp + min_expired) * 7 ) + (up ^ 3) 
         
 class DNSDominio(models.Model):
     dominio = models.ForeignKey(Dominio, on_delete=models.RESTRICT, related_name='dnss')
