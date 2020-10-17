@@ -80,10 +80,10 @@ class Command(BaseCommand):
                         dominio=dominio,
                         momento=momento,
                         have_changes=False)
-                    self.stdout.write(self.style.SUCCESS(f'CREATE Visto {dominio} {momento}'))
+                    self.stdout.write(self.style.SUCCESS(f'{c} CREATE Visto {dominio} {momento}'))
                 else:
                     cc = closest_changes[0]
-                    skipped = f'SKIP {momento} because we have another change for {dominio} at {cc.momento}'
+                    skipped = f'{c} SKIP {momento} because we have another change for {dominio} at {cc.momento}'
                     self.stdout.write(self.style.WARNING(skipped))
 
                 
