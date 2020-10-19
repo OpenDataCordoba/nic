@@ -4,6 +4,8 @@ from django.test import TestCase
 from dominios.models import Dominio, STATUS_DISPONIBLE, STATUS_NO_DISPONIBLE
 from zonas.models import Zona
 
+import logging
+logger = logging.getLogger(__name__)
 
 class CambioDominioTestCase(TestCase):
     
@@ -13,88 +15,93 @@ class CambioDominioTestCase(TestCase):
         cls.all = []
         cls.zona = Zona.objects.create(nombre='ar')
 
-    def create_domain(self, name, delta_updated, status=STATUS_NO_DISPONIBLE, delta_expire=None):
+    def create_domain(self, delta_updated, delta_readed, status=STATUS_NO_DISPONIBLE, delta_expire=None):
+
+        if status == STATUS_DISPONIBLE:
+            nombre = f'FU{delta_updated.days}R{delta_readed.days}'
+        else:
+            if delta_expire.days < 0:
+                nombre = f'E{-delta_expire.days}U{delta_updated.days}R{delta_readed.days}'
+            else:
+                nombre = f'R{delta_expire.days}U{delta_updated.days}R{delta_readed.days}'
+
+        # logger.info(f'Creating {nombre}')        
         dom = Dominio.objects.create(
-            nombre=name,
+            nombre=nombre,
             zona=self.zona,
             estado=status,
             expire=timezone.now() + delta_expire if status==STATUS_NO_DISPONIBLE else None,
-            data_updated=timezone.now() - delta_updated)
+            data_updated=timezone.now() - delta_updated,
+            data_readed=timezone.now() - delta_readed)
         
+        # calcupar la prioridad a estos dominios
+        dom.calculate_priority()
         self.all.append(dom)
         return dom
         
-        
     def test_priority_order(self):
 
-        self.create_domain(name='f10', status=STATUS_DISPONIBLE, delta_updated=timedelta(days=10))
-        self.create_domain(name='f30', status=STATUS_DISPONIBLE, delta_updated=timedelta(days=30))
-        self.create_domain(name='f60', status=STATUS_DISPONIBLE, delta_updated=timedelta(days=60))
-        self.create_domain(name='f100', status=STATUS_DISPONIBLE, delta_updated=timedelta(days=100))
-
-        self.create_domain(name='p50p5', delta_expire=timedelta(days=50), delta_updated=timedelta(days=150))
-        self.create_domain(name='p50p15', delta_expire=timedelta(days=50), delta_updated=timedelta(days=120))
-        self.create_domain(name='p50p1', delta_expire=timedelta(days=50), delta_updated=timedelta(days=90))
+        for u in range(0, 101, 10):
+            for r in range(0, 101, 10):
+                self.create_domain(status=STATUS_DISPONIBLE, delta_updated=timedelta(days=u), delta_readed=timedelta(days=r))
         
-        self.create_domain(name='p30p90', delta_expire=timedelta(days=30), delta_updated=timedelta(days=90))
-        self.create_domain(name='p30p5', delta_expire=timedelta(days=30), delta_updated=timedelta(days=5))
-        self.create_domain(name='p30p15', delta_expire=timedelta(days=30), delta_updated=timedelta(days=15))
-        self.create_domain(name='p30p1', delta_expire=timedelta(days=30), delta_updated=timedelta(days=1))
-        
-        self.create_domain(name='p20p90', delta_expire=timedelta(days=20), delta_updated=timedelta(days=90))
-        self.create_domain(name='p20p5', delta_expire=timedelta(days=20), delta_updated=timedelta(days=5))
-        self.create_domain(name='p20p15', delta_expire=timedelta(days=20), delta_updated=timedelta(days=15))
-        self.create_domain(name='p20p1', delta_expire=timedelta(days=20), delta_updated=timedelta(days=1))
-
-        self.create_domain(name='p10p90', delta_expire=timedelta(days=10), delta_updated=timedelta(days=90))
-        self.create_domain(name='p10p60', delta_expire=timedelta(days=10), delta_updated=timedelta(days=60))
-        self.create_domain(name='p10p5', delta_expire=timedelta(days=10), delta_updated=timedelta(days=5))
-        self.create_domain(name='p10p15', delta_expire=timedelta(days=10), delta_updated=timedelta(days=15))
-        self.create_domain(name='p10p1', delta_expire=timedelta(days=10), delta_updated=timedelta(days=1))
-        
-        self.create_domain(name='p1p90', delta_expire=timedelta(days=1), delta_updated=timedelta(days=90))
-        self.create_domain(name='p1p60', delta_expire=timedelta(days=1), delta_updated=timedelta(days=60))
-        self.create_domain(name='p1p5', delta_expire=timedelta(days=1), delta_updated=timedelta(days=5))
-        self.create_domain(name='p1p15', delta_expire=timedelta(days=1), delta_updated=timedelta(days=15))
-        self.create_domain(name='p1p1', delta_expire=timedelta(days=1), delta_updated=timedelta(days=1))
-        
-        self.create_domain(name='m1p90', delta_expire=-timedelta(days=1), delta_updated=timedelta(days=90))
-        self.create_domain(name='m1p60', delta_expire=-timedelta(days=1), delta_updated=timedelta(days=60))
-        self.create_domain(name='m1p5', delta_expire=-timedelta(days=1), delta_updated=timedelta(days=5))
-        self.create_domain(name='m1p15', delta_expire=-timedelta(days=1), delta_updated=timedelta(days=15))
-        self.create_domain(name='m1p1', delta_expire=-timedelta(days=1), delta_updated=timedelta(days=1))
-        
-        self.create_domain(name='m10p90', delta_expire=-timedelta(days=10), delta_updated=timedelta(days=90))
-        self.create_domain(name='m10p60', delta_expire=-timedelta(days=10), delta_updated=timedelta(days=60))
-        self.create_domain(name='m10p5', delta_expire=-timedelta(days=10), delta_updated=timedelta(days=5))
-        self.create_domain(name='m10p15', delta_expire=-timedelta(days=10), delta_updated=timedelta(days=15))
-        self.create_domain(name='m10p1', delta_expire=-timedelta(days=10), delta_updated=timedelta(days=1))
-        
-        self.create_domain(name='m30p90', delta_expire=-timedelta(days=30), delta_updated=timedelta(days=90))
-        self.create_domain(name='m30p60', delta_expire=-timedelta(days=30), delta_updated=timedelta(days=60))
-        self.create_domain(name='m30p5', delta_expire=-timedelta(days=30), delta_updated=timedelta(days=5))
-        self.create_domain(name='m30p15', delta_expire=-timedelta(days=30), delta_updated=timedelta(days=15))
-        self.create_domain(name='m30p1', delta_expire=-timedelta(days=30), delta_updated=timedelta(days=1))
-        
-        self.create_domain(name='m80p90', delta_expire=-timedelta(days=80), delta_updated=timedelta(days=90))
-        self.create_domain(name='m80p60', delta_expire=-timedelta(days=80), delta_updated=timedelta(days=60))
-        self.create_domain(name='m80p5', delta_expire=-timedelta(days=80), delta_updated=timedelta(days=5))
-        self.create_domain(name='m80p15', delta_expire=-timedelta(days=80), delta_updated=timedelta(days=15))
-        self.create_domain(name='m80p1', delta_expire=-timedelta(days=80), delta_updated=timedelta(days=1))
-        
-        self.create_domain(name='m100p90', delta_expire=-timedelta(days=100), delta_updated=timedelta(days=120))
-        self.create_domain(name='m100p60', delta_expire=-timedelta(days=100), delta_updated=timedelta(days=60))
-        self.create_domain(name='m100p5', delta_expire=-timedelta(days=100), delta_updated=timedelta(days=5))
-        self.create_domain(name='m100p15', delta_expire=-timedelta(days=100), delta_updated=timedelta(days=15))
-        self.create_domain(name='m100p1', delta_expire=-timedelta(days=100), delta_updated=timedelta(days=1))
-        
-        for dominio in self.all:
-            dominio.calculate_priority()
-
+        for e in range(-30, 31, 10):
+            for u in range(0, 101, 10):
+                for r in range(0, r+1, 10):
+                    self.create_domain(delta_expire=timedelta(days=e), delta_updated=timedelta(days=u), delta_readed=timedelta(days=r))
+                    
+                
         # ver en este contexto cuales son los prioritarios
         dominios = Dominio.objects.all().order_by('-priority_to_update')
 
+        results = {}
+        c = dominios.count()
         for dominio in dominios:
-            print(dominio.nombre)
+            results[dominio.nombre] = dominio.priority_to_update
+            logger.info(f'{dominio.nombre} = {dominio.priority_to_update}')
+            c -= 1
+
+        # free, updated 30 days ago, different last readed date
+        self.assertGreater(results['FU30R30'], results['FU30R20'])
+        self.assertGreater(results['FU30R20'], results['FU30R10'])
+        self.assertGreater(results['FU30R10'], results['FU30R0'])
+
+        # free, readed 30 days ago, different last updated date
+        self.assertGreater(results['FU30R30'], results['FU20R30'])
+        self.assertGreater(results['FU20R30'], results['FU10R30'])
+        self.assertGreater(results['FU10R30'], results['FU0R30'])
+        
+        # expired 30 days ago
+        self.assertGreater(results['E30U30R30'], results['E30U30R20'])
+        self.assertGreater(results['E30U30R20'], results['E30U30R10'])
+        self.assertGreater(results['E30U30R10'], results['E30U30R0'])
+
+        self.assertGreater(results['E30U30R30'], results['E30U20R30'])
+        self.assertGreater(results['E30U20R30'], results['E30U10R30'])
+        self.assertGreater(results['E30U10R30'], results['E30U0R30'])
+        
+        # registered, expire in 30 days ago
+        self.assertGreater(results['R30U30R30'], results['R30U30R20'])
+        self.assertGreater(results['R30U30R20'], results['R30U30R10'])
+        self.assertGreater(results['R30U30R10'], results['R30U30R0'])
+
+        self.assertGreater(results['R30U30R30'], results['R30U20R30'])
+        self.assertGreater(results['R30U20R30'], results['R30U10R30'])
+        self.assertGreater(results['R30U10R30'], results['R30U0R30'])
+        
+        # expired > registered
+        self.assertGreater(results['E30U70R10'], results['R30U70R10'])
+        self.assertGreater(results['E30U30R10'], results['R30U30R10'])
+
+        # expired > free
+        self.assertGreater(results['E30U70R10'], results['FU70R10'])
+        self.assertGreater(results['E30U30R10'], results['FU30R10'])
+
+        # registered > free
+        self.assertGreater(results['R30U70R10'], results['FU70R10'])
+        self.assertGreater(results['R30U30R10'], results['FU30R10'])
+
+        # priorities
+        self.assertGreater(results['E10U90R70'], results['R10U90R80'])
 
         
