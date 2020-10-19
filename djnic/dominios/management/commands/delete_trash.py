@@ -28,7 +28,7 @@ class Command(BaseCommand):
             if dominio.estado == STATUS_DISPONIBLE:
                 if dominio.cambios.filter(have_changes=True).count() == 0:
                     to_delete.append(dominio)
-                    logger.info(f'{c} delete {dominio}')
+                    self.stdout.write(self.style.ERROR(f"{c} delete {dominio}"))
             
         self.stdout.write(self.style.SUCCESS(f"{c} processed {len(to_delete)} to be deleted"))
         if options['delete']:
