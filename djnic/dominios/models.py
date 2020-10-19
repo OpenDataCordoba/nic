@@ -3,6 +3,7 @@ import pytz
 from django.db import models
 from django.utils import timezone
 from whoare.whoare import WhoAre
+from cambios.models import CambiosDominio, CampoCambio
 
 STATUS_DISPONIBLE = 'disponible'
 STATUS_NO_DISPONIBLE = 'no disponible'
@@ -12,7 +13,9 @@ class Dominio(models.Model):
     nombre = models.CharField(max_length=240, db_index=True, help_text='Nombre solo sin la zona')
     zona = models.ForeignKey('zonas.Zona', on_delete=models.CASCADE, related_name='dominios', help_text="Lo que va al final y no es parte del dominio")
     registrante = models.ForeignKey('registrantes.Registrante', null=True, blank=True, on_delete=models.SET_NULL, related_name='dominios')
+    
     data_updated = models.DateTimeField(null=True, blank=True, help_text='When this record was updated')
+    data_readed = models.DateField(null=True, blank=True, help_text='When this record was readad (having changes or not)')
     
     estado = models.CharField(null=True, max_length=90, db_index=True)
     registered = models.DateTimeField(null=True, blank=True)
@@ -70,6 +73,8 @@ class Dominio(models.Model):
         
         wa.load(domain, mock_from_txt_file=mock_from_txt_file)
 
+        dominio.data_readed = timezone.now()
+
         # is already exist analyze and register changes
         if not dominio_created:
             dominio.apply_new_version(whoare_object=wa)
@@ -84,8 +89,6 @@ class Dominio(models.Model):
             registrante.changed = wa.registrant.changed
             registrante.save()
             dominio.registrante = registrante
-        
-        dominio.data_updated = timezone.now()
     
         dominio.registered = wa.domain.registered
         dominio.changed = wa.domain.changed
@@ -192,9 +195,10 @@ class Dominio(models.Model):
                 cambios.append({"campo": f"DNS{n+1}", "anterior": r_val, "nuevo": w_val})
 
         
-        if len(cambios) > 0:
-            from cambios.models import CambiosDominio, CampoCambio
-            main_change = CambiosDominio.objects.create(dominio=self, momento=timezone.now())
+        have_changes = len(cambios) > 0
+        main_change = CambiosDominio.objects.create(dominio=self, momento=timezone.now(), have_changes=have_changes)
+
+        if have_changes:
             
             for cambio in cambios:
                 CampoCambio.objects.create(
@@ -202,7 +206,13 @@ class Dominio(models.Model):
                     campo=cambio['campo'],
                     anterior=cambio['anterior'],
                     nuevo=cambio['nuevo'])
-
+            
+            self.data_updated = timezone.now()
+            # por un tiempo no lo miro
+            self.priority_to_update = 0
+            # volver a calcularlo en varios dias
+            self.next_update_priority = timezone.now() + timedelta(days=7)
+        
     def calculate_priority(self):
         """ We need a way to know how to use resources
             We can't update all domains every day.
@@ -210,31 +220,26 @@ class Dominio(models.Model):
             Define a priority value and a next_update date for this domain
             """
         day_seconds = 86400
-        max_expired = 90  # assume it's a fail
         
+        # days measures
         updated_since = int((timezone.now() - self.data_updated).total_seconds() / day_seconds)
         updated_since = min(updated_since, 180)
+
+        readed_since = int((timezone.now() - self.data_readed).total_seconds() / day_seconds)
+        readed_since = min(readed_since, 180)
         
-        expired_since = 0 if self.estado == STATUS_DISPONIBLE else int((timezone.now() - self.expire).total_seconds() / day_seconds)  # negative is still not expired
-        
-        if self.estado == STATUS_DISPONIBLE and updated_since > max_expired:
-            # muertos en la base de datos. Lo vuelvo a evaluar en 180 dias
-            self.priority_to_update = 0
-            self.next_update_priority = timezone.now() + timedelta(days=180)
+        if self.estado == STATUS_DISPONIBLE:
+            
+            self.priority_to_update = readed_since * 9 + updated_since * 2
+            self.next_update_priority = timezone.now() + timedelta(days=updated_since * 10)
             self.save()
             return self
 
-        # si vencio hace mucho y no pasa nada lo doy por perdido por un tiempo
-        if expired_since > max_expired:
-            if updated_since < 30:
-                self.priority_to_update = 1
-                self.next_update_priority = timezone.now() + timedelta(days=150)
-                self.save()
-                return self
+        expired_since = int((timezone.now() - self.expire).total_seconds() / day_seconds)  # negative is still not expired
+        # about to expire (~30 days) are importants
+        expired_since += 30
         
-        
-        # magick
-        self.priority_to_update = (expired_since * 7) + (updated_since ** 3)
+        self.priority_to_update = expired_since * 7 + readed_since * 11 + updated_since * 2
         # volver a calcularlo en varios dias
         self.next_update_priority = timezone.now() + timedelta(days=3)
         self.save()
