@@ -8,10 +8,8 @@ class CambiosDominio(models.Model):
     # to import "vistos" table and merge with this already imported (thats why the default at True) table
     have_changes = models.BooleanField(default=True)
 
-    # def __str__(self):
-    #     dominio = self.dominio if self.dominio is not None else ''
-    #     momento = self.momento if self.momento is not None else ''
-    #     return f'{dominio} {momento}'
+    def __str__(self):
+        return f'{self.dominio} {self.momento}'
 
 class CampoCambio(models.Model):
     """ Cada uno de los campos que cambio 
@@ -26,8 +24,8 @@ class CampoCambio(models.Model):
 
     uid_anterior = models.IntegerField(default=0, db_index=True, help_text="to be deleted after migration")
 
-    # def __str__(self):
-    #     campo = self.campo or ''
-    #     anterior = self.anterior or ''
-    #     nuevo = self.nuevo or ''
-    #     return f'{campo} from {anterior} to {nuevo}'
+    def __str__(self):
+        campo = self.campo or ''
+        anterior = self.anterior or ''
+        nuevo = self.nuevo or ''
+        return f'{campo} from {anterior} to {nuevo}'
