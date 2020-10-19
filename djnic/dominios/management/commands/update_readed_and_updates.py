@@ -13,11 +13,6 @@ logger = logging.getLogger(__name__)
 class Command(BaseCommand):
     help = 'Importar cambios en los dominios'
 
-    def add_arguments(self, parser):
-        parser.add_argument('--offset', nargs='?', type=int, default=0)
-        parser.add_argument('--chunks', nargs='?', type=int, default=5000)
-        parser.add_argument('--limit', nargs='?', type=int, default=15522038)
-
     def handle(self, *args, **options):
 
         
