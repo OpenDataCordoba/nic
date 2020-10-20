@@ -4,6 +4,7 @@ import pytz
 from django.db import models
 from django.utils import timezone
 from whoare.whoare import WhoAre
+from whoare.exceptions import TooManyQueriesError
 from cambios.models import CambiosDominio, CampoCambio
 
 STATUS_DISPONIBLE = 'disponible'
@@ -64,6 +65,9 @@ class Dominio(models.Model):
     
     @classmethod
     def add_from_whois(cls, domain, mock_from_txt_file=None):
+        """ create or update a domain from WhoIs info
+            Returns None if error or the domain object
+            """
         from zonas.models import Zona
         from registrantes.models import Registrante
         from dnss.models import DNS
@@ -73,11 +77,15 @@ class Dominio(models.Model):
         domain_name, zone = wa.detect_zone(domain)
         zona, _ = Zona.objects.get_or_create(nombre=zone)
         
+        try:
+            wa.load(domain, mock_from_txt_file=mock_from_txt_file)
+        except TooManyQueriesError:
+            return None
+
+        # create a domain after being sure we don't have any whoare errors
         dominio, dominio_created = Dominio.objects.get_or_create(nombre=domain_name, zona=zona)
         logger.info(f' - Dominio {dominio} Created: {dominio_created}')
         
-        wa.load(domain, mock_from_txt_file=mock_from_txt_file)
-
         dominio.data_readed = timezone.now()
 
         # is already exist analyze and register changes
@@ -227,7 +235,7 @@ class Dominio(models.Model):
 
             Define a priority value and a next_update date for this domain
             """
-        logger
+        logger.info(f'Calculating priority for {self}')
         day_seconds = 86400
         
         # days measures
@@ -235,17 +243,17 @@ class Dominio(models.Model):
             updated_since = 0
         else:
             updated_since = int((timezone.now() - self.data_updated).total_seconds() / day_seconds)
-            updated_since = min(updated_since, 180)
+            updated_since = min(updated_since, 120)
 
         if self.data_readed is None:
             readed_since = 0
         else:
             readed_since = int((timezone.now() - self.data_readed).total_seconds() / day_seconds)
-            readed_since = min(readed_since, 180)
+            readed_since = min(readed_since, 120)
         
         if self.estado == STATUS_DISPONIBLE:
             
-            self.priority_to_update = readed_since * 9 + updated_since * 2
+            self.priority_to_update = readed_since + updated_since
             self.next_update_priority = timezone.now() + timedelta(days=updated_since * 10)
             self.save()
             return self
@@ -254,7 +262,8 @@ class Dominio(models.Model):
         # about to expire (~30 days) are importants
         expired_since += 30
         # hay dominios vencidos hace años ...
-        expired_since = min(expired_since, 90)
+        if expired_since > 130:
+            expired_since = -expired_since
         
         self.priority_to_update = expired_since * 7 + readed_since * 11 + updated_since * 2
         # volver a calcularlo en varios dias
