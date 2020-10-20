@@ -126,17 +126,27 @@ LOGGING = {
             'class': 'logging.StreamHandler',
             'formatter': 'console',
         },
+        'file': {
+            'level': 'INFO',
+            'class': 'logging.FileHandler',
+            'filename': 'djnic.log',
+            'formatter': 'verbose'
+        },
     },
     'loggers': {
-        '': {
+        'django': {
+            'handlers': ['console', 'file'],
             'level': 'INFO',
-            'handlers': ['console'],
+            'propagate': False,
+        },
+        '': {
+            'handlers': ['console', 'file'],
+            'level': 'INFO',
+            'propagate': False,
         },
     },
 }
 
-# Static files (CSS, JavaScript, Images)
-# https://docs.djangoproject.com/en/3.1/howto/static-files/
 
 STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'static')
