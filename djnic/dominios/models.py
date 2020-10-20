@@ -148,20 +148,20 @@ class Dominio(models.Model):
             cambios.append({"campo": "estado", "anterior": STATUS_NO_DISPONIBLE, "nuevo": STATUS_DISPONIBLE})
         elif self.estado == STATUS_DISPONIBLE and not wa.domain.is_free:
             cambios.append({"campo": "estado", "anterior": STATUS_DISPONIBLE, "nuevo": STATUS_NO_DISPONIBLE})
-            
-        if wa.domain.registered != self.registered:
-            r_val = '' if self.registered is None else self.get_zoned_date('registered').strftime("%Y-%m-%d %H:%M:%S")
-            w_val = '' if wa.domain.registered is None else wa.domain.registered.strftime("%Y-%m-%d %H:%M:%S")
+        
+        r_val = '' if self.registered is None else self.get_zoned_date('registered').strftime("%Y-%m-%d %H:%M:%S")
+        w_val = '' if wa.domain.registered is None else wa.domain.registered.strftime("%Y-%m-%d %H:%M:%S")    
+        if r_val != w_val:
             cambios.append({"campo": "dominio_registered", "anterior": r_val, "nuevo": w_val})
 
-        if wa.domain.changed != self.changed:
-            r_val = '' if self.changed is None else self.get_zoned_date('changed').strftime("%Y-%m-%d %H:%M:%S")
-            w_val = '' if wa.domain.changed is None else wa.domain.changed.strftime("%Y-%m-%d %H:%M:%S")
+        r_val = '' if self.changed is None else self.get_zoned_date('changed').strftime("%Y-%m-%d %H:%M:%S")
+        w_val = '' if wa.domain.changed is None else wa.domain.changed.strftime("%Y-%m-%d %H:%M:%S")
+        if r_val != w_val:
             cambios.append({"campo": "dominio_changed", "anterior": r_val, "nuevo": w_val})
 
-        if wa.domain.expire != self.expire:
-            r_val = '' if self.expire is None else self.get_zoned_date('expire').strftime("%Y-%m-%d %H:%M:%S")
-            w_val = '' if wa.domain.expire is None else wa.domain.expire.strftime("%Y-%m-%d %H:%M:%S")
+        r_val = '' if self.expire is None else self.get_zoned_date('expire').strftime("%Y-%m-%d %H:%M:%S")
+        w_val = '' if wa.domain.expire is None else wa.domain.expire.strftime("%Y-%m-%d %H:%M:%S")
+        if r_val != w_val:
             cambios.append({"campo": "dominio_expire", "anterior": r_val, "nuevo": w_val})
         
         if self.registrante is not None:
