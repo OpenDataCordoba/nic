@@ -15,7 +15,7 @@ class Dominio(models.Model):
     registrante = models.ForeignKey('registrantes.Registrante', null=True, blank=True, on_delete=models.SET_NULL, related_name='dominios')
     
     data_updated = models.DateTimeField(null=True, blank=True, help_text='When this record was updated')
-    data_readed = models.DateField(null=True, blank=True, help_text='When this record was readad (having changes or not)')
+    data_readed = models.DateTimeField(null=True, blank=True, help_text='When this record was readad (having changes or not)')
     
     estado = models.CharField(null=True, max_length=90, db_index=True)
     registered = models.DateTimeField(null=True, blank=True)
