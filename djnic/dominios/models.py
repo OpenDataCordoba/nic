@@ -231,11 +231,17 @@ class Dominio(models.Model):
         day_seconds = 86400
         
         # days measures
-        updated_since = int((timezone.now() - self.data_updated).total_seconds() / day_seconds)
-        updated_since = min(updated_since, 180)
+        if self.data_updated is None:
+            updated_since = 0
+        else:
+            updated_since = int((timezone.now() - self.data_updated).total_seconds() / day_seconds)
+            updated_since = min(updated_since, 180)
 
-        readed_since = int((timezone.now() - self.data_readed).total_seconds() / day_seconds)
-        readed_since = min(readed_since, 180)
+        if self.data_readed is None:
+            readed_since = 0
+        else:
+            readed_since = int((timezone.now() - self.data_readed).total_seconds() / day_seconds)
+            readed_since = min(readed_since, 180)
         
         if self.estado == STATUS_DISPONIBLE:
             
