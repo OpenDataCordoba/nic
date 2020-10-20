@@ -1,5 +1,5 @@
 django==3.1.2
-whoare>=0.1.23
+whoare>=0.1.25
 mysql-connector-python>=8.0.21
 sshtunnel>=0.1.5
 psycopg2>=2.8.3
