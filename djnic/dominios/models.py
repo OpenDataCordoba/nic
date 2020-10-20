@@ -91,6 +91,9 @@ class Dominio(models.Model):
         # is already exist analyze and register changes
         if not dominio_created:
             dominio.apply_new_version(whoare_object=wa)
+        else:
+            # TODO test this field behaviour
+            dominio.data_updated = timezone.now()
         
         dominio.estado = STATUS_DISPONIBLE if wa.domain.is_free else STATUS_NO_DISPONIBLE
 
