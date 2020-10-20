@@ -10,3 +10,5 @@ class DominioAdmin(admin.ModelAdmin):
     list_display = ['nombre', 'zona', 'estado', 'data_updated', 'registrante', 'registered', 'changed', 'expire', 'nameservers']
     list_per_page = 10
     list_select_related = ('zona', 'registrante')
+    search_fields = ['nombre']
+    list_filter = ['estado']
