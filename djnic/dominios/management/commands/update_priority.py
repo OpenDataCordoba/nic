@@ -10,7 +10,7 @@ logger = logging.getLogger(__name__)
 
 
 class Command(BaseCommand):
-    help = 'Importar cambios en los dominios'
+    help = 'Actualizar prioridad en los dominios'
 
     def handle(self, *args, **options):
 

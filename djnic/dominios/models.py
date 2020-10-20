@@ -1,4 +1,5 @@
 from datetime import timedelta
+import logging
 import pytz
 from django.db import models
 from django.utils import timezone
@@ -7,6 +8,7 @@ from cambios.models import CambiosDominio, CampoCambio
 
 STATUS_DISPONIBLE = 'disponible'
 STATUS_NO_DISPONIBLE = 'no disponible'
+logger = logging.getLogger(__name__)
 
 
 class Dominio(models.Model):
@@ -45,7 +47,8 @@ class Dominio(models.Model):
             timefield = self.expire
         else:
             raise Exception('Bad field date')
-
+        
+        logger.info(f'Transforming date {timefield} {self.zona.tz}')
         return timezone.localtime(timefield, pytz.timezone(self.zona.tz))
 
     def full_domain(self):
@@ -58,18 +61,20 @@ class Dominio(models.Model):
     
     def last_change(self):
         return self.cambios.order_by('-momento').first()
-        
+    
     @classmethod
     def add_from_whois(cls, domain, mock_from_txt_file=None):
         from zonas.models import Zona
         from registrantes.models import Registrante
         from dnss.models import DNS
 
+        logger.info(f'Adding from WhoIs {domain}')
         wa = WhoAre()
         domain_name, zone = wa.detect_zone(domain)
         zona, _ = Zona.objects.get_or_create(nombre=zone)
         
         dominio, dominio_created = Dominio.objects.get_or_create(nombre=domain_name, zona=zona)
+        logger.info(f' - Dominio {dominio} Created: {dominio_created}')
         
         wa.load(domain, mock_from_txt_file=mock_from_txt_file)
 
@@ -88,6 +93,8 @@ class Dominio(models.Model):
             registrante.created = wa.registrant.created
             registrante.changed = wa.registrant.changed
             registrante.save()
+            logger.info(f' - Registrante {registrante} Created: {created}')
+        
             dominio.registrante = registrante
     
         dominio.registered = wa.domain.registered
@@ -122,13 +129,15 @@ class Dominio(models.Model):
         # delete exceding DNSs from previous version
         DNSDominio.objects.filter(dominio=dominio, orden__gt=len(wa.dnss)).delete()
 
+        # volver a calcular su prioridad
+        dominio.calculate_priority()
         return dominio
             
 
     def apply_new_version(self, whoare_object):
         """ Get a new version of domain, check differences and register changes """
-        
         wa = whoare_object
+        logger.info(f'Apply new version {self} {wa}')
         
         # ensure is the same
         assert self.nombre == wa.domain.base_name
@@ -194,13 +203,14 @@ class Dominio(models.Model):
             if r_val != w_val:
                 cambios.append({"campo": f"DNS{n+1}", "anterior": r_val, "nuevo": w_val})
 
-        
         have_changes = len(cambios) > 0
         main_change = CambiosDominio.objects.create(dominio=self, momento=timezone.now(), have_changes=have_changes)
 
         if have_changes:
             
             for cambio in cambios:
+                logger.info(f" - CAMBIO {cambio['campo']} FROM {cambio['anterior']} TO {cambio['nuevo']}")
+        
                 CampoCambio.objects.create(
                     cambio=main_change,
                     campo=cambio['campo'],
@@ -208,10 +218,8 @@ class Dominio(models.Model):
                     nuevo=cambio['nuevo'])
             
             self.data_updated = timezone.now()
-            # por un tiempo no lo miro
-            self.priority_to_update = 0
-            # volver a calcularlo en varios dias
-            self.next_update_priority = timezone.now() + timedelta(days=7)
+        else:
+            logger.info(f' - SIN CAMBIOS {self}')
         
     def calculate_priority(self):
         """ We need a way to know how to use resources
@@ -219,6 +227,7 @@ class Dominio(models.Model):
 
             Define a priority value and a next_update date for this domain
             """
+        logger
         day_seconds = 86400
         
         # days measures
