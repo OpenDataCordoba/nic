@@ -192,7 +192,7 @@ class Dominio(models.Model):
         if r_changed != w_changed:
             cambios.append({"campo": "registrant_changed", "anterior": r_changed, "nuevo": w_changed})
         
-        r_dnss = [d.dns.dominio for d in self.dnss.all()]
+        r_dnss = [d.dns.dominio for d in self.dnss.all().order_by('orden')]
         w_dnss = [d.name for d in wa.dnss]
         
         max_len = max(len(r_dnss), len(w_dnss))
@@ -247,6 +247,8 @@ class Dominio(models.Model):
         expired_since = int((timezone.now() - self.expire).total_seconds() / day_seconds)  # negative is still not expired
         # about to expire (~30 days) are importants
         expired_since += 30
+        # hay dominios vencidos hace años ...
+        expired_since = min(expired_since, 90)
         
         self.priority_to_update = expired_since * 7 + readed_since * 11 + updated_since * 2
         # volver a calcularlo en varios dias
