@@ -1,0 +1,29 @@
+language: python
+python:
+  - 3.6
+  - 3.7
+  - 3.8
+services: 
+  - postgresql
+addons:
+  postgresql: "9.6"
+  apt:
+    packages:
+    - postgresql-10-postgis-2.4
+env:
+  - DJANGO=3.1.2 DB=postgres
+before_install:
+  - sudo apt-get update
+  - sudo apt-get install binutils libproj-dev gdal-bin
+  - psql -c 'create database test_db;' -U postgres
+  - psql -U postgres -c "create extension postgis"
+install:
+  - pip install -r requirements.txt
+  - pip install -r dev-requirements.txt
+before_script:
+  - flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
+  - flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
+script:
+  - coverage erase
+  - coverage run manage.py test
+  - coverage report
