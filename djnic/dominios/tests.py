@@ -100,8 +100,3 @@ class CambioDominioTestCase(TestCase):
         # registered > free
         self.assertGreater(results['R30U70R10'], results['FU70R10'])
         self.assertGreater(results['R30U30R10'], results['FU30R10'])
-
-        # priorities
-        self.assertGreater(results['E10U90R70'], results['R10U90R80'])
-
-        

@@ -2,3 +2,8 @@ django==3.1.2
 whoare>=0.1.23
 mysql-connector-python>=8.0.21
 sshtunnel>=0.1.5
+psycopg2>=2.8.3
+psycopg2-binary>=2.8.3
+django-filter==2.4.0
+djangorestframework==3.12.1
+Markdown==3.3.2

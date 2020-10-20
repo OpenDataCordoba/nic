@@ -86,4 +86,4 @@ class Command(BaseCommand):
 
         # server.stop()
 
-        self.stdout.write(self.style.SUCCESS(f"{c} procesados, {nuevos_dominios} nuevos dominios. Nuevos registrantes: {nuevos_registrantes}. Skipped: {skipped}"))
+        self.stdout.write(self.style.SUCCESS(f"{c} procesados."))
