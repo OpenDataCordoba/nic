@@ -23,7 +23,7 @@ class Command(BaseCommand):
         for dominio in dominios:
             c += 1
             old_up = dominio.next_update_priority
-            dominio.calculate_priority
+            dominio.calculate_priority()
             self.stdout.write(self.style.SUCCESS(f"{c} {dominio.priority_to_update} {old_up} => {dominio.next_update_priority} {dominio}"))
 
         self.stdout.write(self.style.SUCCESS(f"{c} processed"))
