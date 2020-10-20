@@ -28,7 +28,7 @@ class Command(BaseCommand):
             c += 1
             self.stdout.write(self.style.SUCCESS(f"{c} {dominio}"))
             try:
-                Dominio.add_from_whois(domain=dominio)
+                dom_obj = Dominio.add_from_whois(domain=dominio)
             except TooManyQueriesError:
                 dlist.append(dominio)
                 self.stdout.write(self.style.SUCCESS(f"WHOIS TooManyQueriesError"))
@@ -36,7 +36,7 @@ class Command(BaseCommand):
             
             sleep(options['sleep'])
 
-            self.stdout.write(self.style.SUCCESS(f" - {dominio.priority_to_update} {dominio.next_update_priority}"))
+            self.stdout.write(self.style.SUCCESS(f" - {dom_obj}"))
 
         self.stdout.write(self.style.SUCCESS(f"{c} processed"))
         
