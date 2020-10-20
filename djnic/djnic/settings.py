@@ -130,7 +130,7 @@ LOGGING = {
             'level': 'INFO',
             'class': 'logging.FileHandler',
             'filename': 'djnic.log',
-            'formatter': 'verbose'
+            'formatter': 'console'
         },
     },
     'loggers': {
