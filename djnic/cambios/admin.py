@@ -11,6 +11,7 @@ class CambiosDominioAdmin(admin.ModelAdmin):
     list_per_page = 10
     list_select_related = ('dominio', )
     list_filter = ['have_changes']
+    search_fields = ['dominio__nombre']
 
 
 @admin.register(CampoCambio)
@@ -23,3 +24,5 @@ class CampoCambioAdmin(admin.ModelAdmin):
 
     list_display = ['dominio', 'momento', 'campo', 'anterior', 'nuevo']
     list_per_page = 10
+    list_filter = ['campo']
+    search_fields = ['cambio__dominio__nombre', 'campo', 'anterior', 'nuevo']
