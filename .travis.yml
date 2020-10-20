@@ -6,10 +6,12 @@ python:
 services: 
   - postgresql
 addons:
-  postgresql: "9.6"
+  postgresql: "10"
   apt:
     packages:
     - postgresql-10-postgis-2.4
+    - postgresql-10-postgis-2.4-scripts
+    - postgresql-client-10
 env:
   - DJANGO=3.1.2 DB=postgres
 before_install:
