@@ -12,12 +12,19 @@ logger = logging.getLogger(__name__)
 class Command(BaseCommand):
     help = 'Actualizar prioridad en los dominios'
 
+    def add_arguments(self, parser):
+        parser.add_argument('--force', nargs='?', type=bool, default=True)
+
     def handle(self, *args, **options):
 
-        dominios = Dominio.objects.filter(
-            Q(next_update_priority__isnull=True) | 
-            Q(next_update_priority__lt=timezone.now()) 
-        )
+        force = options['force']
+        if force:
+            dominios = Dominio.objects.all()
+        else:
+            dominios = Dominio.objects.filter(
+                Q(next_update_priority__isnull=True) | 
+                Q(next_update_priority__lt=timezone.now()) 
+            )
         
         c = 0
         for dominio in dominios:

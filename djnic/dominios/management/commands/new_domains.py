@@ -5,7 +5,6 @@ from django.core.management.base import BaseCommand, CommandError
 from django.db.models import Q
 from django.utils import timezone
 from dominios.models import Dominio
-from whoare.exceptions import TooManyQueriesError
 
 
 logger = logging.getLogger(__name__)
@@ -27,11 +26,10 @@ class Command(BaseCommand):
         for dominio in dlist:
             c += 1
             self.stdout.write(self.style.SUCCESS(f"{c} {dominio}"))
-            try:
-                dom_obj = Dominio.add_from_whois(domain=dominio)
-            except TooManyQueriesError:
+            dom_obj = Dominio.add_from_whois(domain=dominio)
+            if dom_obj is None:
                 dlist.append(dominio)
-                self.stdout.write(self.style.SUCCESS(f"WHOIS TooManyQueriesError"))
+                self.stdout.write(self.style.SUCCESS(f"WHOIS TooManyQueriesError Error"))
                 sleep(15)
             
             sleep(options['sleep'])
