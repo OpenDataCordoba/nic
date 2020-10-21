@@ -14,8 +14,7 @@ class Command(BaseCommand):
     help = 'Actualziar datos de dominios'
 
     def add_arguments(self, parser):
-        parser.add_argument('--sleep', nargs='?', type=int, default=10)
-
+        parser.add_argument('--sleep', nargs='?', type=int, default=41)
 
     def handle(self, *args, **options):
         f = open('news.txt', 'r')
@@ -23,18 +22,23 @@ class Command(BaseCommand):
         f.close()
         dlist = doms.split('\n')
         c = 0
+        errors = 0
         for dominio in dlist:
             c += 1
-            self.stdout.write(self.style.SUCCESS(f"{c} {dominio}"))
+            self.stdout.write(self.style.SUCCESS(f"{c} [{errors}] {dominio}"))
             dom_obj = Dominio.add_from_whois(domain=dominio)
             if dom_obj is None:
                 dlist.append(dominio)
+                errors += 1
                 self.stdout.write(self.style.SUCCESS(f"WHOIS TooManyQueriesError Error"))
                 sleep(15)
             
+            if dom_obj == True:
+                continue
+            
             sleep(options['sleep'])
 
-            self.stdout.write(self.style.SUCCESS(f" - {dom_obj}"))
+            self.stdout.write(self.style.SUCCESS(f" - {dominio} {dom_obj}"))
 
         self.stdout.write(self.style.SUCCESS(f"{c} processed"))
         

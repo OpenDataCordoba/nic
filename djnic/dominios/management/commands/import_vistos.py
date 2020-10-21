@@ -61,7 +61,8 @@ class Command(BaseCommand):
             
             for cambio in cursor:
                 c += 1
-                
+                if cambio['momento'] is None:
+                    continue
                 momento = tz.localize(cambio['momento'], is_dst=True)
                 max_diff = timedelta(hours=12)
                 desde = momento - max_diff
