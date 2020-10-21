@@ -17,13 +17,13 @@ class CambioDominioTestCase(TestCase):
         with self.assertRaises(UnexpectedDomainError):
             Dominio.add_from_whois('fake.com.ar', mock_from_txt_file='djnic/whosamples/sample_fernet.txt')
         
-        dominio = Dominio.add_from_whois('fernet.com.ar', mock_from_txt_file='djnic/whosamples/sample_fernet.txt')
+        dominio = Dominio.add_from_whois('fernet.com.ar', just_new=False, mock_from_txt_file='djnic/whosamples/sample_fernet.txt')
         self.assertEqual(dominio.estado, STATUS_NO_DISPONIBLE)
         # nothing change until here
         self.assertEqual(dominio.cambios.count(), 0)
         self.assertEqual(dominio.dnss.count(), 2)
         
-        dominio2 = Dominio.add_from_whois('fernet.com.ar', mock_from_txt_file='djnic/whosamples/sample_fernet_updated.txt')
+        dominio2 = Dominio.add_from_whois('fernet.com.ar', just_new=False, mock_from_txt_file='djnic/whosamples/sample_fernet_updated.txt')
         self.assertEqual(dominio.cambios.count(), 1)
         self.assertEqual(dominio.cambios.first().campos.count(), 8)
         
@@ -46,7 +46,7 @@ class CambioDominioTestCase(TestCase):
         self.assertEqual(dominio.cambios.count(), 0)
         self.assertEqual(dominio.dnss.count(), 0)
         
-        dominio2 = Dominio.add_from_whois('free.com.ar', mock_from_txt_file='djnic/whosamples/sample_free_updated.txt')
+        dominio2 = Dominio.add_from_whois('free.com.ar', just_new=False, mock_from_txt_file='djnic/whosamples/sample_free_updated.txt')
         self.assertEqual(dominio.cambios.count(), 1)
         self.assertEqual(dominio.dnss.count(), 2)
         self.assertEqual(dominio.last_change().campos.count(), 10)
@@ -63,7 +63,7 @@ class CambioDominioTestCase(TestCase):
         self.assertEqual(CampoCambio.objects.filter(cambio=main_change, campo='DNS1', anterior='', nuevo='ns1.free.com').count(), 1)
         self.assertEqual(CampoCambio.objects.filter(cambio=main_change, campo='DNS2', anterior='', nuevo='ns2.free.com').count(), 1)
         
-        dominio3 = Dominio.add_from_whois('free.com.ar', mock_from_txt_file='djnic/whosamples/sample_free_updated_2.txt')
+        dominio3 = Dominio.add_from_whois('free.com.ar', just_new=False, mock_from_txt_file='djnic/whosamples/sample_free_updated_2.txt')
         self.assertEqual(dominio.cambios.count(), 2)
         self.assertEqual(dominio.dnss.count(), 2)
         self.assertEqual(dominio.last_change().campos.count(), 1)
@@ -72,7 +72,7 @@ class CambioDominioTestCase(TestCase):
         self.assertEqual(CampoCambio.objects.filter(cambio=main_change, campo='dominio_expire', anterior='', nuevo='2024-02-07 09:00:00').count(), 1)
         
         # back to free
-        dominio4 = Dominio.add_from_whois('free.com.ar', mock_from_txt_file='djnic/whosamples/sample_free.txt')
+        dominio4 = Dominio.add_from_whois('free.com.ar', just_new=False, mock_from_txt_file='djnic/whosamples/sample_free.txt')
         self.assertEqual(dominio.estado, STATUS_DISPONIBLE)
         self.assertIsNone(dominio.registrante)
         # nothing change until here
