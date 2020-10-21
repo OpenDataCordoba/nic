@@ -6,6 +6,10 @@ from django.utils import timezone
 from whoare.whoare import WhoAre
 from whoare.exceptions import TooManyQueriesError
 from cambios.models import CambiosDominio, CampoCambio
+from zonas.models import Zona
+from registrantes.models import Registrante
+from dnss.models import DNS
+
 
 STATUS_DISPONIBLE = 'disponible'
 STATUS_NO_DISPONIBLE = 'no disponible'
@@ -68,10 +72,7 @@ class Dominio(models.Model):
         """ create or update a domain from WhoIs info
             Returns None if error or the domain object
             """
-        from zonas.models import Zona
-        from registrantes.models import Registrante
-        from dnss.models import DNS
-
+        
         logger.info(f'Adding from WhoIs {domain}')
         wa = WhoAre()
         domain_name, zone = wa.detect_zone(domain)
