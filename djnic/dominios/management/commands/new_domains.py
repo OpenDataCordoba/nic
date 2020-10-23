@@ -26,7 +26,7 @@ class Command(BaseCommand):
         for dominio in dlist:
             c += 1
             self.stdout.write(self.style.SUCCESS(f"{c} [{errors}] {dominio}"))
-            dom_obj = Dominio.add_from_whois(domain=dominio)
+            dom_obj = Dominio.add_from_whois(domain=dominio, just_new=True)
             if dom_obj is None:
                 dlist.append(dominio)
                 errors += 1

@@ -15,8 +15,8 @@ class Command(BaseCommand):
     help = 'Actualziar datos de dominios'
 
     def add_arguments(self, parser):
-        parser.add_argument('--limit', nargs='?', type=int, default=10)
-        parser.add_argument('--sleep', nargs='?', type=int, default=10)
+        parser.add_argument('--limit', nargs='?', type=int, default=10000)
+        parser.add_argument('--sleep', nargs='?', type=int, default=41)
 
 
     def handle(self, *args, **options):
@@ -24,13 +24,15 @@ class Command(BaseCommand):
         dominios = Dominio.objects.all().order_by('-priority_to_update')[:limit]
         print(dominios)
         c = 0
+        errors = 0
         for dominio in dominios:
             c += 1
-            self.stdout.write(self.style.SUCCESS(f"{c} {dominio} expire:{dominio.expire} \n\tpts:{dominio.priority_to_update} \n\tnext:{dominio.next_update_priority}"))
+            self.stdout.write(self.style.SUCCESS(f"{c} {errors} {dominio} expire:{dominio.expire} \n\tpts:{dominio.priority_to_update} \n\tnext:{dominio.next_update_priority}"))
             try:
                 Dominio.add_from_whois(domain=dominio.full_domain())
             except TooManyQueriesError:
                 self.stdout.write(self.style.SUCCESS(f"WHOIS TooManyQueriesError"))
+                errors += 1
                 sleep(15)
             
             sleep(options['sleep'])

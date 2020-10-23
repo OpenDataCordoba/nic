@@ -68,7 +68,7 @@ class Dominio(models.Model):
         return self.cambios.order_by('-momento').first()
     
     @classmethod
-    def add_from_whois(cls, domain, just_new=True, mock_from_txt_file=None):
+    def add_from_whois(cls, domain, just_new=False, mock_from_txt_file=None):
         """ create or update a domain from WhoIs info
             Returns None if error or the domain object
             """
@@ -77,33 +77,38 @@ class Dominio(models.Model):
         wa = WhoAre()
         domain_name, zone = wa.detect_zone(domain)
         zona, _ = Zona.objects.get_or_create(nombre=zone)
-        
-        try:
-            wa.load(domain, mock_from_txt_file=mock_from_txt_file)
-        except TooManyQueriesError:
-            return None
 
         if just_new:
             dominios = Dominio.objects.filter(nombre=domain_name, zona=zona)
             if dominios.count() > 0:
                 if dominios[0].data_updated is not None:
-                    return dominios[0]
-
+                    return True
         
+        try:
+            wa.load(domain, mock_from_txt_file=mock_from_txt_file)
+        except TooManyQueriesError:
+            return None
+        
+        dominio, dominio_created = Dominio.objects.get_or_create(nombre=wa.domain.base_name, zona=wa.domain.zone)
         # create a domain after being sure we don't have any whoare errors
-        dominio, dominio_created = Dominio.objects.get_or_create(nombre=domain_name, zona=zona)
         logger.info(f' - Dominio {dominio} Created: {dominio_created}')
         
-        dominio.data_readed = timezone.now()
-
-        # is already exist analyze and register changes
-        if not dominio_created:
-            dominio.apply_new_version(whoare_object=wa)
-        else:
-            # TODO test this field behaviour
-            dominio.data_updated = timezone.now()
+        return dominio.update_from_wa_object(wa, just_created=dominio_created)
+            
+    def update_from_wa_object(self, wa, just_created):
+        """ Update a domain from a WhoAre object
+            To use from external users and from local generation """
         
-        dominio.estado = STATUS_DISPONIBLE if wa.domain.is_free else STATUS_NO_DISPONIBLE
+        self.data_readed = timezone.now()
+
+        cambios = []
+        # is already exist analyze and register changes
+        if not just_created:
+            cambios = self.apply_new_version(whoare_object=wa)
+        else:
+            self.data_updated = timezone.now()
+
+        self.estado = STATUS_DISPONIBLE if wa.domain.is_free else STATUS_NO_DISPONIBLE
 
         if wa.registrant is not None:
             registrante, created = Registrante.objects.get_or_create(legal_uid=wa.registrant.legal_uid)
@@ -114,20 +119,20 @@ class Dominio(models.Model):
             registrante.save()
             logger.info(f' - Registrante {registrante} Created: {created}')
         
-            dominio.registrante = registrante
+            self.registrante = registrante
     
-        dominio.registered = wa.domain.registered
-        dominio.changed = wa.domain.changed
-        dominio.expire = wa.domain.expire
+        self.registered = wa.domain.registered
+        self.changed = wa.domain.changed
+        self.expire = wa.domain.expire
 
-        dominio.save()
+        self.save()
 
         orden = 1
         for ns in wa.dnss:
             new_dns, dns_created = DNS.objects.get_or_create(dominio=ns.name)
             
             # get previous DNS in this order
-            previous = DNSDominio.objects.filter(dominio=dominio, orden=orden)
+            previous = DNSDominio.objects.filter(dominio=self, orden=orden)
             if previous.count() > 0:
             
                 dns_found = False
@@ -138,20 +143,19 @@ class Dominio(models.Model):
                     else:
                         dns_found = True
                 if not dns_found:
-                    DNSDominio.objects.create(dominio=dominio, dns=new_dns, orden=orden)
+                    DNSDominio.objects.create(dominio=self, dns=new_dns, orden=orden)
 
             elif previous.count() == 0:    
-                DNSDominio.objects.create(dominio=dominio, dns=new_dns, orden=orden)
+                DNSDominio.objects.create(dominio=self, dns=new_dns, orden=orden)
                     
             orden += 1
         
         # delete exceding DNSs from previous version
-        DNSDominio.objects.filter(dominio=dominio, orden__gt=len(wa.dnss)).delete()
+        DNSDominio.objects.filter(dominio=self, orden__gt=len(wa.dnss)).delete()
 
         # volver a calcular su prioridad
-        dominio.calculate_priority()
-        return dominio
-            
+        self.calculate_priority()
+        return cambios
 
     def apply_new_version(self, whoare_object):
         """ Get a new version of domain, check differences and register changes """
@@ -239,6 +243,8 @@ class Dominio(models.Model):
             self.data_updated = timezone.now()
         else:
             logger.info(f' - SIN CAMBIOS {self}')
+        
+        return cambios
         
     def calculate_priority(self):
         """ We need a way to know how to use resources
