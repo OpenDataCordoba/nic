@@ -270,7 +270,7 @@ class Dominio(models.Model):
         
         if self.estado == STATUS_DISPONIBLE:
             
-            self.priority_to_update = readed_since + updated_since
+            self.priority_to_update = readed_since + updated_since - 150
             self.next_update_priority = timezone.now() + timedelta(days=updated_since * 10)
             self.save()
             return self
@@ -279,8 +279,7 @@ class Dominio(models.Model):
             expired_since = 0
         else:
             expired_since = int((timezone.now() - self.expire).total_seconds() / day_seconds)  # negative is still not expired
-            # about to expire (~30 days) are importants
-            expired_since += 30
+            
             # hay dominios vencidos hace años ...
             if expired_since > 130:
                 expired_since = -expired_since

@@ -111,5 +111,5 @@ class CambioDominioTestCase(TestCase):
         # bad ones
         self.assertGreater(results['R30U70R10'], results['R1500U300R300'])
         self.assertGreater(results['R30U70R10'], results['E1500U300R300'])
-        self.assertGreater(results['R30U70R10'], results['FU300R300'])
+        self.assertGreater(results['R30U70R20'], results['FU300R300'])
         
