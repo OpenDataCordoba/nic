@@ -10,6 +10,8 @@ from rest_framework.authentication import TokenAuthentication
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import filters
 from django.http import JsonResponse
+from django.utils.decorators import method_decorator
+from django.views.decorators.cache import never_cache
 from rest_framework.decorators import action
 from dominios.models import Dominio
 from zonas.models import Zona
@@ -62,7 +64,7 @@ class DominioViewSet(viewsets.ModelViewSet):
         }
         return JsonResponse(res)
 
-
+@method_decorator(never_cache, name='dispatch')
 class NextPriorityDomainViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
@@ -71,7 +73,7 @@ class NextPriorityDomainViewSet(viewsets.ModelViewSet):
         
         # remove priority
         random_item.priority_to_update = 0
-        random_item.next_update_priority = timezone.now() + timedelta(days=3)    
+        random_item.next_update_priority = timezone.now() + timedelta(days=15)    
         random_item.save()
 
         return Dominio.objects.filter(pk=random_item.id)
