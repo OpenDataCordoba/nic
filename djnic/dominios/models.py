@@ -256,38 +256,18 @@ class Dominio(models.Model):
         day_seconds = 86400
         
         # days measures
-        if self.data_updated is None:
-            updated_since = 0
-        else:
-            updated_since = int((timezone.now() - self.data_updated).total_seconds() / day_seconds)
-            updated_since = min(updated_since, 120)
-
-        if self.data_readed is None:
-            readed_since = 0
-        else:
-            readed_since = int((timezone.now() - self.data_readed).total_seconds() / day_seconds)
-            readed_since = min(readed_since, 60)
+        updated_since = 0 if self.data_updated is None else int((timezone.now() - self.data_updated).total_seconds() / day_seconds)
+        readed_since = 0 if self.data_readed is None else int((timezone.now() - self.data_readed).total_seconds() / day_seconds)
+        expired_since = 0 if self.expire is None else int((timezone.now() - self.expire).total_seconds() / day_seconds)  
         
-        if self.estado == STATUS_DISPONIBLE:
-            
-            self.priority_to_update = readed_since + updated_since - 150
-            self.next_update_priority = timezone.now() + timedelta(days=updated_since * 10)
-            self.save()
-            return self
-
-        if self.expire is None:
-            expired_since = 0
+        if self.zona.nombre == 'ar' or self.zona.nombre.endswith('.ar'):
+            from dominios.priority.ar import calculate_priority
+            priority = calculate_priority(expired_since, readed_since, updated_since, self.estado)
         else:
-            # negative is still not expired or expire in most than 30 days
-            expired_since = 30 + int((timezone.now() - self.expire).total_seconds() / day_seconds)  
-            
-            # hay dominios vencidos hace años ...
-            if expired_since > 130:
-                expired_since = -expired_since
-        
-        self.priority_to_update = expired_since * 15 + readed_since * 11 + updated_since * 2
-        # volver a calcularlo en varios dias
-        self.next_update_priority = timezone.now() + timedelta(days=3)
+            raise Exception('Unknown domain')
+
+        self.priority_to_update = priority
+        self.next_update_priority = timezone.now() + timedelta(days=7)
         self.save()
         return self
         
