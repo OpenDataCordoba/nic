@@ -1,7 +1,7 @@
 from datetime import timedelta
 import json
 import logging
-from django.db.models import Count
+from django.db.models import Count, F
 from django.db.models.functions import Trunc
 from django.utils import timezone
 from django.views import View
@@ -39,6 +39,13 @@ class GeneralStatsViews(View):
             .values('week_updated')\
             .annotate(total=Count('week_updated'))
         ret['actualizados_ultimas_semanas'] = list(por_dias)
+
+        # por estado
+        por_zona = dominios.values(nombre_zona=F('zona__nombre')).annotate(total=Count('zona'))
+        ret['zona'] = list(por_zona)
+
+        prioridades = dominios.values('nombre', 'zona__nombre', 'priority_to_update', 'expire', 'data_readed', 'data_updated').order_by('-priority_to_update')[:200]
+        ret['prioridades'] = list(prioridades)
 
         # return JsonResponse({'ok': False, 'error': 'Missing WhoAre version'}, status=400)
         return JsonResponse({'ok': True, 'data': ret}, status=200)
