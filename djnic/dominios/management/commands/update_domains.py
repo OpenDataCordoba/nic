@@ -4,7 +4,7 @@ from time import sleep
 from django.core.management.base import BaseCommand, CommandError
 from django.db.models import Q
 from django.utils import timezone
-from dominios.models import Dominio
+from dominios.models import Dominio, STATUS_NO_DISPONIBLE, STATUS_DISPONIBLE
 from whoare.exceptions import TooManyQueriesError
 
 
@@ -25,16 +25,36 @@ class Command(BaseCommand):
         print(dominios)
         c = 0
         errors = 0
+
+        sin_cambios = 0
+        caidos = 0
+        nuevos = 0
+        renovados = 0
+
         for dominio in dominios:
             c += 1
-            self.stdout.write(self.style.SUCCESS(f"{c} {errors} {dominio} expire:{dominio.expire} \n\tpts:{dominio.priority_to_update} \n\tnext:{dominio.next_update_priority}"))
+            log_cambios = f'sin_cambios {sin_cambios} caidos {caidos} nuevos {nuevos} renovados {renovados}'
+            self.stdout.write(self.style.SUCCESS(f"{c} {errors} {log_cambios} {dominio} expire:{dominio.expire} readed: {dominio.data_readed}"))
             try:
-                Dominio.add_from_whois(domain=dominio.full_domain())
+                cambios = Dominio.add_from_whois(domain=dominio.full_domain())
             except TooManyQueriesError:
                 self.stdout.write(self.style.SUCCESS(f"WHOIS TooManyQueriesError"))
                 errors += 1
                 sleep(15)
+
+            if cambios == []:
+                sin_cambios += 1
+            elif 'estado' in [c['campo'] for c in cambios]:
+                for cambio in cambios:
+                    if cambio['campo'] == 'estado':
+                        if cambio['anterior'] == STATUS_DISPONIBLE:
+                            nuevos += 1
+                        elif cambio['anterior'] == STATUS_NO_DISPONIBLE:
+                            caidos += 1
+            elif 'dominio_expire' in [c['campo'] for c in cambios]:
+                renovados += 1
             
+
             sleep(options['sleep'])
 
             self.stdout.write(self.style.SUCCESS(f" - {dominio.priority_to_update} {dominio.next_update_priority}"))
