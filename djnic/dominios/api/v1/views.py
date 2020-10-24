@@ -40,10 +40,10 @@ class DominioViewSet(viewsets.ModelViewSet):
         final_data = json.loads(real_data_str)
         
         if final_data.get('whoare_version', None) is None:
-            return JsonResponse({'ok': False, 'error': 'Missing WhoAre version'}, status_code=400)
+            return JsonResponse({'ok': False, 'error': 'Missing WhoAre version'}, status=400)
         
         if final_data['whoare_version'] < '0.1.29':
-            return JsonResponse({'ok': False, 'error': 'Unexpected WhoAre version'}, status_code=400)
+            return JsonResponse({'ok': False, 'error': 'Unexpected WhoAre version'}, status=400)
         
         wa = WhoAre()
         wa.from_dict(final_data)

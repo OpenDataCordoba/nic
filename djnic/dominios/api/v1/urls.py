@@ -8,5 +8,6 @@ router.register(r'dominio', DominioViewSet)
 router.register(r'next-priority', NextPriorityDomainViewSet, basename='next-priority')
 
 urlpatterns = [
+    path('stats/', include('dominios.api.v1.urls_stats')),
     path('', include(router.urls)),
 ]
