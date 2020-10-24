@@ -58,6 +58,12 @@ class CambioDominioTestCase(TestCase):
         # FU300R300
         self.create_domain(status=STATUS_DISPONIBLE, delta_updated=timedelta(days=300), delta_readed=timedelta(days=300))
 
+        # most importants
+        # E60U300R10
+        self.create_domain(delta_expire=timedelta(days=-60), delta_updated=timedelta(days=300), delta_readed=timedelta(days=10))
+        # R5U300R380
+        self.create_domain(delta_expire=timedelta(days=5), delta_updated=timedelta(days=300), delta_readed=timedelta(days=380))
+
         # ver en este contexto cuales son los prioritarios
         dominios = Dominio.objects.all().order_by('-priority_to_update')
 
@@ -112,4 +118,7 @@ class CambioDominioTestCase(TestCase):
         self.assertGreater(results['R30U70R10'], results['R1500U300R300'])
         self.assertGreater(results['R30U70R10'], results['E1500U300R300'])
         self.assertGreater(results['R30U70R20'], results['FU300R300'])
+        
+        # Important
+        self.assertGreater(results['E60U300R10'], results['R5U300R380'])
         
