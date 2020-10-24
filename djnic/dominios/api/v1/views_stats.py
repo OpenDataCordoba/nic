@@ -44,8 +44,18 @@ class GeneralStatsViews(View):
         por_zona = dominios.values(nombre_zona=F('zona__nombre')).annotate(total=Count('zona'))
         ret['zona'] = list(por_zona)
 
-        prioridades = dominios.values('nombre', 'zona__nombre', 'priority_to_update', 'expire', 'data_readed', 'data_updated').order_by('-priority_to_update')[:200]
-        ret['prioridades'] = list(prioridades)
+        prioridades = dominios.order_by('-priority_to_update')
+        ret['prioridades'] = []
+        for c in [1, 100, 1000, 5000, 10000, 20000]:
+            if c < prioridades.count():
+                ret['prioridades'].append(
+                    {   'order': c,
+                        'dominio': prioridades[c].full_domain(), 
+                        'priority_to_update': prioridades[c].priority_to_update, 
+                        'expire': prioridades[c].expire, 
+                        'data_readed': prioridades[c].data_readed, 
+                        'data_updated': prioridades[c].data_updated
+                    })
 
         # return JsonResponse({'ok': False, 'error': 'Missing WhoAre version'}, status=400)
         return JsonResponse({'ok': True, 'data': ret}, status=200)
