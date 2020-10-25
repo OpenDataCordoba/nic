@@ -22,3 +22,13 @@ class DominioSerializer(serializers.ModelSerializer):
         fields = ['id', 'domain', 'data_updated', 'data_readed', 'estado',
                   'registered', 'changed', 'expire', 'priority_to_update',
                   'next_update_priority', 'registrante', 'cambios']
+
+
+class FlatDominioSerializer(serializers.ModelSerializer):
+    domain = serializers.CharField(read_only=True, source='full_domain')
+    
+    class Meta:
+        model = Dominio
+        fields = ['id', 'domain', 'data_updated', 'data_readed', 'estado',
+                  'registered', 'changed', 'expire', 'priority_to_update',
+                  'next_update_priority']

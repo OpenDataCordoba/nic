@@ -17,7 +17,7 @@ from rest_framework.decorators import action
 from dominios.models import Dominio, STATUS_DISPONIBLE, STATUS_NO_DISPONIBLE
 from zonas.models import Zona
 from cambios.models import CampoCambio
-from .serializer import DominioSerializer, CambiosDominioSerializer
+from .serializer import DominioSerializer, CambiosDominioSerializer, FlatDominioSerializer
 
 logger = logging.getLogger(__name__)
 
@@ -83,7 +83,7 @@ class NextPriorityDomainViewSet(viewsets.ModelViewSet):
 
         return Dominio.objects.filter(pk=random_item.id)
     
-    serializer_class = DominioSerializer
+    serializer_class = FlatDominioSerializer
     
 
 class UltimosCaidosViewSet(viewsets.ModelViewSet):
