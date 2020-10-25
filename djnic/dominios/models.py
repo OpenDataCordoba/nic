@@ -61,6 +61,9 @@ class Dominio(models.Model):
         zona = '' if self.zona is None else self.zona.nombre
         return f'{nombre}.{zona}'
 
+    def ultimo_cambio(self):
+        return self.cambios.order_by('-momento').first()
+
     def __str__(self):
         return self.full_domain()
     

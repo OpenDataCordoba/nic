@@ -10,13 +10,14 @@ from rest_framework.authentication import TokenAuthentication, SessionAuthentica
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import filters
 from django.http import JsonResponse
+from django.db.models import F, Q
 from django.utils.decorators import method_decorator
 from django.views.decorators.cache import never_cache
 from rest_framework.decorators import action
 from dominios.models import Dominio, STATUS_DISPONIBLE, STATUS_NO_DISPONIBLE
 from zonas.models import Zona
 from cambios.models import CampoCambio
-from .serializer import DominioSerializer, CaidosDominioSerializer
+from .serializer import DominioSerializer, CambiosDominioSerializer
 
 logger = logging.getLogger(__name__)
 
@@ -98,7 +99,81 @@ class UltimosCaidosViewSet(viewsets.ModelViewSet):
         queryset = Dominio.objects.filter(id__in=ids)
         return queryset
 
-    serializer_class = CaidosDominioSerializer
+    serializer_class = CambiosDominioSerializer
+    permission_classes = [DjangoModelPermissions]
+    authentication_classes = [TokenAuthentication, SessionAuthentication]
+    filter_backends = [DjangoFilterBackend, filters.OrderingFilter]
+    filterset_fields = ['estado', 'nombre', 'expire']
+    search_fields = ['nombre']
+    ordering_fields = '__all__'
+    ordering = ['nombre']
+
+
+class UltimosRenovadosViewSet(viewsets.ModelViewSet):
+    """ ultimo dominios que se renovaron """
+
+    def get_queryset(self):
+        campos = CampoCambio.objects.filter(
+            campo='dominio_expire',
+            nuevo__gt=F('nuevo'))\
+                .order_by('-cambio__momento')[:100]
+        ids = [cc.cambio.dominio.id for cc in campos]
+        queryset = Dominio.objects.filter(id__in=ids)
+        return queryset
+
+    serializer_class = CambiosDominioSerializer
+    permission_classes = [DjangoModelPermissions]
+    authentication_classes = [TokenAuthentication, SessionAuthentication]
+    filter_backends = [DjangoFilterBackend, filters.OrderingFilter]
+    filterset_fields = ['estado', 'nombre', 'expire']
+    search_fields = ['nombre']
+    ordering_fields = '__all__'
+    ordering = ['nombre']
+
+
+class UltimosTranspasadosViewSet(viewsets.ModelViewSet):
+    """ ultimo dominios que pasaron a nuevos dueños """
+
+    def get_queryset(self):
+        campos = CampoCambio.objects.filter(
+            campo='registrant_legal_uid',
+            nuevo__isnull=False,
+            anterior__isnull=False)\
+            .exclude(
+                Q(nuevo__exact='') | Q(anterior__exact=''))\
+            .order_by('-cambio__momento')[:100]
+
+        ids = [cc.cambio.dominio.id for cc in campos]
+        queryset = Dominio.objects.filter(id__in=ids)
+        return queryset
+
+    serializer_class = CambiosDominioSerializer
+    permission_classes = [DjangoModelPermissions]
+    authentication_classes = [TokenAuthentication, SessionAuthentication]
+    filter_backends = [DjangoFilterBackend, filters.OrderingFilter]
+    filterset_fields = ['estado', 'nombre', 'expire']
+    search_fields = ['nombre']
+    ordering_fields = '__all__'
+    ordering = ['nombre']
+
+
+class UltimosCambioDNSViewSet(viewsets.ModelViewSet):
+    """ ultimo dominios que pasaron a nuevos dueños """
+
+    def get_queryset(self):
+        campos = CampoCambio.objects.filter(
+            campo='DNS1',
+            nuevo__isnull=False,
+            anterior__isnull=False)\
+            .exclude(
+                Q(nuevo__exact='') | Q(anterior__exact=''))\
+            .order_by('-cambio__momento')[:100]
+
+        ids = [cc.cambio.dominio.id for cc in campos]
+        queryset = Dominio.objects.filter(id__in=ids)
+        return queryset
+
+    serializer_class = CambiosDominioSerializer
     permission_classes = [DjangoModelPermissions]
     authentication_classes = [TokenAuthentication, SessionAuthentication]
     filter_backends = [DjangoFilterBackend, filters.OrderingFilter]
