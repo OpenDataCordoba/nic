@@ -13,9 +13,10 @@ from django.http import JsonResponse
 from django.utils.decorators import method_decorator
 from django.views.decorators.cache import never_cache
 from rest_framework.decorators import action
-from dominios.models import Dominio
+from dominios.models import Dominio, STATUS_DISPONIBLE, STATUS_NO_DISPONIBLE
 from zonas.models import Zona
-from .serializer import DominioSerializer
+from cambios.models import CampoCambio
+from .serializer import DominioSerializer, CaidosDominioSerializer
 
 logger = logging.getLogger(__name__)
 
@@ -83,3 +84,25 @@ class NextPriorityDomainViewSet(viewsets.ModelViewSet):
     
     serializer_class = DominioSerializer
     
+
+class UltimosCaidosViewSet(viewsets.ModelViewSet):
+    """ ultimo dominios que pasaron a estar disponibles """
+
+    def get_queryset(self):
+        campo_caidos = CampoCambio.objects.filter(
+            campo='estado',
+            anterior=STATUS_NO_DISPONIBLE,
+            nuevo=STATUS_DISPONIBLE)\
+                .order_by('-cambio__momento')[:100]
+        ids = [cc.cambio.dominio.id for cc in campo_caidos]
+        queryset = Dominio.objects.filter(id__in=ids)
+        return queryset
+
+    serializer_class = CaidosDominioSerializer
+    permission_classes = [DjangoModelPermissions]
+    authentication_classes = [TokenAuthentication, SessionAuthentication]
+    filter_backends = [DjangoFilterBackend, filters.OrderingFilter]
+    filterset_fields = ['estado', 'nombre', 'expire']
+    search_fields = ['nombre']
+    ordering_fields = '__all__'
+    ordering = ['nombre']

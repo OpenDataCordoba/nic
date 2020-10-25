@@ -4,6 +4,13 @@ from registrantes.api.v1.serializer import RegistrantSerializer
 from cambios.api.v1.serializer import CambiosDominioSerializer
 
 
+class CaidosDominioSerializer(serializers.ModelSerializer):
+    domain = serializers.CharField(read_only=True, source='full_domain')
+    
+    class Meta:
+        model = Dominio
+        fields = ['id', 'domain', 'data_updated', 'data_readed']
+
 class DominioSerializer(serializers.ModelSerializer):
     domain = serializers.CharField(read_only=True, source='full_domain')
     registrante = RegistrantSerializer()
@@ -11,7 +18,6 @@ class DominioSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Dominio
-        
         fields = ['id', 'domain', 'data_updated', 'data_readed', 'estado',
                   'registered', 'changed', 'expire', 'priority_to_update',
                   'next_update_priority', 'registrante', 'cambios']
