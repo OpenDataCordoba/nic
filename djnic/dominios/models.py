@@ -120,6 +120,8 @@ class Dominio(models.Model):
             logger.info(f' - Registrante {registrante} Created: {created}')
         
             self.registrante = registrante
+        else:
+            self.registrante = None
     
         self.registered = wa.domain.registered
         self.changed = wa.domain.changed
