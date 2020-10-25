@@ -1,15 +1,17 @@
 from rest_framework import serializers
 from dominios.models import Dominio
+from registrantes.api.v1.serializer import RegistrantSerializer
+from cambios.api.v1.serializer import CambiosDominioSerializer
 
 
 class DominioSerializer(serializers.ModelSerializer):
     domain = serializers.CharField(read_only=True, source='full_domain')
+    registrante = RegistrantSerializer()
+    cambios = CambiosDominioSerializer(many=True)
+
     class Meta:
         model = Dominio
         
         fields = ['id', 'domain', 'data_updated', 'data_readed', 'estado',
                   'registered', 'changed', 'expire', 'priority_to_update',
-                  'next_update_priority']    
-                # TODO add zona
-                # TODO add registrante
-    
+                  'next_update_priority', 'registrante', 'cambios']

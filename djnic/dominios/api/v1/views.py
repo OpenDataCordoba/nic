@@ -6,7 +6,7 @@ from whoare.whoare import WhoAre
 from django.utils import timezone
 from rest_framework import viewsets
 from rest_framework.permissions import DjangoModelPermissions
-from rest_framework.authentication import TokenAuthentication
+from rest_framework.authentication import TokenAuthentication, SessionAuthentication
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import filters
 from django.http import JsonResponse
@@ -23,7 +23,7 @@ class DominioViewSet(viewsets.ModelViewSet):
     queryset = Dominio.objects.all()
     serializer_class = DominioSerializer
     permission_classes = [DjangoModelPermissions]
-    authentication_classes = [TokenAuthentication]
+    authentication_classes = [TokenAuthentication, SessionAuthentication]
     filter_backends = [DjangoFilterBackend, filters.OrderingFilter]
     filterset_fields = ['estado', 'nombre', 'expire']
     search_fields = ['nombre']
@@ -66,6 +66,9 @@ class DominioViewSet(viewsets.ModelViewSet):
 
 @method_decorator(never_cache, name='dispatch')
 class NextPriorityDomainViewSet(viewsets.ModelViewSet):
+    
+    permission_classes = [DjangoModelPermissions]
+    authentication_classes = [TokenAuthentication, SessionAuthentication]
 
     def get_queryset(self):
         queryset = Dominio.objects.all().order_by('-priority_to_update')[:100]
