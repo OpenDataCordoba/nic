@@ -20,6 +20,6 @@ class RegistrantViewSet(viewsets.ModelViewSet):
     permission_classes = [DjangoModelPermissions]
     authentication_classes = [TokenAuthentication, SessionAuthentication]
     filter_backends = [DjangoFilterBackend, filters.OrderingFilter]
-    search_fields = ['name', 'legal_id']
+    search_fields = ['name', 'legal_uid']
     ordering_fields = '__all__'
     ordering = ['name']
