@@ -11,13 +11,12 @@ from dominios.models import Dominio
 logger = logging.getLogger(__name__)
 
 
-class GeneralStatsViews(View):
+class GeneralStatsView(View):
     def get(self, request):
         ret = {}
         dominios = Dominio.objects.all()
         ret['total_dominios'] = dominios.count()
-        # por zona
-
+        
         # por estado
         por_estado = dominios.values('estado').annotate(total=Count('estado'))
         ret['estado'] = list(por_estado)
@@ -44,9 +43,19 @@ class GeneralStatsViews(View):
         por_zona = dominios.values(nombre_zona=F('zona__nombre')).annotate(total=Count('zona'))
         ret['zona'] = list(por_zona)
 
+        # return JsonResponse({'ok': False, 'error': 'Missing WhoAre version'}, status=400)
+        return JsonResponse({'ok': True, 'data': ret}, status=200)
+
+
+class PriorityView(View):
+    def get(self, request):
+        ret = {}
+        dominios = Dominio.objects.all()
+        ret['total_dominios'] = dominios.count()
+        
         prioridades = dominios.order_by('-priority_to_update')
         ret['prioridades'] = []
-        for c in [1, 100, 1000, 5000, 10000, 20000]:
+        for c in [1, 5, 10, 50, 100, 1000, 5000, 10000, 20000]:
             if c < prioridades.count():
                 ret['prioridades'].append(
                     {   'order': c,
@@ -59,4 +68,3 @@ class GeneralStatsViews(View):
 
         # return JsonResponse({'ok': False, 'error': 'Missing WhoAre version'}, status=400)
         return JsonResponse({'ok': True, 'data': ret}, status=200)
-
