@@ -7,11 +7,14 @@ from django.utils import timezone
 from django.views import View
 from django.http import JsonResponse
 from dominios.models import Dominio
-
+from django.contrib.auth.mixins import PermissionRequiredMixin
 logger = logging.getLogger(__name__)
 
 
-class GeneralStatsView(View):
+class GeneralStatsView(View, PermissionRequiredMixin):
+    
+    permission_required = ['dominios.dominio.can_view']
+
     def get(self, request):
         ret = {}
         dominios = Dominio.objects.all()
@@ -20,6 +23,15 @@ class GeneralStatsView(View):
         # por estado
         por_estado = dominios.values('estado').annotate(total=Count('estado'))
         ret['estado'] = list(por_estado)
+
+        # por dia de actualizacion, ultimos dias
+        starts = timezone.now() - timedelta(days=1)
+        por_horas = dominios.filter(data_updated__gt=starts)\
+            .annotate(hora_updated=Trunc('data_updated', 'hour'))\
+            .order_by('-hora_updated')\
+            .values('hora_updated')\
+            .annotate(total=Count('hora_updated'))
+        ret['actualizados_ultimas_horas'] = list(por_horas)
 
         # por dia de actualizacion, ultimos dias
         starts = timezone.now() - timedelta(days=15)
@@ -47,7 +59,10 @@ class GeneralStatsView(View):
         return JsonResponse({'ok': True, 'data': ret}, status=200)
 
 
-class PriorityView(View):
+class PriorityView(View, PermissionRequiredMixin):
+
+    permission_required = ['dominios.can_view']
+
     def get(self, request):
         ret = {}
         dominios = Dominio.objects.all()

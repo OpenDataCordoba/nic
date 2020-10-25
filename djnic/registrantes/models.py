@@ -6,10 +6,15 @@ from django.utils import timezone
 class Registrante(models.Model):
     
     name = models.CharField(max_length=240)
-    legal_uid = models.CharField(max_length=90, unique=True)
+    legal_uid = models.CharField(max_length=90, db_index=True)
+    zone = models.CharField(max_length=10, default='AR', help_text='Para identificar en el pais donde esta')
     created = models.DateTimeField(null=True, blank=True)
     changed = models.DateTimeField(null=True, blank=True)
 
+    class Meta:
+        unique_together = (('legal_uid', 'zone'))
+
+    
     def get_zoned_date(self, field, zona):
         """ put a datetime in the rigth timezone before move to string """
         
@@ -23,4 +28,4 @@ class Registrante(models.Model):
         return timezone.localtime(timefield, pytz.timezone(zona))
 
     def __str__(self):
-        return f'{self.name} {self.legal_uid}'
+        return f'{self.name} [{self.zone}-{self.legal_uid}]'
