@@ -55,7 +55,7 @@ class CambioDominioTestCase(TestCase):
         Dominio.add_from_whois('free.com.ar', just_new=False, mock_from_txt_file='djnic/whosamples/sample_free_updated.txt')
         self.assertEqual(dominio.cambios.count(), 1)
         self.assertEqual(dominio.dnss.count(), 2)
-        self.assertEqual(dominio.last_change().campos.count(), 10)
+        self.assertEqual(dominio.ultimo_cambio().campos.count(), 10)
         
         main_change = CambiosDominio.objects.all()[0]
         self.assertEqual(CampoCambio.objects.filter(cambio=main_change, campo='dominio_registered', anterior='', nuevo='1998-02-28 23:59:04').count(), 1)
@@ -72,7 +72,7 @@ class CambioDominioTestCase(TestCase):
         Dominio.add_from_whois('free.com.ar', just_new=False, mock_from_txt_file='djnic/whosamples/sample_free_updated_2.txt')
         self.assertEqual(dominio.cambios.count(), 2)
         self.assertEqual(dominio.dnss.count(), 2)
-        self.assertEqual(dominio.last_change().campos.count(), 1)
+        self.assertEqual(dominio.ultimo_cambio().campos.count(), 1)
         
         main_change = CambiosDominio.objects.all()[0]
         self.assertEqual(CampoCambio.objects.filter(cambio=main_change, campo='dominio_expire', anterior='', nuevo='2024-02-07 09:00:00').count(), 1)
