@@ -67,9 +67,6 @@ class Dominio(models.Model):
     def __str__(self):
         return self.full_domain()
     
-    def last_change(self):
-        return self.cambios.order_by('-momento').first()
-    
     @classmethod
     def add_from_whois(cls, domain, just_new=False, mock_from_txt_file=None):
         """ create or update a domain from WhoIs info
