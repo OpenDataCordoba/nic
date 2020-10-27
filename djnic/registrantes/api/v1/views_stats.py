@@ -22,9 +22,9 @@ class GeneralStatsView(View, PermissionRequiredMixin):
         
         # por año de creacion
         por_anios = registrantes.annotate(year_updated=Trunc('created', 'year'))\
-            .order_by('-year_updated')\
-            .values('year_updated')\
-            .annotate(total=Count('year_updated'))
+            .order_by('-year_created')\
+            .values('year_created')\
+            .annotate(total=Count('year_created'))[:200]
         ret['creados_por_anio'] = list(por_anios)
 
         # return JsonResponse({'ok': False, 'error': 'Missing WhoAre version'}, status=400)
