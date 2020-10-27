@@ -7,5 +7,6 @@ router = routers.DefaultRouter()
 router.register(r'registrante', RegistrantViewSet)
 
 urlpatterns = [
+    path('stats/', include('registrantes.api.v1.urls_stats')),
     path('', include(router.urls)),
 ]

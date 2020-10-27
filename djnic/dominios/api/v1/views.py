@@ -115,7 +115,7 @@ class UltimosRenovadosViewSet(viewsets.ModelViewSet):
     def get_queryset(self):
         campos = CampoCambio.objects.filter(
             campo='dominio_expire',
-            nuevo__gt=F('nuevo'))\
+            nuevo__gt=F('anterior'))\
                 .order_by('-cambio__momento')[:100]
         ids = [cc.cambio.dominio.id for cc in campos]
         queryset = Dominio.objects.filter(id__in=ids)
