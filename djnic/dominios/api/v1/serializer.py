@@ -33,3 +33,12 @@ class CambiosDominioSerializer(serializers.ModelSerializer):
     class Meta:
         model = Dominio
         fields = ['id', 'domain', 'data_updated', 'ultimo_cambio']
+
+
+class MicroDominioSerializer(serializers.ModelSerializer):
+    domain = serializers.CharField(read_only=True, source='full_domain')
+    
+    class Meta:
+        model = Dominio
+        fields = ['id', 'domain']
+

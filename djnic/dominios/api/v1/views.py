@@ -27,8 +27,8 @@ class DominioViewSet(viewsets.ModelViewSet):
     permission_classes = [DjangoModelPermissions]
     authentication_classes = [TokenAuthentication, SessionAuthentication]
     filter_backends = [DjangoFilterBackend, filters.OrderingFilter]
-    filterset_fields = ['estado', 'nombre', 'expire']
-    search_fields = ['nombre']
+    filterset_fields = ['estado', 'nombre', 'expire', 'registrante__legal_uid']
+    search_fields = ['nombre', 'registrante__legal_uid']
     ordering_fields = '__all__'
     ordering = ['nombre']
 
@@ -153,7 +153,7 @@ class UltimosTranspasadosViewSet(viewsets.ModelViewSet):
     filter_backends = [DjangoFilterBackend, filters.OrderingFilter]
     filterset_fields = ['estado', 'nombre', 'expire']
     search_fields = ['nombre']
-    ordering_fields = '__all__'
+    ordering_fields = ['nombre', 'expire']
     ordering = ['nombre']
 
 
