@@ -24,7 +24,7 @@ class GeneralStatsView(View, PermissionRequiredMixin):
         por_anios = registrantes.annotate(year_created=Trunc('created', 'year'))\
             .order_by('-year_created')\
             .values('year_created')\
-            .annotate(total=Count('year_created'))[:200]
+            .annotate(total=Count('year_created'))
         ret['creados_por_anio'] = list(por_anios)
 
         # return JsonResponse({'ok': False, 'error': 'Missing WhoAre version'}, status=400)
@@ -39,7 +39,7 @@ class MayoresRegistrantesView(View, PermissionRequiredMixin):
         ret = {}
         registrantes = Registrante.objects.annotate(total_dominios=Count('dominios'))\
             .order_by('-total_dominios')\
-            .values('id', 'name', 'legal_uid', 'total_dominios')
+            .values('id', 'name', 'legal_uid', 'total_dominios')[:200]
 
         ret['mayores_registrantes'] = list(registrantes)
 
