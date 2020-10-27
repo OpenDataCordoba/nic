@@ -21,7 +21,7 @@ class GeneralStatsView(View, PermissionRequiredMixin):
         ret['total_registrantes'] = registrantes.count()
         
         # por año de creacion
-        por_anios = registrantes.annotate(year_updated=Trunc('created', 'year'))\
+        por_anios = registrantes.annotate(year_created=Trunc('created', 'year'))\
             .order_by('-year_created')\
             .values('year_created')\
             .annotate(total=Count('year_created'))[:200]
