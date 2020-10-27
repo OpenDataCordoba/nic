@@ -12,7 +12,7 @@ class Command(BaseCommand):
         parser.add_argument('--delete', nargs='?', type=bool, default=False)
 
     def handle(self, *args, **options):
-        changes = CambiosDominio.objects.filter(momento__gt=datetime(2020, 10, 17))
+        changes = CambiosDominio.objects.filter(momento__gt=datetime(2020, 10, 26, 6, 32))
         c = 0
         delete = options['delete']
         for change in changes:
