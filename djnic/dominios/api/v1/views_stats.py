@@ -1,7 +1,7 @@
 from datetime import timedelta
 import json
 import logging
-from django.db.models import Count, F
+from django.db.models import Count, F, Value, fields, ExpressionWrapper
 from django.db.models.functions import Trunc
 from django.utils import timezone
 from django.views import View
@@ -80,6 +80,38 @@ class PriorityView(View, PermissionRequiredMixin):
                         'data_readed': prioridades[c].data_readed, 
                         'data_updated': prioridades[c].data_updated
                     })
+
+        # return JsonResponse({'ok': False, 'error': 'Missing WhoAre version'}, status=400)
+        return JsonResponse({'ok': True, 'data': ret}, status=200)
+
+
+class ReadingStatsView(View, PermissionRequiredMixin):
+    
+    permission_required = ['dominios.dominio.can_view']
+
+    def get(self, request):
+        ret = {}
+        dominios = Dominio.objects.all()
+
+        # por semana de actualizacion, ultimas semanas
+        starts = timezone.now() - timedelta(days=120)
+        ends = timezone.now() + timedelta(days=45)
+        
+        # now = Value(timezone.now(), output_field=fields.DateTimeField())
+        now = 'epoch'
+        calc_read_since_days = ExpressionWrapper(
+            now - F('data_readed'), 
+            output_field=fields.FloatField()
+            )
+        data = dominios.filter(expire__gt=starts, expire__lt=ends, data_readed__isnull=False)\
+            .annotate(readed_since=calc_read_since_days)\
+            .values('expire', 'readed_since')\
+            .annotate(day_expire=Trunc('expire', 'day'))\
+            .annotate(total=Count('readed_since'))\
+            .values('day_expire', 'readed_since', 'total')\
+            .order_by('-day_expire')
+
+        ret['expires'] = list(data)
 
         # return JsonResponse({'ok': False, 'error': 'Missing WhoAre version'}, status=400)
         return JsonResponse({'ok': True, 'data': ret}, status=200)
