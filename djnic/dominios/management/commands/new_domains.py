@@ -23,9 +23,10 @@ class Command(BaseCommand):
         dlist = doms.split('\n')
         c = 0
         errors = 0
+        skipped = 0
         for dominio in dlist:
             c += 1
-            self.stdout.write(self.style.SUCCESS(f"{c} [{errors}] {dominio}"))
+            self.stdout.write(self.style.SUCCESS(f"{c} [{errors}] [{skipped}] {dominio}"))
             dom_obj = Dominio.add_from_whois(domain=dominio, just_new=True)
             if dom_obj is None:
                 dlist.append(dominio)
@@ -34,6 +35,7 @@ class Command(BaseCommand):
                 sleep(15)
             
             if dom_obj == True:
+                skipped += 1
                 continue
             
             sleep(options['sleep'])
