@@ -81,7 +81,7 @@ class Dominio(models.Model):
         if just_new:
             dominios = Dominio.objects.filter(nombre=domain_name, zona=zona)
             if dominios.count() > 0:
-                if dominios[0].data_updated is not None:
+                if dominios[0].estado == STATUS_NO_DISPONIBLE:
                     return True
         
         try:
