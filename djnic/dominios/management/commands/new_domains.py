@@ -11,7 +11,7 @@ logger = logging.getLogger(__name__)
 
 
 class Command(BaseCommand):
-    help = 'Actualziar datos de dominios'
+    help = 'Actualizar datos de dominios'
 
     def add_arguments(self, parser):
         parser.add_argument('--sleep', nargs='?', type=int, default=41)
