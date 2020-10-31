@@ -90,6 +90,10 @@ class Dominio(models.Model):
         except TooManyQueriesError:
             return None
         
+        # bad domain, don't needed
+        if just_new and wa.domain.is_free:
+            return True
+
         dominio, dominio_created = Dominio.objects.get_or_create(nombre=wa.domain.base_name, zona=zona)
         # create a domain after being sure we don't have any whoare errors
         logger.info(f' - Dominio {dominio} Created: {dominio_created}')
