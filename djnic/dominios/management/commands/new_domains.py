@@ -26,9 +26,9 @@ class Command(BaseCommand):
         skipped = 0
         for dominio in dlist:
             c += 1
-            self.stdout.write(self.style.SUCCESS(f"{c} [{errors}] [{skipped}] {dominio}"))
             dom_obj, error, changes = Dominio.add_from_whois(domain=dominio, just_new=True)
-
+            self.stdout.write(self.style.SUCCESS(f"{c} [{errors}] [{skipped}] {dominio}: {dom_obj}, {error}, {changes}"))
+            
             if not dom_obj:
                 dlist.append(dominio)
                 errors += 1
