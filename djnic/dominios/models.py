@@ -83,22 +83,25 @@ class Dominio(models.Model):
             if dominios.count() > 0:
                 if dominios[0].estado == STATUS_NO_DISPONIBLE:
                     # Already is in the database and will be updated
-                    return True
+                    return True, 'Already exists', None
         
         try:
             wa.load(domain, mock_from_txt_file=mock_from_txt_file)
         except TooManyQueriesError:
-            return None
-        
+            return False, 'Too many queries', None
+        except Exception as e:
+            return False, str(e), None
+
         # bad domain, don't needed
         if just_new and wa.domain.is_free:
-            return True
+            return True, 'Is a free domain', None
 
         dominio, dominio_created = Dominio.objects.get_or_create(nombre=wa.domain.base_name, zona=zona)
         # create a domain after being sure we don't have any whoare errors
         logger.info(f' - Dominio {dominio} Created: {dominio_created}')
         
-        return dominio.update_from_wa_object(wa, just_created=dominio_created)
+        # return the changes list
+        return True, None, dominio.update_from_wa_object(wa, just_created=dominio_created)
             
     def update_from_wa_object(self, wa, just_created):
         """ Update a domain from a WhoAre object

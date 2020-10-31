@@ -27,20 +27,20 @@ class Command(BaseCommand):
         for dominio in dlist:
             c += 1
             self.stdout.write(self.style.SUCCESS(f"{c} [{errors}] [{skipped}] {dominio}"))
-            dom_obj = Dominio.add_from_whois(domain=dominio, just_new=True)
-            if dom_obj is None:
+            dom_obj, error, changes = Dominio.add_from_whois(domain=dominio, just_new=True)
+
+            if not dom_obj:
                 dlist.append(dominio)
                 errors += 1
-                self.stdout.write(self.style.SUCCESS(f"WHOIS TooManyQueriesError Error"))
+                self.stdout.write(self.style.SUCCESS(f"Error {error}"))
                 sleep(15)
-            
-            if dom_obj == True:
+            else:
                 skipped += 1
-                continue
+                if error == 'Already exists':
+                    continue
             
             sleep(options['sleep'])
+            self.stdout.write(self.style.SUCCESS(f" - cambios {changes}"))
 
-            self.stdout.write(self.style.SUCCESS(f" - {dominio} {dom_obj}"))
-
-        self.stdout.write(self.style.SUCCESS(f"{c} processed"))
+        self.stdout.write(self.style.SUCCESS(f"DONE. {c} processed"))
         
