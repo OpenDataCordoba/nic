@@ -49,6 +49,10 @@ class DominioViewSet(viewsets.ModelViewSet):
         if final_data['whoare_version'] < '0.1.29':
             return JsonResponse({'ok': False, 'error': 'Unexpected WhoAre version'}, status=400)
         
+        # skipp not-real domains
+        if final_data['domain'].get('is_free', True):
+            return JsonResponse({'ok': False, 'error': 'Unexpected REGISTERED domain'}, status=400)
+
         wa = WhoAre()
         wa.from_dict(final_data)
         
