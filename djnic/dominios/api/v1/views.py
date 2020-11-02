@@ -93,6 +93,8 @@ class NextPriorityDomainViewSet(viewsets.ModelViewSet):
         else:
             nuevos = nuevos.order_by('-priority')[:100]
             random_item = random.choice(nuevos)
+            random_item.priority = 0
+            random_item.save()
             self.serializer_class = FlatPreDominioSerializer
             return PreDominio.objects.filter(pk=random_item.id)
 
