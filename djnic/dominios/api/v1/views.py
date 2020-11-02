@@ -81,23 +81,37 @@ class NextPriorityDomainViewSet(viewsets.ModelViewSet):
         nuevos = PreDominio.objects.all()
         pick = random.randint(1, 100)
         if pick > 70 or nuevos.count() == 0:
-            prioritarios = Dominio.objects.all().order_by('-priority_to_update')[:100]
-            random_item = random.choice(prioritarios)
-            
-            # remove priority
-            random_item.priority_to_update = 0
-            random_item.next_update_priority = timezone.now() + timedelta(days=15)    
-            random_item.save()
-            self.serializer_class = FlatDominioSerializer
-            return Dominio.objects.filter(pk=random_item.id)
+            res = self.get_from_domain()
+            return res
         else:
-            nuevos = nuevos.order_by('-priority')[:100]
-            random_item = random.choice(nuevos)
-            random_item.priority = 0
-            random_item.save()
-            self.serializer_class = FlatPreDominioSerializer
-            return PreDominio.objects.filter(pk=random_item.id)
-
+            res = self.get_from_predomain()
+            return res
+    
+    def get_from_domain(self):
+        prioritarios = Dominio.objects.all().order_by('-priority_to_update')[:100]
+        random_item = random.choice(prioritarios)
+        
+        # remove priority
+        random_item.priority_to_update = 0
+        random_item.next_update_priority = timezone.now() + timedelta(days=15)    
+        random_item.save()
+        self.serializer_class = FlatDominioSerializer
+        res = Dominio.objects.filter(pk=random_item.id)
+        return res
+    
+    def get_from_predomain(self):
+        nuevos = PreDominio.objects.all()
+        nuevos = nuevos.order_by('-priority')[:100]
+        random_item = random.choice(nuevos)
+        if random_item.priority == 0:
+            # se acabaron
+            return self.get_from_domain()
+        
+        random_item.priority = 0
+        random_item.save()
+        self.serializer_class = FlatPreDominioSerializer
+        res = PreDominio.objects.filter(pk=random_item.id)
+        return res
 
 class UltimosCaidosViewSet(viewsets.ModelViewSet):
     """ ultimo dominios que pasaron a estar disponibles """
