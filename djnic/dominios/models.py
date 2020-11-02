@@ -288,3 +288,13 @@ class DNSDominio(models.Model):
     
     class Meta:
         unique_together = (('dominio', 'dns', 'orden'), )
+
+
+class PreDominio(models.Model):
+    """ dominios que creo que podrían ser nuevos para pa bases de datos 
+        Si ya existen en la tabla principal no deben estar acá """
+    dominio = models.CharField(max_length=250)
+    priority = models.IntegerField(default=50)
+
+    def __str__(self):
+        return self.dominio
