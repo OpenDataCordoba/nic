@@ -14,10 +14,10 @@ from django.db.models import F, Q
 from django.utils.decorators import method_decorator
 from django.views.decorators.cache import never_cache
 from rest_framework.decorators import action
-from dominios.models import Dominio, STATUS_DISPONIBLE, STATUS_NO_DISPONIBLE
+from dominios.models import Dominio, STATUS_DISPONIBLE, STATUS_NO_DISPONIBLE, PreDominio
 from zonas.models import Zona
 from cambios.models import CampoCambio
-from .serializer import DominioSerializer, CambiosDominioSerializer, FlatDominioSerializer
+from .serializer import DominioSerializer, CambiosDominioSerializer, FlatDominioSerializer, FlatPreDominioSerializer
 
 logger = logging.getLogger(__name__)
 
@@ -77,18 +77,25 @@ class NextPriorityDomainViewSet(viewsets.ModelViewSet):
     authentication_classes = [TokenAuthentication, SessionAuthentication]
 
     def get_queryset(self):
-        queryset = Dominio.objects.all().order_by('-priority_to_update')[:100]
-        random_item = random.choice(queryset)
-        
-        # remove priority
-        random_item.priority_to_update = 0
-        random_item.next_update_priority = timezone.now() + timedelta(days=15)    
-        random_item.save()
+        # definir si mando uno de los posibles nuevos o de la base comun
+        nuevos = PreDominio.objects.all()
+        pick = random.randint(1, 100)
+        if pick > 70 or nuevos.count() == 0:
+            prioritarios = Dominio.objects.all().order_by('-priority_to_update')[:100]
+            random_item = random.choice(prioritarios)
+            
+            # remove priority
+            random_item.priority_to_update = 0
+            random_item.next_update_priority = timezone.now() + timedelta(days=15)    
+            random_item.save()
+            self.serializer_class = FlatDominioSerializer
+            return Dominio.objects.filter(pk=random_item.id)
+        else:
+            nuevos = nuevos.order_by('-priority')[:100]
+            random_item = random.choice(nuevos)
+            self.serializer_class = FlatPreDominioSerializer
+            return PreDominio.objects.filter(pk=random_item.id)
 
-        return Dominio.objects.filter(pk=random_item.id)
-    
-    serializer_class = FlatDominioSerializer
-    
 
 class UltimosCaidosViewSet(viewsets.ModelViewSet):
     """ ultimo dominios que pasaron a estar disponibles """

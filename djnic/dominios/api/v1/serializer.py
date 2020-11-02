@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from dominios.models import Dominio
+from dominios.models import Dominio, PreDominio
 from registrantes.api.v1.serializer import RegistrantSerializer
 from cambios.api.v1.serializer import CambiosDominioSerializer
 
@@ -24,6 +24,13 @@ class FlatDominioSerializer(serializers.ModelSerializer):
         fields = ['id', 'domain', 'data_updated', 'data_readed', 'estado',
                   'registered', 'changed', 'expire', 'priority_to_update',
                   'next_update_priority']
+
+class FlatPreDominioSerializer(serializers.ModelSerializer):
+    domain = serializers.CharField(read_only=True, source='dominio')
+    
+    class Meta:
+        model = PreDominio
+        fields = ['id', 'domain']
 
 
 class CambiosDominioSerializer(serializers.ModelSerializer):

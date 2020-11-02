@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Dominio
+from .models import Dominio, PreDominio
 
 @admin.register(Dominio)
 class DominioAdmin(admin.ModelAdmin):
@@ -12,3 +12,11 @@ class DominioAdmin(admin.ModelAdmin):
     list_select_related = ('zona', 'registrante')
     search_fields = ['nombre']
     list_filter = ['estado']
+
+
+@admin.register(PreDominio)
+class PreDominioAdmin(admin.ModelAdmin):
+
+    list_display = ['dominio', 'priority']
+    list_per_page = 10
+    search_fields = ['dominio']
