@@ -62,7 +62,7 @@ class DominioViewSet(viewsets.ModelViewSet):
         if wa.domain.is_free:
             
             # Si ya existe entonces es un update, si no entonces no lo necesitamos
-            dominio = Dominio.get_from_full_domain(full_domain)
+            dominio = Dominio.get_from_full_domain(wa.domain.full_name())
             if dominio is None:
                 return JsonResponse({'ok': False, 'error': 'We expect a REGISTERED domain'}, status=400)
 
