@@ -53,7 +53,7 @@ class DominioViewSet(viewsets.ModelViewSet):
         wa.from_dict(final_data)
         
         # if exists at pre-domains, remove it: we are done with this domain
-        pres = PreDominio.objects.filter(dominio=wa.full_name())
+        pres = PreDominio.objects.filter(dominio=wa.doamin.full_name())
         if pres.count() > 0:
             pre = pres[0]
             pre.delete()
