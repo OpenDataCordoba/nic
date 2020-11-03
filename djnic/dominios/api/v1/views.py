@@ -101,7 +101,7 @@ class NextPriorityDomainViewSet(viewsets.ModelViewSet):
     
     def get_from_predomain(self):
         nuevos = PreDominio.objects.filter(priority__gt=0)
-        nuevos = nuevos.order_by('-priority')[:100]
+        nuevos = nuevos.order_by('-priority', 'dominio')[:100]
         random_item = random.choice(nuevos)
         if random_item.priority == 0:
             # se acabaron
