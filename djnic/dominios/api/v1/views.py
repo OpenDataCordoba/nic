@@ -78,7 +78,7 @@ class NextPriorityDomainViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         # definir si mando uno de los posibles nuevos o de la base comun
-        nuevos = PreDominio.objects.all()
+        nuevos = PreDominio.objects.filter(priority__gt=0)
         pick = random.randint(1, 100)
         if pick > 70 or nuevos.count() == 0:
             res = self.get_from_domain()
@@ -100,8 +100,8 @@ class NextPriorityDomainViewSet(viewsets.ModelViewSet):
         return res
     
     def get_from_predomain(self):
-        nuevos = PreDominio.objects.all()
-        nuevos = nuevos.order_by('-priority')[:100]
+        nuevos = PreDominio.objects.filter(priority__gt=0)
+        nuevos = nuevos.order_by('-priority', 'dominio')[:100]
         random_item = random.choice(nuevos)
         if random_item.priority == 0:
             # se acabaron

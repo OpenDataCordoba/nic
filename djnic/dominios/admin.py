@@ -20,3 +20,4 @@ class PreDominioAdmin(admin.ModelAdmin):
     list_display = ['dominio', 'priority']
     list_per_page = 10
     search_fields = ['dominio']
+    list_filter = ['priority']
