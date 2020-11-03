@@ -49,12 +49,23 @@ class DominioViewSet(viewsets.ModelViewSet):
         if final_data['whoare_version'] < '0.1.29':
             return JsonResponse({'ok': False, 'error': 'Unexpected WhoAre version'}, status=400)
         
-        # skipp not-real domains
-        if final_data['domain'].get('is_free', True):
-            return JsonResponse({'ok': False, 'error': 'Unexpected REGISTERED domain'}, status=400)
-
         wa = WhoAre()
         wa.from_dict(final_data)
+        
+        # if exists at pre-domains, remove it: we are done with this domain
+        pres = PreDominio.objects.filter(dominio=wa.full_name())
+        if pres.count() > 0:
+            pre = pres[0]
+            pre.delete()
+
+        # skipp not-real domains when it come from pre-domains
+        if wa.domain.is_free:
+            
+            # Si ya existe entonces es un update, si no entonces no lo necesitamos
+            dominio = Dominio.get_from_full_domain(full_domain)
+            if dominio is None:
+                return JsonResponse({'ok': False, 'error': 'We expect a REGISTERED domain'}, status=400)
+
         
         zona, _ = Zona.objects.get_or_create(nombre=wa.domain.zone)
         dominio, dominio_created = Dominio.objects.get_or_create(
