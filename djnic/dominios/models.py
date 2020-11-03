@@ -61,6 +61,16 @@ class Dominio(models.Model):
         zona = '' if self.zona is None else self.zona.nombre
         return f'{nombre}.{zona}'
 
+    @classmethod
+    def get_from_full_domain(cls, full_domain):
+        wa = WhoAre()
+        domain_name, zone = wa.detect_zone(full_domain)
+        zona, _ = Zona.objects.get_or_create(nombre=zone)
+        dominios = Dominio.objects.filter(nombre=domain_name, zona=zona)
+        if dominios.count() > 0:
+            return dominios[0]
+        return None
+
     def ultimo_cambio(self):
         return self.cambios.order_by('-momento').first()
 
@@ -79,11 +89,10 @@ class Dominio(models.Model):
         zona, _ = Zona.objects.get_or_create(nombre=zone)
 
         if just_new:
-            dominios = Dominio.objects.filter(nombre=domain_name, zona=zona)
-            if dominios.count() > 0:
-                if dominios[0].estado == STATUS_NO_DISPONIBLE:
-                    # Already is in the database and will be updated
-                    return True, 'Already exists', None
+            dominio = cls.get_from_full_domain(domain)
+            if dominio is not None and dominio.estado == STATUS_NO_DISPONIBLE:
+                # Already is in the database and will be updated by priority later
+                return True, 'Already exists', None
         
         try:
             wa.load(domain, mock_from_txt_file=mock_from_txt_file)
