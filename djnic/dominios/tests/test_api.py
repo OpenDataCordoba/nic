@@ -1,8 +1,10 @@
+import json
+import requests
 from rest_framework.test import APIRequestFactory
 from rest_framework.test import APIClient
 from rest_framework.authtoken.models import Token
 from django.contrib.auth.models import User
-from django.test import TestCase
+from django.test import TestCase, LiveServerTestCase
 from dominios.models import Dominio, STATUS_DISPONIBLE
 from zonas.models import Zona
 
@@ -124,4 +126,4 @@ class APIDominioTestCase(TestCase):
             
             resp = self.tokened_admin_client.get(ep)
             self.assertEqual(resp.status_code, 200)
-            
+        
