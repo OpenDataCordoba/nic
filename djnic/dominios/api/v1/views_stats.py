@@ -98,7 +98,7 @@ class ReadingStatsView(PermissionRequiredMixin, View):
         ends = timezone.now() + timedelta(days=hasta_dias)
         ret['start'] = starts
         ret['end'] = ends
-        dominios = Dominio.objects.exclude(data_readed__isnull=True).filter(expire__gt=starts, expire__lt=ends)
+        dominios = Dominio.objects.exclude(data_readed__isnull=True).filter(expire__gt=starts, expire__lt=ends).order_by('-expire')
         data = {}
         total = 0
         for dominio in dominios:
