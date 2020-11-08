@@ -11,7 +11,7 @@ from django.contrib.auth.mixins import PermissionRequiredMixin
 logger = logging.getLogger(__name__)
 
 
-class GeneralStatsView(View, PermissionRequiredMixin):
+class GeneralStatsView(PermissionRequiredMixin, View):
     
     permission_required = ['dominios.dominio.can_view']
 
@@ -59,7 +59,7 @@ class GeneralStatsView(View, PermissionRequiredMixin):
         return JsonResponse({'ok': True, 'data': ret}, status=200)
 
 
-class PriorityView(View, PermissionRequiredMixin):
+class PriorityView(PermissionRequiredMixin, View):
 
     permission_required = ['dominios.can_view']
 
@@ -85,33 +85,59 @@ class PriorityView(View, PermissionRequiredMixin):
         return JsonResponse({'ok': True, 'data': ret}, status=200)
 
 
-class ReadingStatsView(View, PermissionRequiredMixin):
+class ReadingStatsView(PermissionRequiredMixin, View):
     
     permission_required = ['dominios.dominio.can_view']
-
-    def get(self, request):
+    
+    def get(self, request, **kwargs):
         ret = {}
-        dominios = Dominio.objects.all()
-
+        desde_dias = kwargs.get('desde_dias', 90)
+        hasta_dias = kwargs.get('hasta_dias', 45)
         # por semana de actualizacion, ultimas semanas
-        starts = timezone.now() - timedelta(days=120)
-        ends = timezone.now() + timedelta(days=45)
+        starts = timezone.now() - timedelta(days=desde_dias)
+        ends = timezone.now() + timedelta(days=hasta_dias)
+        ret['start'] = starts
+        ret['end'] = ends
+        dominios = Dominio.objects.exclude(data_readed__isnull=True).filter(expire__gt=starts, expire__lt=ends)
+        data = {}
+        total = 0
+        for dominio in dominios:
+            expire = dominio.expire.strftime("%Y-%m-%d")
+            readed = dominio.data_readed
+            if readed is None:  # (?)
+                continue
+            readed_since = int((timezone.now() - readed).total_seconds() // 86400)
+
+            if expire not in data:
+                data[expire] = {}
+            if str(readed_since) not in data[expire]:
+                data[expire][str(readed_since)] = 0
+            data[expire][str(readed_since)] += 1
+            total += 1
+
+        ret['total'] = total
+        ret['dates'] = data
+            
+
+        # TODO HELP ====================================
+        # # now = Value(timezone.now(), output_field=fields.DateTimeField())
+        # now = timezone.now()
+        # # now = 'NOW()'
+        # # now = 'epoch'
+        # calc_read_since_days = ExpressionWrapper(
+        #     now - F('data_readed'), 
+        #     output_field=fields.DurationField()
+        #     )
+        # data = dominios.filter(expire__gt=starts, expire__lt=ends, data_readed__isnull=False)\
+        #     .annotate(readed_day=Trunc('data_readed', 'day'))\
+        #     .annotate(expire_day=Trunc('expire', 'day'))\
+        #     .values('expire_day', 'readed_day')\
+        #     .annotate(total=Count('expire_day'))\
+        #     .order_by('-total')
+
+        # # for res in data:
+        # #     res['readed_since'] = res['readed_since'].total_seconds() / 86400
+        # ret['expires'] = list(data)
+
         
-        # now = Value(timezone.now(), output_field=fields.DateTimeField())
-        now = 'epoch'
-        calc_read_since_days = ExpressionWrapper(
-            now - F('data_readed'), 
-            output_field=fields.FloatField()
-            )
-        data = dominios.filter(expire__gt=starts, expire__lt=ends, data_readed__isnull=False)\
-            .annotate(readed_since=calc_read_since_days)\
-            .values('expire', 'readed_since')\
-            .annotate(day_expire=Trunc('expire', 'day'))\
-            .annotate(total=Count('readed_since'))\
-            .values('day_expire', 'readed_since', 'total')\
-            .order_by('-day_expire')
-
-        ret['expires'] = list(data)
-
-        # return JsonResponse({'ok': False, 'error': 'Missing WhoAre version'}, status=400)
         return JsonResponse({'ok': True, 'data': ret}, status=200)
