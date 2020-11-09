@@ -103,16 +103,35 @@ class ReadingStatsView(PermissionRequiredMixin, View):
         total = 0
         for dominio in dominios:
             expire = dominio.expire.strftime("%Y-%m-%d")
+            
             readed = dominio.data_readed
             if readed is None:  # (?)
                 continue
-            readed_since = int((timezone.now() - readed).total_seconds() // 86400)
+            readed_since = (timezone.now() - readed).days
+
 
             if expire not in data:
                 data[expire] = {}
-            if str(readed_since) not in data[expire]:
-                data[expire][str(readed_since)] = 0
-            data[expire][str(readed_since)] += 1
+            
+            if readed_since >=300:
+                rs = '+300'
+            elif readed_since >=150:
+                rs = '150-300'
+            elif readed_since >=60:
+                rs = '60-150'
+            elif readed_since >=30:
+                rs = '30-60'
+            elif readed_since >=10:
+                rs = '10-30'
+            elif readed_since >=5:
+                rs = '5-10'
+            else:
+                rs = str(readed_since)
+            
+            if rs not in data[expire]:
+                data[expire][rs] = 0
+            
+            data[expire][rs] += 1
             total += 1
 
         ret['total'] = total
