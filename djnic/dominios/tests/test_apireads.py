@@ -5,6 +5,7 @@ from rest_framework.test import APIRequestFactory
 from rest_framework.test import APIClient
 from rest_framework.authtoken.models import Token
 from django.contrib.auth.models import User
+from django.utils import timezone
 from django.test import TestCase, LiveServerTestCase
 from dominios.models import Dominio, STATUS_DISPONIBLE, STATUS_NO_DISPONIBLE
 from zonas.models import Zona
@@ -58,37 +59,39 @@ class APIDominioTestCase(TestCase):
         resp = self.tokened_admin_client.get(ep)
         self.assertEqual(resp.status_code, 302)  # redirige por que es un vista django que no ve los token en los headers
 
+        hoy = timezone.now()
         for n in range(0, 10):
+
             Dominio.objects.create(
                 nombre=f'test1-{n}.ar',
                 zona=self.zona,
                 estado=STATUS_NO_DISPONIBLE,
-                data_readed=datetime.today() - timedelta(days=n),
-                expire=datetime.today() - timedelta(days=n)
+                data_readed= hoy - timedelta(days=n),
+                expire=hoy - timedelta(days=n)
                 )
             
             Dominio.objects.create(
                 nombre=f'test2-{n}.ar',
                 zona=self.zona,
                 estado=STATUS_NO_DISPONIBLE,
-                data_readed=datetime.today() - timedelta(days=2*n),
-                expire=datetime.today() - timedelta(days=n)
+                data_readed=hoy - timedelta(days=2*n),
+                expire=hoy - timedelta(days=n)
                 )
         
             Dominio.objects.create(
                 nombre=f'test3-{n}.ar',
                 zona=self.zona,
                 estado=STATUS_NO_DISPONIBLE,
-                data_readed=datetime.today() - timedelta(days=2 * n),
-                expire=datetime.today() + timedelta(days=n)
+                data_readed=hoy - timedelta(days=2 * n),
+                expire=hoy + timedelta(days=n)
                 )
             
             Dominio.objects.create(
                 nombre=f'test4-{n}.ar',
                 zona=self.zona,
                 estado=STATUS_NO_DISPONIBLE,
-                data_readed=datetime.today() - timedelta(days=3 * n),
-                expire=datetime.today() + timedelta(days=n)
+                data_readed=hoy - timedelta(days=3 * n),
+                expire=hoy + timedelta(days=n)
                 )
         
         resp = self.admin_user_client.get(ep)
@@ -98,8 +101,8 @@ class APIDominioTestCase(TestCase):
         self.assertEqual(data['data']['total'], 40)
         
         def check(days_ago, read_since_days):
-            dia = (datetime.today() - timedelta(days=days_ago)).strftime("%Y-%m-%d")
-            print(f"{days_ago} {dia} = {data['data']['dates'][dia]}")
+            dia = (hoy - timedelta(days=days_ago)).strftime("%Y-%m-%d")
+            print(f"DATES {days_ago} {dia} = {data['data']['dates'][dia]}")
             return data['data']['dates'][dia][str(read_since_days)]
 
         self.assertEqual(check(0, 0), 4)
@@ -108,7 +111,7 @@ class APIDominioTestCase(TestCase):
         self.assertEqual(check(2, 2), 1)
         self.assertEqual(check(2, 4), 1)
         self.assertEqual(check(3, 3), 1)
-        self.assertEqual(check(3, 6), 1)
+        self.assertEqual(check(3, '5-10'), 1)
         
         ep = '/api/v1/dominios/stats/reading/3/3'
         resp = self.admin_user_client.get(ep)
