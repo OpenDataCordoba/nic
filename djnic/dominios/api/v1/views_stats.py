@@ -1,25 +1,25 @@
 from datetime import timedelta
 import json
 import logging
+from django.conf import settings
 from django.db.models import Count, F, Value, fields, ExpressionWrapper
 from django.db.models.functions import Trunc
 from django.utils import timezone
 from django.views import View
 from django.http import JsonResponse
 from dominios.models import Dominio
-from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.utils.decorators import method_decorator
+from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.views.decorators.cache import cache_page, never_cache, cache_control
 
 logger = logging.getLogger(__name__)
 
-
+@method_decorator(cache_control(max_age=settings.GENERAL_CACHE_SECONDS), name='dispatch')
+@method_decorator(cache_page(settings.GENERAL_CACHE_SECONDS), name='dispatch')
 class GeneralStatsView(PermissionRequiredMixin, View):
     
     permission_required = ['dominios.dominio.can_view']
 
-    @cache_control(max_age=60*60*2)
-    @method_decorator(cache_page(60*60*2))  # 2 hours
     def get(self, request):
         ret = {}
         dominios = Dominio.objects.all()
@@ -64,12 +64,12 @@ class GeneralStatsView(PermissionRequiredMixin, View):
         return JsonResponse({'ok': True, 'data': ret}, status=200)
 
 
+@method_decorator(cache_control(max_age=settings.GENERAL_CACHE_SECONDS), name='dispatch')
+@method_decorator(cache_page(settings.GENERAL_CACHE_SECONDS), name='dispatch')
 class PriorityView(PermissionRequiredMixin, View):
 
     permission_required = ['dominios.can_view']
 
-    @cache_control(max_age=60*60*2)
-    @method_decorator(cache_page(60*60*2))  # 2 hours
     def get(self, request):
         ret = {}
         dominios = Dominio.objects.all()
@@ -92,16 +92,18 @@ class PriorityView(PermissionRequiredMixin, View):
         return JsonResponse({'ok': True, 'data': ret}, status=200)
 
 
+@method_decorator(cache_control(max_age=settings.GENERAL_CACHE_SECONDS), name='dispatch')
+@method_decorator(cache_page(settings.GENERAL_CACHE_SECONDS), name='dispatch')
 class ReadingStatsView(PermissionRequiredMixin, View):
     
     permission_required = ['dominios.dominio.can_view']
     
-    @cache_control(max_age=60*60*2)
-    @method_decorator(cache_page(60*60*2))  # 2 hours
     def get(self, request, **kwargs):
         ret = {}
         desde_dias = kwargs.get('desde_dias', 90)
         hasta_dias = kwargs.get('hasta_dias', 45)
+        desde_dias = min(desde_dias, 90)
+        hasta_dias = min(hasta_dias, 45)
         # por semana de actualizacion, ultimas semanas
         starts = timezone.now() - timedelta(days=desde_dias)
         ends = timezone.now() + timedelta(days=hasta_dias)

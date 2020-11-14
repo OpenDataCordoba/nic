@@ -79,6 +79,13 @@ DATABASES = {
     }
 }
 
+CACHES = {
+    'default': {
+        'BACKEND': 'django.core.cache.backends.db.DatabaseCache',
+        'LOCATION': 'cache_tbl',
+    }
+}
+
 REST_FRAMEWORK = {
     # Use Django's standard `django.contrib.auth` permissions,
     # or allow read-only access for unauthenticated users.
@@ -180,6 +187,7 @@ OLD_DB_USER = ''
 OLD_DB_PASS = ''
 OLD_DB_NAME = ''
 
+GENERAL_CACHE_SECONDS = 60 * 60 * 24
 
 try:
     from .local_settings import *
