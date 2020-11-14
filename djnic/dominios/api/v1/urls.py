@@ -6,7 +6,7 @@ from .views import (DominioViewSet, NextPriorityDomainViewSet,
 
 
 router = routers.DefaultRouter()
-router.register(r'dominio', DominioViewSet)
+router.register(r'dominio', DominioViewSet, basename='dominio')
 router.register(r'next-priority', NextPriorityDomainViewSet, basename='next-priority')
 router.register(r'ultimos-caidos', UltimosCaidosViewSet, basename='ultimos-caidos')
 router.register(r'ultimos-renovados', UltimosRenovadosViewSet, basename='ultimos-renovados')

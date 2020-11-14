@@ -12,7 +12,7 @@ from rest_framework import filters
 from django.http import JsonResponse
 from django.db.models import F, Q
 from django.utils.decorators import method_decorator
-from django.views.decorators.cache import never_cache
+from django.views.decorators.cache import never_cache, cache_page, cache_control
 from rest_framework.decorators import action
 from dominios.models import Dominio, STATUS_DISPONIBLE, STATUS_NO_DISPONIBLE, PreDominio
 from zonas.models import Zona
@@ -124,6 +124,7 @@ class NextPriorityDomainViewSet(viewsets.ModelViewSet):
         res = PreDominio.objects.filter(pk=random_item.id)
         return res
 
+@method_decorator(cache_page(60*60*2), name='dispatch')  # 2 hours
 class UltimosCaidosViewSet(viewsets.ModelViewSet):
     """ ultimo dominios que pasaron a estar disponibles """
 
@@ -147,6 +148,7 @@ class UltimosCaidosViewSet(viewsets.ModelViewSet):
     ordering = ['nombre']
 
 
+@method_decorator(cache_page(60*60*2), name='dispatch')  # 2 hours
 class UltimosRenovadosViewSet(viewsets.ModelViewSet):
     """ ultimo dominios que se renovaron """
 
@@ -169,6 +171,7 @@ class UltimosRenovadosViewSet(viewsets.ModelViewSet):
     ordering = ['nombre']
 
 
+@method_decorator(cache_page(60*60*2), name='dispatch')  # 2 hours
 class UltimosTranspasadosViewSet(viewsets.ModelViewSet):
     """ ultimo dominios que pasaron a nuevos dueños """
 
@@ -195,6 +198,7 @@ class UltimosTranspasadosViewSet(viewsets.ModelViewSet):
     ordering = ['nombre']
 
 
+@method_decorator(cache_page(60*60*2), name='dispatch')  # 2 hours
 class UltimosCambioDNSViewSet(viewsets.ModelViewSet):
     """ ultimo dominios que pasaron a nuevos dueños """
 

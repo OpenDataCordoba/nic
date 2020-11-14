@@ -8,6 +8,9 @@ from django.views import View
 from django.http import JsonResponse
 from dominios.models import Dominio
 from django.contrib.auth.mixins import PermissionRequiredMixin
+from django.utils.decorators import method_decorator
+from django.views.decorators.cache import cache_page, never_cache, cache_control
+
 logger = logging.getLogger(__name__)
 
 
@@ -15,6 +18,8 @@ class GeneralStatsView(PermissionRequiredMixin, View):
     
     permission_required = ['dominios.dominio.can_view']
 
+    @cache_control(max_age=60*60*2)
+    @method_decorator(cache_page(60*60*2))  # 2 hours
     def get(self, request):
         ret = {}
         dominios = Dominio.objects.all()
@@ -63,6 +68,8 @@ class PriorityView(PermissionRequiredMixin, View):
 
     permission_required = ['dominios.can_view']
 
+    @cache_control(max_age=60*60*2)
+    @method_decorator(cache_page(60*60*2))  # 2 hours
     def get(self, request):
         ret = {}
         dominios = Dominio.objects.all()
@@ -89,6 +96,8 @@ class ReadingStatsView(PermissionRequiredMixin, View):
     
     permission_required = ['dominios.dominio.can_view']
     
+    @cache_control(max_age=60*60*2)
+    @method_decorator(cache_page(60*60*2))  # 2 hours
     def get(self, request, **kwargs):
         ret = {}
         desde_dias = kwargs.get('desde_dias', 90)
