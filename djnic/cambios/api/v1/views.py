@@ -10,18 +10,18 @@ from django.utils.decorators import method_decorator
 from django.views.decorators.cache import cache_page, never_cache, cache_control
 from rest_framework import filters
 from rest_framework.decorators import action
-from .serializer import CambiosDominioSerializer, CampoCambioSerializer
+from .serializer import FullCambiosDominioSerializer, FullCampoCambioSerializer
 from cambios.models import CambiosDominio, CampoCambio
 
 
 logger = logging.getLogger(__name__)
 
 
-@cache_control(max_age=60*60*2, name='dispatch')
+@method_decorator(cache_control(max_age=60*60*2), name='dispatch')
 @method_decorator(cache_page(60*60*2), name='dispatch')  # 2 hours
 class CambiosDominioViewSet(viewsets.ModelViewSet):
     queryset = CambiosDominio.objects.all()
-    serializer_class = CambiosDominioSerializer
+    serializer_class = FullCambiosDominioSerializer
     permission_classes = [DjangoModelPermissions]
     authentication_classes = [TokenAuthentication, SessionAuthentication]
     filter_backends = [DjangoFilterBackend, filters.OrderingFilter]
@@ -29,11 +29,11 @@ class CambiosDominioViewSet(viewsets.ModelViewSet):
     ordering = ['-id']
 
 
-@cache_control(max_age=60*60*2, name='dispatch')
+@method_decorator(cache_control(max_age=60*60*2), name='dispatch')
 @method_decorator(cache_page(60*60*2), name='dispatch')  # 2 hours
 class CampoCambioViewSet(viewsets.ModelViewSet):
     queryset = CampoCambio.objects.all()
-    serializer_class = CampoCambioSerializer
+    serializer_class = FullCampoCambioSerializer
     permission_classes = [DjangoModelPermissions]
     authentication_classes = [TokenAuthentication, SessionAuthentication]
     filter_backends = [DjangoFilterBackend, filters.OrderingFilter]
