@@ -7,5 +7,7 @@ class HomeView(TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['hola'] = 'Hola mundo'
+        context['site_title'] = 'NIC Data'
+        context['site_description'] = 'Sitio con información de registros de dominios argentinos'
+        
         return context
