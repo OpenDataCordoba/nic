@@ -32,7 +32,8 @@ class HomeView(TemplateView):
             box =  {
                     'counter': dominios_grupo.count(),
                     'title': grupo.nombre,
-                    'data_list': ','.join([str(x['total']) for x in grouped])}
+                    'data_list': ','.join([str(x['total']) for x in grouped]),
+                    'type': 'country'}
 
             context['boxes'].append(box)
             
@@ -50,7 +51,8 @@ class HomeView(TemplateView):
                 box =  {
                     'counter': dominios.count(),
                     'title': zona.nombre,
-                    'data_list': ','.join([str(x['total']) for x in ultimos_dias])}
+                    'data_list': ','.join([str(x['total']) for x in ultimos_dias]),
+                    'type': 'zone'}
 
                 context['boxes'].append(box)
 
