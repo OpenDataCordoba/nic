@@ -5,6 +5,7 @@ from rest_framework.test import APIRequestFactory
 from rest_framework.test import APIClient
 from rest_framework.authtoken.models import Token
 from django.contrib.auth.models import User
+from django.core.cache import cache
 from django.utils import timezone
 from django.test import TestCase, LiveServerTestCase
 from dominios.models import Dominio, STATUS_DISPONIBLE, STATUS_NO_DISPONIBLE
@@ -57,7 +58,7 @@ class APIDominioTestCase(TestCase):
         self.assertEqual(data['data']['total'], 0)
         
         resp = self.tokened_admin_client.get(ep)
-        self.assertEqual(resp.status_code, 302)  # redirige por que es un vista django que no ve los token en los headers
+        self.assertEqual(resp.status_code, 200)
 
         hoy = timezone.now()
         for n in range(0, 10):
@@ -93,6 +94,9 @@ class APIDominioTestCase(TestCase):
                 data_readed=hoy - timedelta(days=3 * n),
                 expire=hoy + timedelta(days=n)
                 )
+        
+        # to repeat the view call we need to clean the cache
+        cache.clear()
         
         resp = self.admin_user_client.get(ep)
         self.assertEqual(resp.status_code, 200)

@@ -26,7 +26,8 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-
+    'django.contrib.humanize',
+    
     'rest_framework',
     'django_filters',
     'rest_framework.authtoken',
@@ -36,6 +37,7 @@ INSTALLED_APPS = [
     'dnss',
     'zonas',
     'cambios',
+    'web',
 ]
 
 MIDDLEWARE = [
@@ -79,6 +81,13 @@ DATABASES = {
     }
 }
 
+CACHES = {
+    'default': {
+        'BACKEND': 'django.core.cache.backends.db.DatabaseCache',
+        'LOCATION': 'cache_tbl',
+    }
+}
+
 REST_FRAMEWORK = {
     # Use Django's standard `django.contrib.auth` permissions,
     # or allow read-only access for unauthenticated users.
@@ -96,9 +105,10 @@ REST_FRAMEWORK = {
     ],
     'DEFAULT_THROTTLE_RATES': {
         'anon': '10/day',
-        'anon': '1/minute',
         'user': '25000/day'
-    }
+    },
+    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.LimitOffsetPagination',
+    'PAGE_SIZE': 10
 }
 
 # Password validation
@@ -179,6 +189,7 @@ OLD_DB_USER = ''
 OLD_DB_PASS = ''
 OLD_DB_NAME = ''
 
+GENERAL_CACHE_SECONDS = 60 * 60 * 24
 
 try:
     from .local_settings import *

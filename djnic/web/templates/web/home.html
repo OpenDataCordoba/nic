@@ -1,0 +1,33 @@
+{% extends "web/base.html" %}
+{% load static %}
+{% load humanize %}
+
+{% block section1 %}
+
+<!-- Start Statusrea -->
+<div class="notika-status-area">
+    <div class="container">
+        <div class="row">
+
+        {% for box in boxes %}
+
+            {% if forloop.counter0 > 0 and forloop.counter0|divisibleby:"4" %}</div><div class="row">{% endif %}
+            <div class="col-lg-3 col-md-6 col-sm-6 col-xs-12">
+                <div class="wb-traffic-inner notika-shadow sm-res-mg-t-30 tb-res-mg-t-30">
+                    <div class="website-traffic-ctn">
+                        <h2><span class="counter">{{ box.counter }}</span></h2>
+                        <p>{{ box.title}} (cambios detectados)</p>
+                    </div>
+                    <div class="sparkline-bar-stats1">{{ box.data_list }}</div>
+                </div>
+            </div>
+
+        {% endfor %}
+
+        </div>
+    </div>
+</div>
+<!-- End Status area-->
+    
+
+{% endblock section1 %}
