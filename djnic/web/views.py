@@ -4,7 +4,8 @@ from django.db.models.functions import Trunc
 from django.utils import timezone
 from django.views.generic.base import TemplateView
 
-from dominios.models import Dominio, STATUS_NO_DISPONIBLE
+from cambios.models import CampoCambio
+from dominios.models import Dominio, STATUS_NO_DISPONIBLE, STATUS_DISPONIBLE
 from zonas.models import GrupoZona
 
 class HomeView(TemplateView):
@@ -56,4 +57,5 @@ class HomeView(TemplateView):
 
                 context['boxes'].append(box)
 
+        context['ultimos_caidos'] = CampoCambio.objects.filter(campo='estado', anterior=STATUS_NO_DISPONIBLE, nuevo=STATUS_DISPONIBLE).order_by('-cambio__momento')[:100]
         return context
