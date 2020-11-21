@@ -36,6 +36,6 @@ class CampoCambio(models.Model):
 
     def brother_registrant_name(self):
         return self.brother(campo='registrant_name')
-    
+        
     def brother_expire(self):
-        return self.brother(campo='expire')
+        return self.brother(campo='dominio_expire')

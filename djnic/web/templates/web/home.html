@@ -50,8 +50,8 @@
 {% for campo in ultimos_caidos %}
 <tr>
     <td>{{ campo.cambio.dominio.full_domain }}</td>
-    <td>{{ campo.brother_registrant_name }}</td>
-    <td>{{ campo.brother_expire|date:"Y-M-d H:i:s" }}</td>
+    <td>{% if campo.brother_registrant_name %}{{ campo.brother_registrant_name.anterior }}{% endif %}</td>
+    <td>{% if campo.brother_expire %}{{ campo.brother_expire.anterior }}{% endif %}</td>
     <td>{{ campo.cambio.momento|date:"Y-M-d H:i:s" }}</td>
 </tr>
 {% endfor %}                                 
