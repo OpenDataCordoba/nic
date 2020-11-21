@@ -29,3 +29,13 @@ class CampoCambio(models.Model):
         anterior = self.anterior or ''
         nuevo = self.nuevo or ''
         return f'{campo} from {anterior} to {nuevo}'
+
+    def brother(campo):
+        """ campo cambiado en base a otro campo del mismo cambio """
+        return self.cambio.campos.filter(campo=campo).first()
+
+    def brother_registrant_name():
+        return self.brother(campo='registrant_name')
+    
+    def brother_expire():
+        return self.brother(campo='expire')

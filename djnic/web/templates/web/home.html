@@ -43,14 +43,16 @@
                             <table id="data-table-basic" class="table table-striped">
                                 <thead>
                                     <tr>
-<th>Dominio</th><th>Detectado</th>
+<th>Dominio</th><th>Ultimo registrante</th><th>Fecha expiracion</th><th>Detectado</th>
                                     </tr>
                                 </thead>
                                 <tbody>
 {% for campo in ultimos_caidos %}
 <tr>
     <td>{{ campo.cambio.dominio.full_domain }}</td>
-    <td>{{ campo.cambio.momento }}</td>
+    <td>{{ campo.brother_registrant_name }}</td>
+    <td>{{ campo.brother_expire|date:"Y-M-d H:i:s" }}</td>
+    <td>{{ campo.cambio.momento|date:"Y-M-d H:i:s" }}</td>
 </tr>
 {% endfor %}                                 
                                 </tbody>
