@@ -69,7 +69,7 @@ class HomeView(TemplateView):
             .order_by('-cambio__momento')[:10]
         context['ultimos_caidos'] = ultimos_cambios
         
-        context['ultimos_registrados'] = Dominio.objects.order_by('-registered')[10]
+        context['ultimos_registrados'] = Dominio.objects.order_by('-registered')[:10]
         
         
         return context
