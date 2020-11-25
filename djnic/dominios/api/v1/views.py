@@ -18,7 +18,9 @@ from rest_framework.decorators import action
 from dominios.models import Dominio, STATUS_DISPONIBLE, STATUS_NO_DISPONIBLE, PreDominio
 from zonas.models import Zona
 from cambios.models import CampoCambio
-from .serializer import DominioSerializer, CambiosDominioSerializer, FlatDominioSerializer, FlatPreDominioSerializer
+from .serializer import (DominioSerializer, CambiosDominioSerializer, 
+                         FlatDominioSerializer, FlatPreDominioSerializer,
+                         PreDominioSerializer)
 
 logger = logging.getLogger(__name__)
 
@@ -81,6 +83,17 @@ class DominioViewSet(viewsets.ModelViewSet):
             'cambios': cambios
         }
         return JsonResponse(res)
+
+
+@method_decorator(cache_page(settings.GENERAL_CACHE_SECONDS), name='dispatch')
+class PreDominioViewSet(viewsets.ModelViewSet):
+    queryset = PreDominio.objects.all()
+    serializer_class = PreDominioSerializer
+    permission_classes = [DjangoModelPermissions]
+    authentication_classes = [TokenAuthentication, SessionAuthentication]
+    filter_backends = [DjangoFilterBackend, filters.OrderingFilter]
+    ordering = ['dominio']
+
 
 @method_decorator(never_cache, name='dispatch')
 class NextPriorityDomainViewSet(viewsets.ModelViewSet):

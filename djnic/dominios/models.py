@@ -302,7 +302,7 @@ class DNSDominio(models.Model):
 class PreDominio(models.Model):
     """ dominios que creo que podrían ser nuevos para pa bases de datos 
         Si ya existen en la tabla principal no deben estar acá """
-    dominio = models.CharField(max_length=250)
+    dominio = models.CharField(max_length=250, unique=True)
     priority = models.IntegerField(default=50)
 
     def __str__(self):

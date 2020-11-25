@@ -33,6 +33,12 @@ class FlatPreDominioSerializer(serializers.ModelSerializer):
         fields = ['id', 'domain']
 
 
+class PreDominioSerializer(serializers.ModelSerializer):
+    
+    class Meta:
+        model = PreDominio
+        fields = ['id', 'dominio', 'priority']
+
 class CambiosDominioSerializer(serializers.ModelSerializer):
     domain = serializers.CharField(read_only=True, source='full_domain')
     ultimo_cambio = CambiosDominioSerializer()
