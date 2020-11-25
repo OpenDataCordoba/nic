@@ -43,7 +43,7 @@ class Command(BaseCommand):
         hoy = timezone.now()
         for n in range(0, 5000):
             for zona in zonas:
-                dom, created = Dominio.objects.get_or_create(nombre=f'test-{n}.{zona.nombre}',zona=zona)
+                dom, created = Dominio.objects.get_or_create(nombre=f'test-{n}',zona=zona)
                 dom.estado=STATUS_NO_DISPONIBLE
                 dom.data_readed= hoy - timedelta(days=random.randint(1, 90))
                 dom.data_updated= hoy - timedelta(days=random.randint(1, 60))

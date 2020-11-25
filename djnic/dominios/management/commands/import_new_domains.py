@@ -30,19 +30,14 @@ class Command(BaseCommand):
             dominio = dominio.strip().lower()
             c += 1
             self.stdout.write(self.style.SUCCESS(f"{c} [{skipped}] {dominio}"))
-            # ver si ya existe en la base
-            wa = WhoAre()
-            domain_name, zone = wa.detect_zone(dominio)
-            zona = Zona.objects.get(nombre=zone)
-
-            dominios = Dominio.objects.filter(nombre=domain_name, zona=zona)
-            if dominios.count() > 0:
+            
+            pd, created = PreDominio.objects.get_or_create(dominio=dominio)
+            # ID=0 si ya existe como dominio
+            if not created or pd.id == 0:
                 skipped += 1
-                continue
 
-            _, created = PreDominio.objects.get_or_create(dominio=dominio, priority=options['priority'])
-            if not created:
-                skipped += 1
+            pd.priority=options['priority']
+            pd.save()
             
         self.stdout.write(self.style.SUCCESS(f"DONE. {c} processed {skipped} skipped"))
         

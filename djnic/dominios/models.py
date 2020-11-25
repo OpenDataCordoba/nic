@@ -307,3 +307,16 @@ class PreDominio(models.Model):
 
     def __str__(self):
         return self.dominio
+
+    def save(self, **kwargs):
+        # si ya existe como dominio, omitir
+        wa = WhoAre()
+        domain_name, zone = wa.detect_zone(self.dominio)
+        zona = Zona.objects.get(nombre=zone)
+
+        dominios = Dominio.objects.filter(nombre=domain_name, zona=zona)
+        if dominios.count() > 0:
+            # TODO, este injerto no parece bueno
+            self.id = 0
+        else:
+            return super().save(**kwargs)
