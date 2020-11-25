@@ -66,6 +66,10 @@ class HomeView(TemplateView):
         ultimos_cambios = CampoCambio.objects\
             .filter(cambio__momento__gt=starts)\
             .filter(campo='estado', anterior=STATUS_NO_DISPONIBLE, nuevo=STATUS_DISPONIBLE)\
-            .order_by('-cambio__momento')[:50]
+            .order_by('-cambio__momento')[:10]
         context['ultimos_caidos'] = ultimos_cambios
+        
+        context['ultimos_registrados'] = Dominio.objects.order_by('-registered')[10]
+        
+        
         return context

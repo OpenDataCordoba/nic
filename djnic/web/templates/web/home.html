@@ -29,7 +29,7 @@
 </div>
 <!-- End Status area-->
 
-<!-- Data Table area Start-->
+<!-- ULTIMOS CAIDOS Data Table area Start-->
     <div class="data-table-area">
         <div class="container">
             <div class="row">
@@ -53,6 +53,44 @@
     <td>{% if campo.brother_registrant_name %}{{ campo.brother_registrant_name.anterior }}{% endif %}</td>
     <td>{% if campo.brother_expire %}{{ campo.brother_expire.anterior }}{% endif %}</td>
     <td>{{ campo.cambio.momento|date:"Y-M-d H:i:s" }}</td>
+</tr>
+{% endfor %}                                 
+                                </tbody>
+<!-- <tfoot><tr><th>Dominio</th><th>Detectado</th></tr></tfoot> -->
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Data Table area End-->
+
+
+<!-- ULTIMOS REGISTRADOS Data Table area Start-->
+    <div class="data-table-area">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                    <div class="data-table-list">
+                        <div class="basic-tb-hd">
+                            <h2>Últimos dominios registrados</h2>
+                            <p>(según nuestro sistema lo detecta)</p>
+                        </div>
+                        <div class="table-responsive">
+                            <table id="data-table-basic" class="table table-striped">
+                                <thead>
+                                    <tr>
+<th>Dominio</th><th>Ultimo registrante</th><th>Fecha registro</th><th>Detectado</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+{% for dominio in ultimos_registrados %}
+<tr>
+    <td>{{ dominio.nombre }}.{{ dominio.zona.nombre }}</td>
+    <td>{{ dominio.registrante.name }}</td>
+    <td>{{ dominio.registered }}</td>
+    <td>{{ dominio.data_updated|date:"Y-M-d H:i:s" }}</td>
 </tr>
 {% endfor %}                                 
                                 </tbody>
