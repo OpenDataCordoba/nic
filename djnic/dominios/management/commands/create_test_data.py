@@ -4,9 +4,9 @@ import random
 from time import sleep
 from django.core.management.base import BaseCommand, CommandError
 from django.utils import timezone
-from dominios.models import Dominio, STATUS_NO_DISPONIBLE
+from dominios.models import Dominio, STATUS_NO_DISPONIBLE, STATUS_DISPONIBLE, DNSDominio
 from zonas.models import GrupoZona, Zona, ZonaEnGrupo
-
+from dnss.models import DNS
 logger = logging.getLogger(__name__)
 
 
@@ -40,14 +40,28 @@ class Command(BaseCommand):
 
         zonas = [zona_ar, zona_cl, zona_com_uy, zona_gob_ar, zona_uy]
 
+        for r in range(1, 50):
+            for n in range(1, 4):
+                DNS.objects.get_or_create(dominio=f'ns{n}.test{r}.com')
+
         hoy = timezone.now()
-        for n in range(0, 5000):
+        for n in range(0, 500):
             for zona in zonas:
-                dom, created = Dominio.objects.get_or_create(nombre=f'test-{n}',zona=zona)
-                dom.estado=STATUS_NO_DISPONIBLE
+                
+                dom, created = Dominio.objects.get_or_create(nombre=f'test-{n}.{zona.nombre}',zona=zona)
+                # clean DNSs
+                DNSDominio.objects.filter(dominio=dom).delete()
                 dom.data_readed= hoy - timedelta(days=random.randint(1, 90))
                 dom.data_updated= hoy - timedelta(days=random.randint(1, 60))
-                dom.expire=hoy + timedelta(days=random.randint(1, 90))
+                    
+                if random.randint(1, 90) > 30:
+                    dom.estado=STATUS_NO_DISPONIBLE
+                    dom.expire=hoy + timedelta(days=random.randint(1, 90))
+                    for n in range(1, random.randint(3, 6)):
+                        dns = DNS.objects.order_by('?').first()
+                        DNSDominio.objects.create(dominio=dom, dns=dns, orden=n)
+                else:
+                    dom.estado=STATUS_DISPONIBLE
                 dom.save()
 
         self.stdout.write(self.style.SUCCESS(f"Finished"))
