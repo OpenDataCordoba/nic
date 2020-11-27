@@ -74,7 +74,7 @@ class APIDominioTestCase(LiveServerTestCase):
         # missing whoare version
         self.assertEqual(resp.status_code, 400)
 
-        test_dict['whoare_version'] = '0.1.39'
+        test_dict['whoare_version'] = '0.1.42'
         str_data = json.dumps(test_dict)
         final = {'domain': str_data}    
         resp = requests.post(ep, data=final, headers=headers)
