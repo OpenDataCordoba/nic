@@ -1,6 +1,6 @@
 from datetime import timedelta
 from django.conf import settings
-from django.db.models import Count
+from django.db.models import Count, Q
 from django.db.models.functions import Trunc
 from django.utils import timezone
 from django.utils.decorators import method_decorator
@@ -10,6 +10,8 @@ from django.views.generic.base import TemplateView
 from cambios.models import CampoCambio
 from dominios.models import Dominio, STATUS_NO_DISPONIBLE, STATUS_DISPONIBLE
 from zonas.models import GrupoZona
+from dnss.models import Empresa
+
 
 @method_decorator(cache_control(max_age=settings.GENERAL_CACHE_SECONDS), name='dispatch')
 @method_decorator(cache_page(settings.GENERAL_CACHE_SECONDS), name='dispatch')
@@ -71,5 +73,9 @@ class HomeView(TemplateView):
         
         context['ultimos_registrados'] = Dominio.objects.filter(estado=STATUS_NO_DISPONIBLE).order_by('-registered')[:10]
         
+        hostings = Empresa.objects.all()
+        hostings = hostings.annotate(total_dominios=Count('regexs__nameservers__dominios', filter=Q(regexs__nameservers__dominios__orden=1))).order_by('-total_dominios')[:30]
+
+        context['hostings'] = hostings
         
         return context
