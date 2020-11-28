@@ -6,7 +6,7 @@ logger = logging.getLogger(__name__)
 
 class Empresa(models.Model):
     """ una empresa de hosting """
-    nombre = models.CharField(max_length=90)
+    nombre = models.CharField(max_length=90, unique=True)
     object_created = models.DateTimeField(auto_now_add=True)
     object_modified = models.DateTimeField(auto_now=True)
     
@@ -18,7 +18,8 @@ class Empresa(models.Model):
         for rg in self.regexs.all():
             rg.detect_DNSs()
         
-
+    class Meta:
+        ordering = ['nombre']
 
 class EmpresaRegexDomain(models.Model):
     """ cada una de las expresiones regulares para detectar dominios que le pertenecen """
