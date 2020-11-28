@@ -32,3 +32,24 @@ class Registrante(models.Model):
 
     def __str__(self):
         return f'{self.name} [{self.zone}-{self.legal_uid}]'
+
+
+class TagForRegistrante(models.Model):
+    """ etiqueta para los registrantes """
+    nombre = models.CharField(max_length=190)
+    object_created = models.DateTimeField(auto_now_add=True)
+    object_modified = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return self.nombre
+
+
+class RegistranteTag(models.Model):
+    registrante = models.ForeignKey(Registrante, on_delete=models.CASCADE)
+    tag = models.ForeignKey(TagForRegistrante, on_delete=models.CASCADE)
+    object_created = models.DateTimeField(auto_now_add=True)
+    object_modified = models.DateTimeField(auto_now=True)
+    
+    def __str__(self):
+        return f'{self.tag}->{self.registrante}'
+

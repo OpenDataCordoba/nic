@@ -7,6 +7,9 @@ from django.utils import timezone
 from dominios.models import Dominio, STATUS_NO_DISPONIBLE, STATUS_DISPONIBLE, DNSDominio
 from zonas.models import GrupoZona, Zona, ZonaEnGrupo
 from dnss.models import DNS
+from registrantes.models import Registrante, TagForRegistrante, RegistranteTag
+
+
 logger = logging.getLogger(__name__)
 
 
@@ -44,6 +47,16 @@ class Command(BaseCommand):
             for n in range(1, 4):
                 DNS.objects.get_or_create(dominio=f'ns{n}.test{r}.com')
 
+        for r in range(1, 7):
+            TagForRegistrante.objects.get_or_create(nombre=f'RegTag{r}')
+        
+        for r in range(1, 70):
+            reg, created = Registrante.objects.get_or_create(legal_uid=f'R00000{r}', name=f'Registrante {r}')
+            for n in range(1, 3):
+                if random.randint(1, 90) > 70:
+                    tag = TagForRegistrante.objects.order_by('?').first()
+                    RegistranteTag.objects.create(registrante=reg, tag=tag)
+            
         hoy = timezone.now()
         for n in range(0, 500):
             for zona in zonas:
