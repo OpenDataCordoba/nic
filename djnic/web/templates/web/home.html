@@ -95,13 +95,7 @@
 {% endfor %}                                 
                             </tbody>
 <!-- <tfoot><tr><th>Dominio</th><th>Detectado</th></tr></tfoot> -->
-                        </table>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
+</table></div></div></div></div></div></div>
 <!-- Data Table area End-->
 
 
@@ -212,5 +206,81 @@
 </div>
 <!-- Data Table area End-->
 
+
+<!-- transferencias -->
+    <div class="data-table-area">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                    <div class="data-table-list">
+                        <div class="basic-tb-hd">
+                            <h2>Transferencias de dominios</h2>
+                            <p>(según nuestro sistema lo detecta)</p>
+                        </div>
+                        <div class="table-responsive">
+                            <table id="data-table-basic" class="table table-striped">
+                                <thead>
+                                    <tr>
+<th>Dominio</th><th>Anterior</th><th>Nuevo</th><th>Detectado</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+{% for campo in Transferencias %}
+<tr>
+    <td>{{ campo.cambio.dominio.full_domain }}</td>
+    {% with r=campo.cambio.registrantes_en_cambio %}
+    <td>{{ r.0 }}</td><td>{{ r.1 }}</td>
+    {% endwith %}
+    <td>{{ campo.cambio.momento|date:"Y-m-d H:i:s" }}</td>
+</tr>
+{% endfor %}                                 
+                                </tbody>
+<!-- <tfoot><tr><th>Dominio</th><th>Detectado</th></tr></tfoot> -->
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Data Table area End-->
+
+<!-- cambios de tagueados-->
+    <div class="data-table-area">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                    <div class="data-table-list">
+                        <div class="basic-tb-hd">
+                            <h2>Transferencias de dominios registrantes etiquetados</h2>
+                            <p>(según nuestro sistema lo detecta)</p>
+                        </div>
+                        <div class="table-responsive">
+                            <table id="data-table-basic" class="table table-striped">
+                                <thead>
+                                    <tr>
+<th>Dominio</th><th>Anterior</th><th>Nuevo</th><th>Detectado</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+{% for campo in Transferencias %}
+<tr>
+    <td>{{ campo.cambio.dominio.full_domain }}</td>
+    {% with r=campo.cambio.registrantes_en_cambio %}
+    <td>{{ r.0 }}</td><td>{{ r.1 }}</td>
+    {% endwith %}
+    <td>{{ campo.cambio.momento|date:"Y-m-d H:i:s" }}</td>
+</tr>
+{% endfor %}                                 
+                                </tbody>
+<!-- <tfoot><tr><th>Dominio</th><th>Detectado</th></tr></tfoot> -->
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Data Table area End-->
 
 {% endblock section1 %}

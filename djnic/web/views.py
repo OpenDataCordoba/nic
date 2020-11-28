@@ -92,6 +92,26 @@ class HomeView(TemplateView):
 
         context['news_from_tags'] = nuevos
 
+        # Transferencias de dominios
+        
+        starts = timezone.now() - timedelta(days=120)
+        transferencias = CampoCambio.objects\
+            .filter(cambio__momento__gt=starts)\
+            .filter(campo='registrant_legal_uid')\
+            .exclude(Q(anterior__exact="") | Q(nuevo__exact=""))\
+            .order_by('-cambio__momento')
+        context['transferencias'] = transferencias[:10]
+
+        # Transferencias de dominios tagueados
+        tg_regs = Registrante.objects.annotate(total_tags=Count('tags'))\
+                    .filter(total_tags__gt=0)
+        tg_ids = [reg.legal_uid for reg in tg_regs]     
+        
+        transferencias_tag = transferencias.filter(
+            Q(anterior__in=tg_ids) | Q(nuevo__in=tg_ids)
+        )
+        context['transferencias_tag'] = transferencias[:10]
+
         # Dominios vencidos de registrantes tagueados
         timezone.now()
         nuevos = Dominio.objects\
@@ -101,5 +121,7 @@ class HomeView(TemplateView):
                     .order_by('expire')
 
         context['expired_from_tags'] = nuevos
+
+        
 
         return context
