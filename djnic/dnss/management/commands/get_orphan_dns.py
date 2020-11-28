@@ -14,11 +14,11 @@ class Command(BaseCommand):
 
         self.stdout.write(self.style.SUCCESS("Buscando DNSs"))
         orphans = DNS.objects.filter(empresa_regex__isnull=True)
-        pending = orphans.annotate(total_dominios=Count('dominios', filter=Q(dominios__orden=1))).order_by('total_dominios')
+        pending = orphans.annotate(total_dominios=Count('dominios', filter=Q(dominios__orden=1))).order_by('-total_dominios')
         
         process = pending[:options['show']]
 
-        for p in process:
+        for p in reversed(process):
             self.stdout.write(self.style.WARNING(f'{p.dominio} {p.total_dominios}'))
             if options['show_domains'] > 0:
                 dominios = Dominio.objects.filter(estado=STATUS_NO_DISPONIBLE)\
