@@ -53,3 +53,9 @@ class RegistranteTag(models.Model):
     def __str__(self):
         return f'{self.tag}->{self.registrante}'
 
+    """ por ahora a mano desde el shell
+        from registrantes.models import *
+        r = Registrante.objects.get(legal_uid='')
+        tr = TagForRegistrante.objects.get(nombre='AutosAR')
+        RegistranteTag.objects.create(registrante=r, tag=tr)
+    """
