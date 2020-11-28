@@ -83,7 +83,7 @@ class HomeView(TemplateView):
         context['hostings'] = hostings
         
         # Nuevos dominios de registrantes tagueados
-        starts = timezone.now() - timedelta(days=60)
+        starts = timezone.now() - timedelta(days=120)
         nuevos = Dominio.objects\
                     .filter(registered__gt=starts)\
                     .annotate(tags=Count('registrante__tags'))\
