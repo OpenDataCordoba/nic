@@ -18,7 +18,7 @@ class CambiosDominio(models.Model):
         registrante_anterior = None
         registrante_nuevo = None
         
-        for campo in self.campos:
+        for campo in self.campos.all():
             if campo.campo == 'registrant_legal_uid':
                 if campo.anterior != '':
                     registrante_anterior = Registrante.objects.filter(legal_uid=campo.anterior).first()
