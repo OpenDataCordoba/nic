@@ -225,7 +225,7 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-{% for campo in Transferencias %}
+{% for campo in transferencias %}
 <tr>
     <td>{{ campo.cambio.dominio.full_domain }}</td>
     {% with r=campo.cambio.registrantes_en_cambio %}
@@ -263,7 +263,7 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-{% for campo in Transferencias %}
+{% for campo in transferencias_tag %}
 <tr>
     <td>{{ campo.cambio.dominio.full_domain }}</td>
     {% with r=campo.cambio.registrantes_en_cambio %}
