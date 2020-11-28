@@ -64,12 +64,14 @@ class Command(BaseCommand):
                 dom, created = Dominio.objects.get_or_create(nombre=f'test-{n}.{zona.nombre}',zona=zona)
                 # clean DNSs
                 DNSDominio.objects.filter(dominio=dom).delete()
-                dom.data_readed= hoy - timedelta(days=random.randint(1, 90))
-                dom.data_updated= hoy - timedelta(days=random.randint(1, 60))
-                    
+                dom.data_readed = hoy - timedelta(days=random.randint(1, 90))
+                dom.data_updated = hoy - timedelta(days=random.randint(1, 60))
+                
+
                 if random.randint(1, 90) > 30:
-                    dom.estado=STATUS_NO_DISPONIBLE
-                    dom.expire=hoy + timedelta(days=random.randint(1, 90))
+                    dom.estado = STATUS_NO_DISPONIBLE
+                    dom.registered = hoy - timedelta(days=random.randint(1, 900))
+                    dom.expire = hoy + timedelta(days=random.randint(1, 90))
                     for n in range(1, random.randint(3, 6)):
                         dns = DNS.objects.order_by('?').first()
                         DNSDominio.objects.create(dominio=dom, dns=dns, orden=n)
