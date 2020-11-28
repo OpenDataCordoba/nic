@@ -294,6 +294,9 @@ class DNSDominio(models.Model):
     dominio = models.ForeignKey(Dominio, on_delete=models.RESTRICT, related_name='dnss')
     dns = models.ForeignKey('dnss.DNS', on_delete=models.RESTRICT, related_name='dominios')
     orden = models.IntegerField()
+    object_created = models.DateTimeField(auto_now_add=True)
+    object_modified = models.DateTimeField(auto_now=True)
+
     
     class Meta:
         unique_together = (('dominio', 'dns', 'orden'), )
@@ -304,6 +307,8 @@ class PreDominio(models.Model):
         Si ya existen en la tabla principal no deben estar acá """
     dominio = models.CharField(max_length=250, unique=True)
     priority = models.IntegerField(default=50)
+    object_created = models.DateTimeField(auto_now_add=True)
+    object_modified = models.DateTimeField(auto_now=True)
 
     def __str__(self):
         return self.dominio

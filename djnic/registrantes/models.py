@@ -10,6 +10,9 @@ class Registrante(models.Model):
     zone = models.CharField(max_length=10, default='AR', help_text='Para identificar en el pais donde esta')
     created = models.DateTimeField(null=True, blank=True)
     changed = models.DateTimeField(null=True, blank=True)
+    object_created = models.DateTimeField(auto_now_add=True)
+    object_modified = models.DateTimeField(auto_now=True)
+
 
     class Meta:
         unique_together = (('legal_uid', 'zone'))

@@ -7,6 +7,8 @@ logger = logging.getLogger(__name__)
 class Empresa(models.Model):
     """ una empresa de hosting """
     nombre = models.CharField(max_length=90)
+    object_created = models.DateTimeField(auto_now_add=True)
+    object_modified = models.DateTimeField(auto_now=True)
     
     def __str__(self):
         return self.nombre
@@ -24,7 +26,9 @@ class EmpresaRegexDomain(models.Model):
     regex_dns = models.CharField(max_length=190,
                                  help_text='Experesion regular para encontrar los DNSs que le pertenecen', 
                                  null=True, blank=True, unique=True)
-    
+    object_created = models.DateTimeField(auto_now_add=True)
+    object_modified = models.DateTimeField(auto_now=True)
+
     def detect_DNSs(self):
         logger.info(f'Look for domains to Empresa {self.empresa.nombre} {self.regex_dns}')
         # remove previous
@@ -45,6 +49,8 @@ class EmpresaRegexDomain(models.Model):
 class DNS(models.Model):
     empresa_regex = models.ForeignKey(EmpresaRegexDomain, null=True, blank=True, on_delete=models.SET_NULL, related_name='nameservers')
     dominio = models.CharField(max_length=240, unique=True)
+    object_created = models.DateTimeField(auto_now_add=True)
+    object_modified = models.DateTimeField(auto_now=True)
 
     def __str__(self):
         return self.dominio
