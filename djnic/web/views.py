@@ -11,6 +11,7 @@ from cambios.models import CampoCambio
 from dominios.models import Dominio, STATUS_NO_DISPONIBLE, STATUS_DISPONIBLE
 from zonas.models import GrupoZona
 from dnss.models import Empresa
+from registrantes.models import Registrante, TagForRegistrante, RegistranteTag
 
 
 @method_decorator(cache_control(max_age=settings.GENERAL_CACHE_SECONDS), name='dispatch')
@@ -64,6 +65,7 @@ class HomeView(TemplateView):
 
                 context['boxes'].append(box)
 
+        # ultimos dominios caidos
         starts = timezone.now() - timedelta(days=2)
         ultimos_cambios = CampoCambio.objects\
             .filter(cambio__momento__gt=starts)\
@@ -71,11 +73,24 @@ class HomeView(TemplateView):
             .order_by('-cambio__momento')[:10]
         context['ultimos_caidos'] = ultimos_cambios
         
+        # Ultimos dominios registrados
         context['ultimos_registrados'] = Dominio.objects.filter(estado=STATUS_NO_DISPONIBLE).order_by('-registered')[:10]
-        
+
+        # Empresas de hosting más usadas        
         hostings = Empresa.objects.all()
         hostings = hostings.annotate(total_dominios=Count('regexs__nameservers__dominios', filter=Q(regexs__nameservers__dominios__orden=1))).order_by('-total_dominios')[:30]
 
         context['hostings'] = hostings
         
+        # Nuevos dominios de registrantes tagueados
+        starts = timezone.now() - timedelta(days=60)
+        nuevos = Dominio.objects\
+                    .filter(registered__gt=starts)\
+                    .annotate(tags=Count('registrante__tags'))\
+                    .filter(tags__gt=0)\
+                    .order_by('-registered')
+
+        context['news_from_tags'] = nuevos
+
+
         return context

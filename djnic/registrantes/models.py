@@ -45,11 +45,11 @@ class TagForRegistrante(models.Model):
 
 
 class RegistranteTag(models.Model):
-    registrante = models.ForeignKey(Registrante, on_delete=models.CASCADE)
-    tag = models.ForeignKey(TagForRegistrante, on_delete=models.CASCADE)
+    registrante = models.ForeignKey(Registrante, on_delete=models.CASCADE, related_name='tags')
+    tag = models.ForeignKey(TagForRegistrante, on_delete=models.CASCADE, related_name='registrantes')
     object_created = models.DateTimeField(auto_now_add=True)
     object_modified = models.DateTimeField(auto_now=True)
-    
+
     def __str__(self):
         return f'{self.tag}->{self.registrante}'
 
