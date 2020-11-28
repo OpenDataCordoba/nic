@@ -154,7 +154,7 @@
                         <table id="data-table-basic" class="table table-striped">
                             <thead>
                                 <tr>
-<th>Dominio</th><th>Registrante</th><th>Registrado</th>
+<th>Dominio</th><th>Registrante</th><th>Registrado</th><th>Etiquetas</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -163,6 +163,7 @@
 <td>{{ nuevo.full_domain}}</td>
 <td>{{ nuevo.registrante }}</td>
 <td>{{ nuevo.registered|date:"Y-m-d H:i:s" }}</td>
+<td>{% for rt in nuevo.registrante.tags.all %}{{ rt.tag.nombre }} {% endfor %}</td>
 </tr>
 {% endfor %}                                 
                             </tbody>
