@@ -147,7 +147,7 @@
             <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
                 <div class="data-table-list">
                     <div class="basic-tb-hd">
-                        <h2>Nuevos dominios de trgistrantes etiquetados</h2>
+                        <h2>Nuevos dominios de registrantes etiquetados</h2>
                         <p>(según nuestro sistema)</p>
                     </div>
                     <div class="table-responsive">
@@ -163,6 +163,42 @@
 <td>{{ nuevo.full_domain}}</td>
 <td>{{ nuevo.registrante }}</td>
 <td>{{ nuevo.registered|date:"Y-m-d H:i:s" }}</td>
+<td>{% for rt in nuevo.registrante.tags.all %}{{ rt.tag.nombre }} {% endfor %}</td>
+</tr>
+{% endfor %}                                 
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Data Table area End-->
+
+<!-- Nuevos tagueados-->
+<div class="data-table-area">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                <div class="data-table-list">
+                    <div class="basic-tb-hd">
+                        <h2>Dominios vencidos y por caer de registrantes etiquetados</h2>
+                        <p>(según nuestro sistema)</p>
+                    </div>
+                    <div class="table-responsive">
+                        <table id="data-table-basic" class="table table-striped">
+                            <thead>
+                                <tr>
+<th>Dominio</th><th>Registrante</th><th>Expira</th><th>Etiquetas</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+{% for nuevo in expired_from_tags %}
+<tr>
+<td>{{ nuevo.full_domain}}</td>
+<td>{{ nuevo.registrante }}</td>
+<td>{{ nuevo.expire|date:"Y-m-d H:i:s" }}</td>
 <td>{% for rt in nuevo.registrante.tags.all %}{{ rt.tag.nombre }} {% endfor %}</td>
 </tr>
 {% endfor %}                                 

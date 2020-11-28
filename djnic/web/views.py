@@ -92,5 +92,14 @@ class HomeView(TemplateView):
 
         context['news_from_tags'] = nuevos
 
+        # Dominios vencidos de registrantes tagueados
+        starts = timezone.now() - timedelta(days=120)
+        nuevos = Dominio.objects\
+                    .filter(expire__gt=timezone.now())\
+                    .annotate(tags=Count('registrante__tags'))\
+                    .filter(tags__gt=0)\
+                    .order_by('expire')
+
+        context['expired_from_tags'] = nuevos
 
         return context
