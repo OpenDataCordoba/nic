@@ -110,7 +110,7 @@ class HomeView(TemplateView):
         transferencias_tag = transferencias.filter(
             Q(anterior__in=tg_ids) | Q(nuevo__in=tg_ids)
         )
-        context['transferencias_tag'] = transferencias[:10]
+        context['transferencias_tag'] = transferencias_tag[:10]
 
         # Dominios vencidos de registrantes tagueados
         timezone.now()
