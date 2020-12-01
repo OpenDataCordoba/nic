@@ -1,10 +1,8 @@
-from datetime import datetime, timedelta
 import logging
-from time import sleep
 from django.core.management.base import BaseCommand, CommandError
-from django.db.models import Q
-from django.utils import timezone
-from dominios.models import Dominio
+
+from core.models import News
+from dominios.models import PreDominio
 
 
 logger = logging.getLogger(__name__)
@@ -21,26 +19,32 @@ class Command(BaseCommand):
         doms = f.read()
         f.close()
         dlist = doms.split('\n')
+        
         c = 0
-        errors = 0
         skipped = 0
+        news = 0
+        already_domain = 0
+        report = '-'
+
         for dominio in dlist:
             c += 1
-            dom_obj, error, changes = Dominio.add_from_whois(domain=dominio, just_new=True)
-            self.stdout.write(self.style.SUCCESS(f"{c} [{errors}] [{skipped}] {dominio}: {dom_obj}, {error}, {changes}"))
             
-            if not dom_obj:
-                dlist.append(dominio)
-                errors += 1
-                self.stdout.write(self.style.SUCCESS(f"Error {error}"))
-                sleep(15)
-            else:
+            pd, created = PreDominio.objects.get_or_create(dominio=dominio)
+            # ID=0 si ya existe como dominio
+            if not created:
                 skipped += 1
-                if error == 'Already exists':
-                    continue
+                continue
             
-            sleep(options['sleep'])
-            self.stdout.write(self.style.SUCCESS(f" - cambios {changes}"))
+            if pd.id == 0:
+                already_domain += 1
+            else:
+                pd.priority=80
+                pd.save()
+                news += 1
 
+            report = f'{c} processed. {news} news, {skipped} skipped, {already_domain} already exists as domain'
+            self.stdout.write(self.style.SUCCESS(report))
+        
+        News.objects.create(title='NEW AR Domains', description=report)
         self.stdout.write(self.style.SUCCESS(f"DONE. {c} processed"))
         
