@@ -17,7 +17,7 @@ class DominioAdmin(admin.ModelAdmin):
 @admin.register(PreDominio)
 class PreDominioAdmin(admin.ModelAdmin):
 
-    list_display = ['dominio', 'priority']
+    list_display = ['dominio', 'priority', 'object_created']
     list_per_page = 10
     search_fields = ['dominio']
     list_filter = ['priority']

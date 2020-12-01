@@ -55,7 +55,10 @@ class RegistranteTag(models.Model):
 
     """ por ahora a mano desde el shell
         from registrantes.models import *
-        r = Registrante.objects.get(legal_uid='')
-        tr = TagForRegistrante.objects.get(nombre='AutosAR')
+        r = Registrante.objects.get(legal_uid='50039229460')
+        tr = TagForRegistrante.objects.get(nombre='BigTech')
         RegistranteTag.objects.create(registrante=r, tag=tr)
+
+        # one line shell
+        from registrantes.models import *;RegistranteTag.objects.create(registrante=Registrante.objects.get(legal_uid='50033280669'), tag=TagForRegistrante.objects.get(nombre='BancosAR'))
     """

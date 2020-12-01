@@ -38,6 +38,7 @@ INSTALLED_APPS = [
     'zonas',
     'cambios',
     'web',
+    'core',
 ]
 
 MIDDLEWARE = [
