@@ -31,21 +31,22 @@ class Command(BaseCommand):
         skipped = 0
         news = 0
         already_domain = 0
+        report = '-'
+
         for dominio in dominios:
             c += 1
             
             pd, created = PreDominio.objects.get_or_create(dominio=dominio)
             # ID=0 si ya existe como dominio
-            if not created or pd.id == 0:
+            if not created:
                 skipped += 1
                 continue
-            
-            pd.priority=80
-            pd.save()
             
             if pd.id == 0:
                 already_domain += 1
             else:
+                pd.priority=80
+                pd.save()
                 news += 1
 
             report = f'{c} processed. {news} news, {skipped} skipped, {already_domain} already exists as domain'
