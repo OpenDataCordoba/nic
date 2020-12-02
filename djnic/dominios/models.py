@@ -317,7 +317,12 @@ class PreDominio(models.Model):
         # si ya existe como dominio, omitir
         wa = WhoAre()
         domain_name, zone = wa.detect_zone(self.dominio)
-        zona = Zona.objects.get(nombre=zone)
+        try:
+            zona = Zona.objects.get(nombre=zone)
+        except:
+            logger.error(f'Bad zone {zone}')
+            self.id = 0
+            return 
 
         dominios = Dominio.objects.filter(nombre=domain_name, zona=zona)
         if dominios.count() > 0:
