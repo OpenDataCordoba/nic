@@ -3,6 +3,7 @@ from django.core.management.base import BaseCommand, CommandError
 from django.utils import timezone
 from dominios.models import Dominio
 from cambios.models import CambiosDominio
+from core.models import News
 
 
 class Command(BaseCommand):
@@ -10,10 +11,15 @@ class Command(BaseCommand):
 
     def add_arguments(self, parser):
         parser.add_argument('--delete', nargs='?', type=bool, default=False)
+        parser.add_argument('--days_ago', nargs='?', type=int, default=2)
 
     def handle(self, *args, **options):
-        changes = CambiosDominio.objects.filter(momento__gt=datetime(2020, 11, 29, 3, 32))
+        from_date = timezone.now() - timedelta(days=options['days_ago'])
+        changes = CambiosDominio.objects.filter(momento__gt=from_date)
         c = 0
+        fix1 = 0
+        fix2 = 0
+        fix3 = 0
         delete = options['delete']
         for change in changes:
             c += 1
@@ -31,6 +37,7 @@ class Command(BaseCommand):
                 if rch is not None and rcr is not None:
                     if rch.anterior == rcr.nuevo and rch.nuevo == rcr.anterior:
                         if delete:
+                            fix1 += 1
                             self.stdout.write(self.style.ERROR(f" ERROR 1 found {change}\n\t{rcr}\n\t{rch}"))
                             rch.delete()
                             rcr.delete()
@@ -41,6 +48,7 @@ class Command(BaseCommand):
                             self.stdout.write(self.style.ERROR(f" ERROR 1 found (not changed) {change}\n\t{rcr}\n\t{rch}"))
                     elif rch.anterior == rcr.nuevo:
                         if delete:
+                            fix2 += 1
                             self.stdout.write(self.style.ERROR(f" ERROR 2 found {change}\n\t{rcr}\n\t{rch}"))
                             rch.anterior = rcr.anterior
                             rch.save()
@@ -49,6 +57,7 @@ class Command(BaseCommand):
                             self.stdout.write(self.style.ERROR(f" ERROR 2 found (not changed) {change}\n\t{rcr}\n\t{rch}"))
                     elif rch.nuevo == rcr.anterior:
                         if delete:
+                            fix3 += 1
                             self.stdout.write(self.style.ERROR(f" ERROR 3 found {change}\n\t{rcr}\n\t{rch}"))
                             rcr.anterior = rch.anterior
                             rcr.save()
@@ -56,5 +65,8 @@ class Command(BaseCommand):
                         else:
                             self.stdout.write(self.style.ERROR(f" ERROR 3 found (not changed) {change}\n\t{rcr}\n\t{rch}"))
                     
-        self.stdout.write(self.style.SUCCESS(f"{c} processed"))
+        report = f"{c} processed. Fixes: {fix1}{fix2}{fix3}"
+        self.stdout.write(self.style.SUCCESS(report))
+        News.objects.create(title='NEW AR Domains', description=report)
+        
         
