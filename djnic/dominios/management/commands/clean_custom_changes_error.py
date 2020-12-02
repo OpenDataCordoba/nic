@@ -67,6 +67,6 @@ class Command(BaseCommand):
                     
         report = f"{c} processed. Fixes: {fix1}, {fix2}, {fix3}"
         self.stdout.write(self.style.SUCCESS(report))
-        News.objects.create(title='NEW AR Domains', description=report)
+        News.objects.create(title='Clean failed changes', description=report)
         
         

@@ -52,6 +52,6 @@ class Command(BaseCommand):
             report = f'{c} processed. {news} news, {skipped} skipped, {already_domain} already exists as domain'
             self.stdout.write(self.style.SUCCESS(report))
         
-        News.objects.create(title='Clean failed changes', description=report)
+        News.objects.create(title='NEW AR Domains', description=report)
         self.stdout.write(self.style.SUCCESS(f"DONE. {c} processed"))
         
