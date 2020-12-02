@@ -18,14 +18,7 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
 
-        force = options['force']
-        if force:
-            dominios = Dominio.objects.all()
-        else:
-            dominios = Dominio.objects.filter(
-                Q(next_update_priority__isnull=True) | 
-                Q(next_update_priority__lt=timezone.now()) 
-            )
+        dominios = Dominio.objects.all()
         
         c = 0
         for dominio in dominios:
@@ -34,7 +27,7 @@ class Command(BaseCommand):
             dominio.calculate_priority()
             self.stdout.write(self.style.SUCCESS(f"{c} {dominio.priority_to_update} {old_up} => {dominio.next_update_priority} {dominio}"))
 
-        report = f"{c} processed (force:{force})"
+        report = f"{c} processed"
         self.stdout.write(self.style.SUCCESS(report))
         News.objects.create(title='Update priority', description=report)
         
