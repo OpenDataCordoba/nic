@@ -133,6 +133,40 @@
 </div>
 <!-- Data Table area End-->
 
+<!-- Hostings 30 dias Data Table area Start-->
+<div class="data-table-area">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                <div class="data-table-list">
+                    <div class="basic-tb-hd">
+                        <h2>Hosting más usados en los dominios creados en los últimos 30 días</h2>
+                        <p>(según nuestro sistema usando el DNS1 como referencia)</p>
+                    </div>
+                    <div class="table-responsive">
+                        <table id="data-table-basic" class="table table-striped">
+                            <thead>
+                                <tr>
+<th>Hosting</th><th>Dominios apuntados</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+{% for host in hostings_last_30_days %}
+<tr>
+<td>{{ host.nombre }}</td>
+<td>{{ host.total_dominios }}</td>
+</tr>
+{% endfor %}                                 
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Data Table area End-->
+
 
 <!-- Nuevos tagueados-->
 <div class="data-table-area">

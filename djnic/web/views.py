@@ -78,10 +78,21 @@ class HomeView(TemplateView):
 
         # Empresas de hosting más usadas        
         hostings = Empresa.objects.all()
-        hostings = hostings.annotate(total_dominios=Count('regexs__nameservers__dominios', filter=Q(regexs__nameservers__dominios__orden=1))).order_by('-total_dominios')[:30]
-
-        context['hostings'] = hostings
+        hostings_all = hostings.annotate(total_dominios=Count('regexs__nameservers__dominios', filter=Q(regexs__nameservers__dominios__orden=1))).order_by('-total_dominios')[:10]
+        context['hostings'] = hostings_all
         
+        starts = timezone.now() - timedelta(days=30)
+        hostings_last_30_days = hostings.filter(regexs__nameservers__dominios__dominio__registered__gt=starts)\
+            .annotate(
+                total_dominios=Count(
+                    'regexs__nameservers__dominios', 
+                    filter=Q(regexs__nameservers__dominios__orden=1)
+                    )
+                )\
+            .order_by('-total_dominios')[:10]
+        context['hostings_last_30_days'] = hostings_last_30_days
+        
+
         # Nuevos dominios de registrantes tagueados
         starts = timezone.now() - timedelta(days=120)
         nuevos = Dominio.objects\

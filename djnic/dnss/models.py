@@ -51,7 +51,11 @@ class EmpresaRegexDomain(models.Model):
         self.detect_DNSs()
             
 class DNS(models.Model):
-    empresa_regex = models.ForeignKey(EmpresaRegexDomain, null=True, blank=True, on_delete=models.SET_NULL, related_name='nameservers')
+    empresa_regex = models.ForeignKey(
+        EmpresaRegexDomain, 
+        null=True, blank=True, 
+        on_delete=models.SET_NULL, 
+        related_name='nameservers')
     dominio = models.CharField(max_length=240, unique=True)
     object_created = models.DateTimeField(auto_now_add=True)
     object_modified = models.DateTimeField(auto_now=True)
