@@ -328,5 +328,8 @@ class PreDominio(models.Model):
         if dominios.count() > 0:
             # TODO, este injerto no parece bueno
             self.id = 0
+            # TODO si trate de agregarlo como predominio y existe pero esta disponible
+            # es posible que se haya vuelto a registrar. Debería aqui darle mas prioridad
+            # a su actualizacion
         else:
             return super().save(**kwargs)
