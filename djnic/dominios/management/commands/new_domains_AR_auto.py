@@ -41,8 +41,9 @@ class Command(BaseCommand):
             if not created:
                 skipped += 1
                 # le damos otra oportunidad
-                pd.priority=10
-                pd.save()
+                if pd.priority == 0:
+                    pd.priority=10
+                    pd.save()
                 continue
             
             if pd.id == 0:
