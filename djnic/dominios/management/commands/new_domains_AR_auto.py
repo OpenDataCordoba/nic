@@ -40,6 +40,9 @@ class Command(BaseCommand):
             # ID=0 si ya existe como dominio
             if not created:
                 skipped += 1
+                # le damos otra oportunidad
+                pd.priority=10
+                pd.save()
                 continue
             
             if pd.id == 0:
