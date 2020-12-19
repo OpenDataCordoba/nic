@@ -15,7 +15,11 @@
 <tr>
 <td>
     <button onclick="$('#ultimo_caido_{{ campo.id }}').toggle();">+</button>
+
+    <a href='{% url "dominio" pk=campo.cambio.dominio.id %}'>
     {{ campo.cambio.dominio.full_domain }}
+    </a>
+
 <div style="display: none" id="ultimo_caido_{{ campo.id }}">
     {% if campo.brother_registrant_name %} Ultimo registrante <b>{{ campo.brother_registrant_name.anterior }}</b>{% endif %}
     {% if campo.brother_expire %}<br />Expiró: {{ campo.brother_expire.anterior }}{% endif %}
@@ -47,7 +51,10 @@
 <tr>
 <td>
     <button onclick="$('#ultimo_registrado_{{ dominio.id }}').toggle();">+</button>
+    <a href='{% url "dominio" pk=dominio.id %}'>
     {{ dominio.nombre }}.{{ dominio.zona.nombre }}
+    </a>
+    
 <div style="display: none" id="ultimo_registrado_{{ dominio.id }}">
     Registrante <b>{{ dominio.registrante.name }}</b>
     <br />Registrado: {{ dominio.registered|date:"Y-m-d H:i:s" }}
@@ -130,7 +137,10 @@
 
 <td>
     <button onclick="$('#ultimo_registrado_tag_{{ nuevo.id }}').toggle();">+</button>
+    <a href='{% url "dominio" pk=nuevo.id %}'>
     {{ nuevo.full_domain }}
+    </a>
+
 <div style="display: none" id="ultimo_registrado_tag_{{ nuevo.id }}">
     Registrante <b>{{ nuevo.registrante.name }}</b>
     <br />Registrado: {{ nuevo.registered|date:"Y-m-d H:i:s" }}
@@ -166,10 +176,14 @@
 
 <td>
     <button onclick="$('#transferencia_{{ campo.id }}').toggle();">+</button>
+
+    <a href='{% url "dominio" pk=campo.cambio.dominio.id %}'>
     {{ campo.cambio.dominio.full_domain }}
+    </a>
+    
 <div style="display: none" id="transferencia_{{ campo.id }}">
     {% with r=campo.cambio.registrantes_en_cambio %}
-    De <b>{{ r.0 }}</b> a <b>{{ r.1 }}</b>
+    De <b>{{ r.0.name }}</b> a <b>{{ r.1.name }}</b>
     {% endwith %}
     <br />Detectado: {{ campo.cambio.momento|date:"Y-m-d H:i:s" }}
 </div>
