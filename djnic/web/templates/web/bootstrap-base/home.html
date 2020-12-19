@@ -1,0 +1,190 @@
+{% extends "web/bootstrap-base/base.html" %}
+
+{% block main %}
+
+<div class="container">
+    <div class="row">
+        <div class="col-lg-4 col-md-4 col-sm-4 col-xs-4">
+            <div class="data-table-list">
+                <div class="basic-tb-hd"><h2>Últimos caidos</h2></div>
+                <div class="table-responsive">
+                    <table id="data-table-basic" class="table table-striped">
+<thead><tr><th>Dominio</th></tr></thead>
+<tbody>
+{% for campo in ultimos_caidos %}
+<tr>
+<td>
+    <button onclick="$('#ultimo_caido_{{ campo.id }}').toggle();">+</button>
+    {{ campo.cambio.dominio.full_domain }}
+<div style="display: none" id="ultimo_caido_{{ campo.id }}">
+    {% if campo.brother_registrant_name %} Ultimo registrante <b>{{ campo.brother_registrant_name.anterior }}</b>{% endif %}
+    {% if campo.brother_expire %}<br />Expiró: {{ campo.brother_expire.anterior }}{% endif %}
+    <br />Detectado: {{ campo.cambio.momento|date:"Y-m-d H:i:s" }}
+</div>
+
+</td>
+
+</tr>
+{% endfor %}                                 
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-4 col-md-4 col-sm-4 col-xs-4">
+            <div class="data-table-list">
+                <div class="basic-tb-hd"><h2>Últimos registrados</h2></div>
+                <div class="table-responsive">
+                    <table id="data-table-basic" class="table table-striped">
+                        <thead>
+                            <tr>
+<th>Dominio</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+{% for dominio in ultimos_registrados %}
+<tr>
+<td>
+    <button onclick="$('#ultimo_registrado_{{ dominio.id }}').toggle();">+</button>
+    {{ dominio.nombre }}.{{ dominio.zona.nombre }}
+<div style="display: none" id="ultimo_registrado_{{ dominio.id }}">
+    Registrante <b>{{ dominio.registrante.name }}</b>
+    <br />Registrado: {{ dominio.registered|date:"Y-m-d H:i:s" }}
+    <br />Detectado: {{ dominio.data_updated|date:"Y-m-d H:i:s" }}
+</div>
+</td>
+</tr>
+{% endfor %}                                 
+                            </tbody>
+</table></div></div></div>
+
+        <div class="col-lg-4 col-md-4 col-sm-4 col-xs-4">
+            <div class="data-table-list">
+                <div class="basic-tb-hd"><h2>Hosting más usados</h2></div>
+                <div class="table-responsive">
+                    <table id="data-table-basic" class="table table-striped">
+                        <thead>
+                            <tr>
+<th>Hosting</th><th>Dominios apuntados</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+{% for host in hostings %}
+<tr>
+<td>{{ host.nombre }}</td>
+<td>{{ host.total_dominios }}</td>
+</tr>
+{% endfor %}                                 
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+<!-- Data Table area End-->
+
+<!-- Hostings 30 dias Data Table area Start-->
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-4 col-md-4 col-sm-4 col-xs-4">
+                <div class="data-table-list">
+                    <div class="basic-tb-hd"><h2>Hosting más usados</h2><p>dominios creados en los últimos 30 días</p></div>
+                    <div class="table-responsive">
+                        <table id="data-table-basic" class="table table-striped">
+                            <thead>
+                                <tr>
+<th>Hosting</th><th>Dominios apuntados</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+{% for host in hostings_last_30_days %}
+<tr>
+<td>{{ host.nombre }}</td>
+<td>{{ host.total_dominios }}</td>
+</tr>
+{% endfor %}                                 
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-4 col-md-4 col-sm-4 col-xs-4">
+                <div class="data-table-list">
+                    <div class="basic-tb-hd">
+                        <h2>Nuevos dominios de registrantes etiquetados</h2>
+                        <p>(según nuestro sistema)</p>
+                    </div>
+                    <div class="table-responsive">
+                        <table id="data-table-basic" class="table table-striped">
+                            <thead>
+                                <tr>
+<th>Dominio</th><th>Etiquetas</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+{% for nuevo in news_from_tags %}
+<tr>
+
+<td>
+    <button onclick="$('#ultimo_registrado_tag_{{ nuevo.id }}').toggle();">+</button>
+    {{ nuevo.full_domain }}
+<div style="display: none" id="ultimo_registrado_tag_{{ nuevo.id }}">
+    Registrante <b>{{ nuevo.registrante.name }}</b>
+    <br />Registrado: {{ nuevo.registered|date:"Y-m-d H:i:s" }}
+    <br />Detectado: {{ nuevo.data_updated|date:"Y-m-d H:i:s" }}
+</div>
+</td>
+<td>{% for rt in nuevo.registrante.tags.all %}{{ rt.tag.nombre }} {% endfor %}</td>
+
+</tr>
+{% endfor %}                                 
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        
+            <div class="col-lg-4 col-md-4 col-sm-4 col-xs-4">
+                <div class="data-table-list">
+                    <div class="basic-tb-hd">
+                        <h2>Transferencias de dominios</h2>
+                        <p>(o registros inmediatos luego de una caida)</p>
+                    </div>
+                    <div class="table-responsive">
+                        <table id="data-table-basic" class="table table-striped">
+                            <thead>
+                                <tr>
+<th>Dominio</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+{% for campo in transferencias %}
+<tr>
+
+<td>
+    <button onclick="$('#transferencia_{{ campo.id }}').toggle();">+</button>
+    {{ campo.cambio.dominio.full_domain }}
+<div style="display: none" id="transferencia_{{ campo.id }}">
+    {% with r=campo.cambio.registrantes_en_cambio %}
+    De <b>{{ r.0 }}</b> a <b>{{ r.1 }}</b>
+    {% endwith %}
+    <br />Detectado: {{ campo.cambio.momento|date:"Y-m-d H:i:s" }}
+</div>
+</td>
+
+</tr>
+{% endfor %}                                 
+                                </tbody>
+<!-- <tfoot><tr><th>Dominio</th><th>Detectado</th></tr></tfoot> -->
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    <!-- Data Table area End-->
+
+{% endblock main %}

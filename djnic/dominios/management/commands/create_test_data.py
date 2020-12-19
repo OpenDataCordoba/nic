@@ -8,6 +8,7 @@ from dominios.models import Dominio, STATUS_NO_DISPONIBLE, STATUS_DISPONIBLE, DN
 from zonas.models import GrupoZona, Zona, ZonaEnGrupo
 from dnss.models import DNS
 from registrantes.models import Registrante, TagForRegistrante, RegistranteTag
+from cambios.models import CambiosDominio, CampoCambio
 
 
 logger = logging.getLogger(__name__)
@@ -79,6 +80,28 @@ class Command(BaseCommand):
                 else:
                     dom.estado=STATUS_DISPONIBLE
                 dom.save()
+
+                # agregar registros de camibos
+                starts = timezone.now() - timedelta(minutes=random.randint(1440000, 2880000))
+                while starts < timezone.now():
+                    cd = CambiosDominio.objects.create(dominio=dom, momento=starts, have_changes=False)
+                    starts = starts + timedelta(minutes=random.randint(344000, 644000))
+                    if random.randint(1, 90) > 40:
+                        cd.have_changes = True
+                        cd.save()
+                        rlu = str(random.randint(10000, 90000))
+                        rnm = f'reg {rlu}'
+                        dns1 = f'ns{random.randint(1, 9)}.lala.com'
+                        if random.randint(1, 90) > 40:
+                            CampoCambio.objects.create(cambio=cd, campo='estado', anterior=STATUS_DISPONIBLE, nuevo=STATUS_NO_DISPONIBLE)
+                            CampoCambio.objects.create(cambio=cd, campo='registrant_legal_uid', anterior='', nuevo=rlu)
+                            CampoCambio.objects.create(cambio=cd, campo='DNS1', anterior='', nuevo=dns1)
+                            CampoCambio.objects.create(cambio=cd, campo='registrant_name', anterior='', nuevo=rnm)
+                        else:
+                            CampoCambio.objects.create(cambio=cd, campo='estado', nuevo=STATUS_DISPONIBLE, anterior=STATUS_NO_DISPONIBLE)
+                            CampoCambio.objects.create(cambio=cd, campo='registrant_legal_uid', nuevo='', anterior=rlu)
+                            CampoCambio.objects.create(cambio=cd, campo='DNS1', nuevo='', anterior=dns1)
+                            CampoCambio.objects.create(cambio=cd, campo='registrant_name', nuevo='', anterior=rnm)                                    
 
         self.stdout.write(self.style.SUCCESS(f"Finished"))
         
