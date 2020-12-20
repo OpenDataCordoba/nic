@@ -11,13 +11,13 @@ class CambiosDominio(models.Model):
 
     def __str__(self):
         return f'{self.dominio} {self.momento}'
-    
+
     def registrantes_en_cambio(self):
         """ Si cambio el registrante devuelve el nuevo y el anterior """
-        
+
         registrante_anterior = None
         registrante_nuevo = None
-        
+
         for campo in self.campos.all():
             if campo.campo == 'registrant_legal_uid':
                 if campo.anterior != '':
@@ -27,6 +27,7 @@ class CambiosDominio(models.Model):
                     registrante_nuevo = Registrante.objects.filter(legal_uid=campo.nuevo).first()
 
         return registrante_anterior, registrante_nuevo
+
 
 class CampoCambio(models.Model):
     """ Cada uno de los campos que cambio 
@@ -53,6 +54,6 @@ class CampoCambio(models.Model):
 
     def brother_registrant_name(self):
         return self.brother(campo='registrant_name')
-        
+
     def brother_expire(self):
         return self.brother(campo='dominio_expire')
