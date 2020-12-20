@@ -1,9 +1,11 @@
 from django.conf import settings
 from django.utils.decorators import method_decorator
 from django.views.decorators.cache import cache_page, cache_control
+from django.views.generic.base import TemplateView
 from django.views.generic.detail import DetailView
 
 from dominios.models import Dominio, STATUS_DISPONIBLE
+from cambios.data import get_ultimos_caidos
 
 
 @method_decorator(cache_control(max_age=settings.GENERAL_CACHE_SECONDS), name='dispatch')
@@ -22,5 +24,21 @@ class DominioView(DetailView):
 
         # ordenar los cambios
         context['cambios'] = self.object.cambios.order_by('-momento')
+
+        return context
+
+
+@method_decorator(cache_control(max_age=settings.GENERAL_CACHE_SECONDS), name='dispatch')
+@method_decorator(cache_page(settings.GENERAL_CACHE_SECONDS), name='dispatch')
+class UltimosCaidos(TemplateView):
+
+    template_name = "web/bootstrap-base/dominios/ultimos-caidos.html"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['site_title'] = 'Ultimos dominios caidos'
+        context['site_description'] = 'Lista de los últimos dominios caidos'
+
+        context['ultimos_caidos'] = get_ultimos_caidos(limit=500)
 
         return context

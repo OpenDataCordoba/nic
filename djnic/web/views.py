@@ -1,17 +1,7 @@
-from datetime import timedelta
 from django.conf import settings
-from django.db.models import Count, Q
-from django.db.models.functions import Trunc
-from django.utils import timezone
 from django.utils.decorators import method_decorator
 from django.views.decorators.cache import cache_page, cache_control
 from django.views.generic.base import TemplateView
-
-from cambios.models import CampoCambio
-from dominios.models import Dominio, STATUS_NO_DISPONIBLE, STATUS_DISPONIBLE
-from zonas.models import GrupoZona
-from dnss.models import Empresa
-from registrantes.models import Registrante, TagForRegistrante, RegistranteTag
 
 from cambios.data import get_ultimos_caidos, get_ultimas_transferencias
 from dominios.data import get_ultimos_registrados
