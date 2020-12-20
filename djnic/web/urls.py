@@ -3,7 +3,8 @@ from .views import HomeView
 from .views_dominio import (DominioView, UltimosCaidos,
                             UltimosRegistrados, Judicializados,
                             DominiosAntiguosView)
-from .views_registrante import RegistranteView, RubrosView, RubroView
+from .views_registrante import (RegistranteView, RubrosView,
+                                RubroView, RegistrantesAntiguosView)
 
 urlpatterns = [
     path('', HomeView.as_view(), name='home'),
@@ -17,6 +18,7 @@ urlpatterns = [
     path('dominios-antiguos', DominiosAntiguosView.as_view(), name='dominios-antiguos'),
 
     # registrantes
+    path('registrantes-antiguos', RegistrantesAntiguosView.as_view(), name='registrantes-antiguos'),
     path('rubros', RubrosView.as_view(), name='rubros'),
     path('rubro-<int:pk>', RubroView.as_view(), name='rubro'),
 
