@@ -6,7 +6,7 @@ from django.views.generic.list import ListView
 
 from registrantes.models import Registrante, TagForRegistrante
 from dominios.data import get_ultimos_registrados
-from registrantes.data import get_primeros_reg_creados
+from registrantes.data import get_primeros_reg_creados, get_mayores_registrantes
 
 
 @method_decorator(cache_control(max_age=settings.GENERAL_CACHE_SECONDS), name='dispatch')
@@ -39,6 +39,23 @@ class RegistrantesAntiguosView(ListView):
         context['site_description'] = 'Lista de registrantes de dominio más antiguos'
         
         context['registrantes'] = get_primeros_reg_creados(limit=500)
+        return context
+
+
+@method_decorator(cache_control(max_age=settings.GENERAL_CACHE_SECONDS), name='dispatch')
+@method_decorator(cache_page(settings.GENERAL_CACHE_SECONDS), name='dispatch')
+class MayoresRegistrantesView(ListView):
+
+    model = Registrante
+    context_object_name = "registrante"
+    template_name = "web/bootstrap-base/registrantes/mayores.html"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['site_title'] = 'Mayores registrantes'
+        context['site_description'] = 'Lista de registrantes con más dominio registrados'
+
+        context['registrantes'] = get_mayores_registrantes(limit=50)
         return context
 
 

@@ -4,7 +4,8 @@ from .views_dominio import (DominioView, UltimosCaidos,
                             UltimosRegistrados, Judicializados,
                             DominiosAntiguosView, DominiosVencimientoLargoView)
 from .views_registrante import (RegistranteView, RubrosView,
-                                RubroView, RegistrantesAntiguosView)
+                                RubroView, RegistrantesAntiguosView,
+                                MayoresRegistrantesView)
 
 urlpatterns = [
     path('', HomeView.as_view(), name='home'),
@@ -22,5 +23,6 @@ urlpatterns = [
     path('registrantes-antiguos', RegistrantesAntiguosView.as_view(), name='registrantes-antiguos'),
     path('rubros', RubrosView.as_view(), name='rubros'),
     path('rubro-<int:pk>', RubroView.as_view(), name='rubro'),
+    path('mayores-registrantes', MayoresRegistrantesView.as_view(), name='mayores-registrantes'),
 
 ]
