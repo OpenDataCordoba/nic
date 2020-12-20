@@ -1,0 +1,48 @@
+{% extends "web/bootstrap-base/base.html" %}
+
+{% block main %}
+
+<div class="container">
+    <div class="row">
+        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+            <div class="data-table-list">
+                <div class="basic-tb-hd">
+                    <h2>Dominios que vencen más en el futuro</h2>
+                    <p>NIC Argentina solo permite un año<p>
+                </div>
+                <div class="table-responsive">
+                    <table id="data-table-basic" class="table table-striped">
+<thead><tr><th>Dominio</th><th>Registrante</th><th>Expira</th><th>Ultima lectura</th></tr></thead>
+<tbody>
+{% for dominio in dominios %}
+<tr>
+<td>
+    <a href='{% url "dominio" pk=dominio.id %}'>
+    {{ dominio.full_domain }}
+    </a>
+</td>
+<td>
+    {% if dominio.registrante %}
+    <a href='{% url "registrante" pk=dominio.registrante.id %}'>{{ dominio.registrante.name }}</a>
+    {% else %}
+    ERROR
+    {% endif %}
+</td>
+<td>
+    {{ dominio.expire|date:"Y-m-d H:i:s" }}
+</td>
+<td>
+    {{ dominio.data_readed|date:"Y-m-d H:i:s" }}
+</td>
+
+</tr>
+{% endfor %}                                 
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+    
+{% endblock main %}

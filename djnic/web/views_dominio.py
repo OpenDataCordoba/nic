@@ -6,7 +6,8 @@ from django.views.generic.detail import DetailView
 
 from dominios.models import Dominio, STATUS_DISPONIBLE
 from cambios.data import get_ultimos_caidos
-from dominios.data import get_ultimos_registrados, get_judicializados, get_primeros_registrados
+from dominios.data import (get_ultimos_registrados, get_judicializados,
+                           get_primeros_registrados, get_futuros)
 
 
 @method_decorator(cache_control(max_age=settings.GENERAL_CACHE_SECONDS), name='dispatch')
@@ -89,5 +90,22 @@ class Judicializados(TemplateView):
         context['site_description'] = 'Lista de los dominios vencidos sin caer'
 
         context['dominios'] = get_judicializados(limit=500)
+
+        return context
+
+
+@method_decorator(cache_control(max_age=settings.GENERAL_CACHE_SECONDS), name='dispatch')
+@method_decorator(cache_page(settings.GENERAL_CACHE_SECONDS), name='dispatch')
+class DominiosVencimientoLargoView(TemplateView):
+    """ Dominios que vencen más en el futuro """
+
+    template_name = "web/bootstrap-base/dominios/futuros.html"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['site_title'] = 'Dominios futuros'
+        context['site_description'] = 'Dominios que vencen más en el futuro'
+
+        context['dominios'] = get_futuros(limit=500)
 
         return context

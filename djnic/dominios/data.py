@@ -41,3 +41,9 @@ def get_judicializados(limit=50, days_ago=300):
 
     dominios = dominios.order_by('expire')[:limit]
     return dominios
+
+
+def get_futuros(limit=5, de_registrantes_etiquetados=False, etiqueta=None):
+    """ Dominios que vencen más en el futuro """
+    ultimos = Dominio.objects.order_by('-expire')[:limit]
+    return ultimos
