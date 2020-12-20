@@ -56,7 +56,8 @@
     </a>
     
 <div style="display: none" id="ultimo_registrado_{{ dominio.id }}">
-    Registrante <b>{{ dominio.registrante.name }}</b>
+    Registrante 
+    <b><a href='{% url "registrante" pk=dominio.registrante.id %}'>{{ dominio.registrante.name }}</a></b>
     <br />Registrado: {{ dominio.registered|date:"Y-m-d H:i:s" }}
     <br />Detectado: {{ dominio.data_updated|date:"Y-m-d H:i:s" }}
 </div>
@@ -142,7 +143,9 @@
     </a>
 
 <div style="display: none" id="ultimo_registrado_tag_{{ nuevo.id }}">
-    Registrante <b>{{ nuevo.registrante.name }}</b>
+    Registrante 
+    <b><a href='{% url "registrante" pk=nuevo.registrante.id %}'>{{ nuevo.registrante.name }}</a></b>
+    
     <br />Registrado: {{ nuevo.registered|date:"Y-m-d H:i:s" }}
     <br />Detectado: {{ nuevo.data_updated|date:"Y-m-d H:i:s" }}
 </div>
@@ -183,7 +186,11 @@
     
 <div style="display: none" id="transferencia_{{ campo.id }}">
     {% with r=campo.cambio.registrantes_en_cambio %}
-    De <b>{{ r.0.name }}</b> a <b>{{ r.1.name }}</b>
+    De 
+    <b></b>
+    <b><a href='{% url "registrante" pk=r.0.id %}'>{{ r.0.name }}</a></b> 
+    a 
+    <b><a href='{% url "registrante" pk=r.1.id %}'>{{ r.1.name }}</a></b> 
     {% endwith %}
     <br />Detectado: {{ campo.cambio.momento|date:"Y-m-d H:i:s" }}
 </div>
