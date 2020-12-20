@@ -90,5 +90,6 @@ class RubroView(DetailView):
 
         # TODO context['ultimos_caidos'] = get_ultimos_caidos(limit=100)
         context['ultimos_registrados'] = get_ultimos_registrados(limit=100, etiqueta=self.object)
+        context['mayores_registrantes'] = get_mayores_registrantes(limit=50, etiqueta=self.object)
         
         return context
