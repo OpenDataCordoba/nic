@@ -22,9 +22,11 @@
             {% for cambio in cambios %}
                 <p><b>{{ cambio.momento }}</b>. Cambios encontrados: <b>{{ cambio.have_changes|yesno:"si,no" }}</b></p>
                 {% if cambio.have_changes %}
+                <ul>
                 {% for campo in cambio.campos.all %}
-                    <b>{{ campo.campo }}</b> cambio de <b>{{ campo.anterior|default:"vacio" }}</b> a <b>{{ campo.nuevo|default:"vacio" }}</b>
+                    <li><b>{{ campo.campo }}</b> cambio de <b>{{ campo.anterior|default:"vacio" }}</b> a <b>{{ campo.nuevo|default:"vacio" }}</b></li>
                 {% endfor %}
+                </ul>
                 {% endif %}
             {% endfor %}
         </div>
