@@ -1,0 +1,52 @@
+{% extends "web/bootstrap-base/base.html" %}
+
+{% block main %}
+
+<div class="container">
+    <div class="row">
+        <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
+            <h2>Hosting: {{hosting.nombre }}</h2>
+            <p>Dominios en DNS: <b>{{ hosting.dominios.count }}</b></p>
+
+            <p>Ultimos registrados
+            <ul>
+            {% for dominio in dominios %}
+            <li><a href='{% url "dominio" pk=dominio.id %}'>{{ dominio.full_domain }}</a></li>
+            {% endfor %}
+            </ul>
+            </p>
+        </div>
+
+
+        <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
+            <div class="data-table-list">
+                <div class="basic-tb-hd">
+                    <h2>DNS asignados</h2>
+                    <small>Sujeto a revision</small>
+                </div>
+                <div class="table-responsive">
+                    <table id="data-table-basic" class="table table-striped">
+<thead>
+                            <tr>
+<th>DNS</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+{% for regxdns in hosting.regexs.all %}
+<tr>
+
+<td>    
+    {{ regxdns.regex_dns }}
+</td>
+
+</tr>
+{% endfor %}                                 
+                            </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+    
+{% endblock main %}

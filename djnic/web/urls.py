@@ -6,6 +6,8 @@ from .views_dominio import (DominioView, UltimosCaidos,
 from .views_registrante import (RegistranteView, RubrosView,
                                 RubroView, RegistrantesAntiguosView,
                                 MayoresRegistrantesView)
+from .views_dnss import HostingsView, Hostings30View, HostingView
+
 
 urlpatterns = [
     path('', HomeView.as_view(), name='home'),
@@ -24,5 +26,10 @@ urlpatterns = [
     path('rubros', RubrosView.as_view(), name='rubros'),
     path('rubro-<int:pk>', RubroView.as_view(), name='rubro'),
     path('mayores-registrantes', MayoresRegistrantesView.as_view(), name='mayores-registrantes'),
+
+    # Hostings
+    path('hostings', HostingsView.as_view(), name='hostings'),
+    path('hostings-30', Hostings30View.as_view(), name='hostings-30'),
+    path('hosting-<int:pk>', HostingView.as_view(), name='hosting'),
 
 ]

@@ -4,6 +4,7 @@ from django.db import models
 
 logger = logging.getLogger(__name__)
 
+
 class Empresa(models.Model):
     """ una empresa de hosting """
     nombre = models.CharField(max_length=90, unique=True)
@@ -17,15 +18,16 @@ class Empresa(models.Model):
         """ connect all DNSs to regexs """
         for rg in self.regexs.all():
             rg.detect_DNSs()
-        
+    
     class Meta:
         ordering = ['nombre']
+
 
 class EmpresaRegexDomain(models.Model):
     """ cada una de las expresiones regulares para detectar dominios que le pertenecen """
     empresa = models.ForeignKey(Empresa, on_delete=models.CASCADE, related_name='regexs')
     regex_dns = models.CharField(max_length=190,
-                                 help_text='Experesion regular para encontrar los DNSs que le pertenecen', 
+                                 help_text='Experesion regular para encontrar los DNSs que le pertenecen',
                                  null=True, blank=True, unique=True)
     object_created = models.DateTimeField(auto_now_add=True)
     object_modified = models.DateTimeField(auto_now=True)
@@ -49,7 +51,8 @@ class EmpresaRegexDomain(models.Model):
     def save(self, **kwargs):
         super().save(**kwargs)
         self.detect_DNSs()
-            
+
+
 class DNS(models.Model):
     empresa_regex = models.ForeignKey(
         EmpresaRegexDomain, 
