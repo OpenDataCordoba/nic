@@ -15,12 +15,19 @@
 <tbody>
 {% for rubro in rubros %}
 <tr>
-<td>
-    <a href='{% url "rubro" pk=rubro.id %}'>
-    {{ rubro.nombre }}
-    </a>
-</td>
+    <td>
+        <a href='{% url "rubro" pk=rubro.id %}'>
+        <b>{{ rubro.nombre }}</b>
+        </a>
+    </td>
 </tr>
+{% for rt in rubro.registrantes.all %}
+<tr>
+    <td>
+    <a href='{% url "registrante" pk=rt.registrante.id %}'>{{ rt.registrante.name }}</a>
+    </td>
+</tr>
+{% endfor %}
 {% endfor %}                                 
                         </tbody>
                     </table>
