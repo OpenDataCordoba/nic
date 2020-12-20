@@ -1,6 +1,8 @@
 from django.urls import path, include
 from .views import HomeView
-from .views_dominio import DominioView, UltimosCaidos, UltimosRegistrados, Judicializados
+from .views_dominio import (DominioView, UltimosCaidos,
+                            UltimosRegistrados, Judicializados,
+                            DominiosAntiguosView)
 from .views_registrante import RegistranteView, RubrosView, RubroView
 
 urlpatterns = [
@@ -12,6 +14,7 @@ urlpatterns = [
     path('ultimos-caidos', UltimosCaidos.as_view(), name='ultimos-caidos'),
     path('ultimos-registrados', UltimosRegistrados.as_view(), name='ultimos-registrados'),
     path('judicializados', Judicializados.as_view(), name='judicializados'),
+    path('dominios-antiguos', DominiosAntiguosView.as_view(), name='dominios-antiguos'),
 
     # registrantes
     path('rubros', RubrosView.as_view(), name='rubros'),
