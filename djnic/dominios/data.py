@@ -5,11 +5,14 @@ from django.utils import timezone
 from dominios.models import Dominio, STATUS_NO_DISPONIBLE
 
 
-def get_ultimos_registrados(limit=5, de_registrantes_etiquetados=False):
+def get_ultimos_registrados(limit=5, de_registrantes_etiquetados=False, etiqueta=None):
     ultimos = Dominio.objects.filter(estado=STATUS_NO_DISPONIBLE)
 
     if de_registrantes_etiquetados:
         ultimos = ultimos.annotate(tags=Count('registrante__tags')).filter(tags__gt=0)
+
+    if etiqueta is not None:
+        ultimos = ultimos.filter(registrante__tags__tag=etiqueta)
 
     ultimos = ultimos.order_by('-registered')[:limit]
     return ultimos
