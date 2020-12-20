@@ -27,6 +27,6 @@ def get_hosting_usados(days_ago=0, limit=5):
 def get_dominios_from_hosting(hosting, limit=5):
     dominios = Dominio.objects.filter(
         dnss__dns__empresa_regex__empresa=hosting
-    ).order_by('-registered')[:limit]
+    ).distinct().order_by('-registered')[:limit]
 
     return dominios
