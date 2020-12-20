@@ -20,4 +20,7 @@ class DominioView(DetailView):
         context['site_description'] = f'Datos del Dominio {self.object.full_domain()}'
         context['estado'] = 'Disponible' if self.object.estado == STATUS_DISPONIBLE else 'No disponible'
 
+        # ordenar los cambios
+        context['cambios'] = self.object.cambios.order_by('-momento')
+
         return context

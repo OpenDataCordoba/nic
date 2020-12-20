@@ -12,13 +12,20 @@
 
         <div class="col-lg-4 col-md-4 col-sm-4 col-xs-4">
             <h3>Registrante</h3>
-            <p><b>{{ dominio.registrante.name }}</b></p>
+            {% if dominio.registrante %}
+                <p><b>{{ dominio.registrante.name }}</b></p>
+            {% endif %}
         </div>
 
         <div class="col-lg-4 col-md-4 col-sm-4 col-xs-4">
             <h3>Historial de lecturas</h3>
-            {% for cambio in dominio.cambios.all %}
+            {% for cambio in cambios %}
                 <p><b>{{ cambio.momento }}</b>. Cambios encontrados: <b>{{ cambio.have_changes|yesno:"si,no" }}</b></p>
+                {% if cambio.have_changes %}
+                {% for campo in cambio.campos %}
+                    <b>{{ campo.campo }}</b> cambio de <b>{{ campo.anterior|default:"vacio" }}</b> a <b>{{ campo.nuevo|default:"vacio" }}</b>
+                {% endfor %}
+                {% endif %}
             {% endfor %}
         </div>
     </div>
