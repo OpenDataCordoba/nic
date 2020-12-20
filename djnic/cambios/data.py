@@ -8,8 +8,8 @@ from cambios.models import CampoCambio
 
 def get_ultimos_caidos(limit=5):
     ultimos_caidos = CampoCambio.objects\
-            .filter(campo='estado', anterior=STATUS_NO_DISPONIBLE, nuevo=STATUS_DISPONIBLE)\
-            .order_by('-cambio__momento')[:limit]
+        .filter(campo='estado', anterior=STATUS_NO_DISPONIBLE, nuevo=STATUS_DISPONIBLE)\
+        .order_by('-cambio__momento')[:limit]
 
     return ultimos_caidos
 
