@@ -10,11 +10,16 @@
             <p>Registrado: <b>{{ dominio.registered|date:"Y-m-d H:i:s" }}</b></p>
             <p>Cambio en NIC: <b>{{ dominio.changed|date:"Y-m-d H:i:s" }}</b></p>
             <p>Expira: <b>{{ dominio.expire|date:"Y-m-d H:i:s" }}</b></p>
-
             <p>Ultima lectura: <b>{{ dominio.data_readed|date:"Y-m-d H:i:s" }}</b></p>
-            <p>Ultima actualizacion: <b>{{ dominio.data_updated|date:"Y-m-d H:i:s" }}</b></p>
-
             <p>Estado: <b>{{ estado }}</b></p>
+            {% if dominio.registrante %}
+            <p>Registrante: <b>{{ dominio.registrante.name }}</b></p>
+            {% endif %}
+            <ul>
+            {% for dns in dominio.dnss.all %}
+            <li>{{ dns.dns.dominio }} {% if dns.dns.empresa_regex %} (HOSTING: {{ dns.dns.empresa_regex.empresa.nombre }}) {% endif %}</li>
+            {% endfor %}
+            </ul>
         </div>
 
     {% if dominio.registrante %}
