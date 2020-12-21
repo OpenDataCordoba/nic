@@ -1,5 +1,5 @@
 from django.urls import path, include
-from .views import HomeView
+from .views import HomeView, AboutView
 from .views_dominio import (DominioView, UltimosCaidos,
                             UltimosRegistrados, Judicializados,
                             DominiosAntiguosView, DominiosVencimientoLargoView)
@@ -7,11 +7,14 @@ from .views_registrante import (RegistranteView, RubrosView,
                                 RubroView, RegistrantesAntiguosView,
                                 MayoresRegistrantesView)
 from .views_dnss import HostingsView, Hostings30View, HostingView
+from .views_plataforma import StatsView
 
 
 urlpatterns = [
     path('', HomeView.as_view(), name='home'),
     path('dominio-<int:pk>', DominioView.as_view(), name='dominio'),
+    path('about', AboutView.as_view(), name='about'),
+    path('stats', StatsView.as_view(), name='stats'),
     path('registrante-<int:pk>', RegistranteView.as_view(), name='registrante'),
 
     # dominios

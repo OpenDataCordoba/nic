@@ -27,3 +27,17 @@ class HomeView(TemplateView):
         context['transferencias'] = get_ultimas_transferencias(limit=5)
 
         return context
+
+
+@method_decorator(cache_control(max_age=settings.GENERAL_CACHE_SECONDS), name='dispatch')
+@method_decorator(cache_page(settings.GENERAL_CACHE_SECONDS), name='dispatch')
+class AboutView(TemplateView):
+
+    template_name = "web/bootstrap-base/about.html"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['site_title'] = 'Acerca de Dominios Argentinos'
+        context['site_description'] = 'Dominios Argentinos es un proyecto de OpenDataCordoba'
+
+        return context
