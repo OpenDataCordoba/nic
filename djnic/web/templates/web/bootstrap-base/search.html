@@ -1,0 +1,44 @@
+{% extends "web/bootstrap-base/base.html" %}
+
+{% block main %}
+
+<div class="container">
+    <div class="row">
+        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+            <div class="data-table-list">
+                <div class="basic-tb-hd"><h2>Resultados de la busqueda <i>{{ query }}</i></h2></div>
+                <div class="table-responsive">
+                    <table id="data-table-basic" class="table table-striped">
+<thead><tr><th>Resultado</th><th>Tipo</th></tr></thead>
+<tbody>
+
+{% for res in dominios %}
+<tr>
+<td><a href='{% url "dominio" pk=res.id %}'>{{ res.full_domain }}</a></td>
+<td>Dominio</td>
+</tr>
+{% endfor %}
+
+{% for res in registrantes %}
+<tr>
+<td><a href='{% url "registrante" pk=res.id %}'>{{ res.name }}</a></td>
+<td>Registrante</td>
+</tr>
+{% endfor %}
+
+{% for res in hostings %}
+<tr>
+<td><a href='{% url "hosting" pk=res.id %}'>{{ res.nombre }}</a></td>
+<td>Hosting</td>
+</tr>
+{% endfor %}
+
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>        
+    </div>
+</div>
+
+{% endblock main %}
