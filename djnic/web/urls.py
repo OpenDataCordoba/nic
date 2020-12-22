@@ -8,6 +8,7 @@ from .views_registrante import (RegistranteView, RubrosView,
                                 MayoresRegistrantesView)
 from .views_dnss import HostingsView, Hostings30View, HostingView
 from .views_plataforma import StatsView
+from .views_cambios import RenovacionesView
 
 
 urlpatterns = [
@@ -24,6 +25,7 @@ urlpatterns = [
     path('judicializados', Judicializados.as_view(), name='judicializados'),
     path('dominios-antiguos', DominiosAntiguosView.as_view(), name='dominios-antiguos'),
     path('dominios-futuros', DominiosVencimientoLargoView.as_view(), name='dominios-futuros'),
+    path('renovaciones', RenovacionesView.as_view(), name='renovaciones'),
 
     # registrantes
     path('registrantes-antiguos', RegistrantesAntiguosView.as_view(), name='registrantes-antiguos'),
