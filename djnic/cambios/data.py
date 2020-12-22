@@ -29,7 +29,7 @@ def get_ultimas_transferencias(limit=5):
     return transferencias[:limit]
 
 
-def get_renovaciones(limit=50):
+def get_renovaciones(limit=50, solo_fallados=False):
     """ Dominios que cambia la fecha en que expira """
     cambios = CampoCambio.objects\
         .filter(campo='dominio_expire')\
@@ -37,7 +37,13 @@ def get_renovaciones(limit=50):
         .exclude(nuevo__exact="")\
         .annotate(dnuevo=Cast('nuevo', DateTimeField()))\
         .annotate(danterior=Cast('anterior', DateTimeField()))\
-        .annotate(segundos=ExpressionWrapper((F('dnuevo') - F('danterior')) / 86400000000, output_field=IntegerField()))\
-        .order_by('-cambio__momento')
-        
+        .annotate(tdiff=ExpressionWrapper(F('dnuevo') - F('danterior'), output_field=DurationField()))
+    
+    if solo_fallados:
+        cambios = cambios.filter(
+            Q(tdiff__gt=timedelta(days=370)) | Q(tdiff__lt=timedelta(days=360))
+        )
+
+    cambios = cambios.order_by('-cambio__momento')
+
     return cambios[:limit]
