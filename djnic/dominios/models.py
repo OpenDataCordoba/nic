@@ -157,7 +157,7 @@ class Dominio(models.Model):
                 dns_found = False
                 for prev in previous:
                     if prev.dns != new_dns:
-                        # delete all 
+                        # delete
                         prev.delete()
                     else:
                         dns_found = True
@@ -289,7 +289,8 @@ class Dominio(models.Model):
         self.next_update_priority = timezone.now() + timedelta(days=7)
         self.save()
         return self
-        
+
+
 class DNSDominio(models.Model):
     dominio = models.ForeignKey(Dominio, on_delete=models.RESTRICT, related_name='dnss')
     dns = models.ForeignKey('dnss.DNS', on_delete=models.RESTRICT, related_name='dominios')
@@ -297,7 +298,6 @@ class DNSDominio(models.Model):
     object_created = models.DateTimeField(auto_now_add=True)
     object_modified = models.DateTimeField(auto_now=True)
 
-    
     class Meta:
         unique_together = (('dominio', 'dns', 'orden'), )
 

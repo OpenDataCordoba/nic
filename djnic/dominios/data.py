@@ -47,3 +47,13 @@ def get_futuros(limit=5, de_registrantes_etiquetados=False, etiqueta=None):
     """ Dominios que vencen más en el futuro """
     ultimos = Dominio.objects.filter(expire__isnull=False).order_by('-expire')[:limit]
     return ultimos
+
+
+def dominios_sin_dns(limit=5):
+    # agregar los que no tienen DNS
+    dominios = Dominio.objects.filter(dnss__isnull=True)
+    
+    if limit > 0:
+        dominios = dominios[:limit]
+
+    return dominios

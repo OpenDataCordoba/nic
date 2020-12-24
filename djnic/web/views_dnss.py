@@ -6,6 +6,7 @@ from django.views.generic.list import ListView
 
 from dnss.models import Empresa
 from dnss.data import get_hosting_usados, get_dominios_from_hosting
+from dominios.data import dominios_sin_dns
 
 
 @method_decorator(cache_control(max_age=settings.GENERAL_CACHE_SECONDS), name='dispatch')
@@ -39,6 +40,8 @@ class HostingsView(ListView):
         context['site_description'] = 'Proveedores de hostings mas usados según DNS1'
 
         context['hostings'] = get_hosting_usados(limit=100)
+        context['dominios_sin_dns'] = dominios_sin_dns(limit=0).count()
+
         context['value_is'] = 'Dominios'
         return context
 

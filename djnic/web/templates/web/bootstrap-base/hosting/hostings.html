@@ -19,17 +19,21 @@
                             </thead>
                             <tbody>
 {% for host in hostings %}
+
 <tr>
-<td>
-    <a href='{% url "hosting" pk=host.id %}'>{{ host.nombre }}</a>
-</td>
-
-<td>
-    {{ host.total_dominios }}
-</td>
-
+    <td>
+        <a href='{% url "hosting" pk=host.id %}'>{{ host.nombre }}</a>
+    </td>
+    <td>
+        {{ host.total_dominios }}
+    </td>
 </tr>
 {% endfor %}                                 
+
+{% if dominios_sin_dns %}
+    <tr><td>Dominios no delegados</td><td>{{ dominios_sin_dns }}</td></tr>
+{% endif %}
+
                             </tbody>
                     </table>
                 </div>
