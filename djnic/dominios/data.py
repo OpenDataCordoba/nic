@@ -51,7 +51,7 @@ def get_futuros(limit=5, de_registrantes_etiquetados=False, etiqueta=None):
 
 def dominios_sin_dns(limit=5):
     # agregar los que no tienen DNS
-    dominios = Dominio.objects.filter(dnss__isnull=True)
+    dominios = Dominio.objects.filter(estado=STATUS_NO_DISPONIBLE, dnss__isnull=True)
     
     if limit > 0:
         dominios = dominios[:limit]
