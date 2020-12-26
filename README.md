@@ -1,13 +1,14 @@
-# Servicio de descarga de datos de NIC.ar
+[![Travis (.org)](https://img.shields.io/travis/avdata99/nic)](https://travis-ci.org/github/avdata99/nic)
+[![GitHub All Releases](https://img.shields.io/github/downloads/avdata99/nic/total)](https://github.com/avdata99/nic/releases)
+[![GitHub Issues](https://img.shields.io/github/issues/avdata99/nic)](https://github.com/avdata99/nic/issues)
+[![GitHub PR](https://img.shields.io/github/issues-pr/avdata99/nic)](https://github.com/avdata99/nic/pulls)
+[![Licence](https://img.shields.io/github/license/avdata99/nic)](https://github.com/avdata99/nic/blob/main/LICENSE)
+[![Last Commit](https://img.shields.io/github/last-commit/avdata99/nic)](https://github.com/avdata99/nic/commits/main)
 
-Re escritura de un grupo de proyectos comenzados en 2012 con la historia de los dominios argentinos
-Desarrollo en estado alfa, en desarrollo inicial
+# Dominios en Argentina
 
-# TODO
+Proyecto de análisis de datos sobre dominios argentinos.
 
- - Movimientos de hosting
- - Importar datos de sitios web (status, headers, html) y continuar mejorando los datos
- - Crear un spider para busqueda de nuevos dominios dentro de las zonas en el sistema
- - API por dia de vencimiento con colores por dias desde la última actualizacion
- - Conectar la zona de prefijo de ID de los registranes con las zonas de los dominios
-- Agrupar las zonas por paises o instituciones o algo
+## Como colaborar
+
+Abierto a recibir PRs o agregar issues. En construcción. 
