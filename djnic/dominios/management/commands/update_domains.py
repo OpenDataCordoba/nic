@@ -18,7 +18,6 @@ class Command(BaseCommand):
         parser.add_argument('--limit', nargs='?', type=int, default=10000)
         parser.add_argument('--sleep', nargs='?', type=int, default=41)
 
-
     def handle(self, *args, **options):
         limit = options['limit']
         dominios = Dominio.objects.all().order_by('-priority_to_update')[:limit]

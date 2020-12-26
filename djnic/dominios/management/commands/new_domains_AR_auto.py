@@ -6,7 +6,7 @@ from django.core.management.base import BaseCommand, CommandError
 from core.models import News
 from dominios.models import PreDominio
 
-from whoare.zone_parsers.ar.news import NewDomains
+from whoare.zone_parsers.ar.news_from_blockchain import NewDomains
 
 
 logger = logging.getLogger(__name__)
@@ -25,7 +25,7 @@ class Command(BaseCommand):
         nd.data_path = settings.STATIC_ROOT
 
         fromd = date.today() - timedelta(days=days_ago)
-        dominios = nd.get_from_date_range(from_date=fromd)
+        dominios = nd.get_from_date_range(from_date=fromd, to_date=date.today() - timedelta(days=1))
 
         c = 0
         skipped = 0
@@ -42,14 +42,14 @@ class Command(BaseCommand):
                 skipped += 1
                 # le damos otra oportunidad
                 if pd.priority == 0:
-                    pd.priority=10
+                    pd.priority = 10
                     pd.save()
                 continue
             
             if pd.id == 0:
                 already_domain += 1
             else:
-                pd.priority=80
+                pd.priority = 80
                 pd.save()
                 news += 1
 
