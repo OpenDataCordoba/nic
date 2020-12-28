@@ -4,7 +4,7 @@
 
 <div class="container">
     <div class="row">
-        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+        <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
             <div class="data-table-list">
                 <div class="basic-tb-hd">
                     <h2>Proveedores de hosting</h2>
@@ -40,6 +40,44 @@
                 </div>
             </div>
         </div>
+
+{% if huerfanos %}
+
+        <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
+            <div class="data-table-list">
+                <div class="basic-tb-hd">
+                    <h2>Huérfanos</h2>
+                    <small>DNSs que tiene dominios conectados pero no están asignados todavía a una empresa de Hosting</small>
+                </div>
+                <div class="table-responsive">
+                    <table id="data-table-basic" class="table table-striped">
+<thead>
+                            <tr>
+<th>DNS</th><th>Dominios</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+{% for dns in huerfanos %}
+
+<tr>
+    <td>
+        {{ dns.dominio }}
+    </td>
+    <td>
+        {{ dns.total_dominios }}
+    </td>
+</tr>
+{% endfor %}                                 
+
+
+                            </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+{% endif %}
+
     </div>
 </div>
     
