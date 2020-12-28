@@ -5,7 +5,7 @@ from django.views.generic.detail import DetailView
 from django.views.generic.list import ListView
 
 from dnss.models import Empresa
-from dnss.data import get_hosting_usados, get_dominios_from_hosting
+from dnss.data import get_hosting_usados, get_dominios_from_hosting, get_orphan_dns
 from dominios.data import dominios_sin_dns
 
 
@@ -41,7 +41,7 @@ class HostingsView(ListView):
 
         context['hostings'] = get_hosting_usados(limit=100)
         context['dominios_sin_dns'] = dominios_sin_dns(limit=0).count()
-
+        context['huerfanos'] = get_orphan_dns(limit=101)
         context['value_is'] = 'Dominios'
         return context
 

@@ -1,8 +1,7 @@
 from datetime import timedelta
 from django.db.models import Count, Q
-from django.db.models.functions import Trunc
 from django.utils import timezone
-from dnss.models import Empresa
+from dnss.models import Empresa, DNS
 from dominios.models import Dominio
 
 
@@ -30,3 +29,13 @@ def get_dominios_from_hosting(hosting, limit=5):
     ).distinct().order_by('-registered')[:limit]
 
     return dominios
+
+
+def get_orphan_dns(limit=5):
+    orphans = DNS.objects.filter(
+        empresa_regex__isnull=True
+    ).annotate(
+        total_dominios=Count('dominios', filter=Q(dominios__orden=1))
+    ).order_by('-total_dominios')
+
+    return orphans[:limit]
