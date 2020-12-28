@@ -11,7 +11,7 @@ class DominioAdmin(admin.ModelAdmin):
     list_per_page = 10
     list_select_related = ('zona', 'registrante')
     search_fields = ['nombre']
-    list_filter = ['estado']
+    list_filter = ['estado', 'zona']
 
 
 @admin.register(PreDominio)
