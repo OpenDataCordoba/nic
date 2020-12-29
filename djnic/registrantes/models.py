@@ -1,5 +1,6 @@
 import pytz
 from django.db import models
+from django.urls import reverse
 from django.utils import timezone
 
 
@@ -13,11 +14,12 @@ class Registrante(models.Model):
     object_created = models.DateTimeField(auto_now_add=True)
     object_modified = models.DateTimeField(auto_now=True)
 
+    def get_absolute_url(self):
+        return reverse('registrante', kwargs={'pk': self.id})
 
     class Meta:
         unique_together = (('legal_uid', 'zone'))
 
-    
     def get_zoned_date(self, field, zona):
         """ put a datetime in the rigth timezone before move to string """
         
@@ -42,6 +44,9 @@ class TagForRegistrante(models.Model):
 
     def __str__(self):
         return self.nombre
+
+    def get_absolute_url(self):
+        return reverse('rubro', kwargs={'pk': self.id})
 
 
 class RegistranteTag(models.Model):

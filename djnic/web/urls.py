@@ -38,5 +38,4 @@ urlpatterns = [
     path('hostings', HostingsView.as_view(), name='hostings'),
     path('hostings-30', Hostings30View.as_view(), name='hostings-30'),
     path('hosting-<int:pk>', HostingView.as_view(), name='hosting'),
-
 ]
