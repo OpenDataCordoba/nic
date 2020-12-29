@@ -39,9 +39,9 @@ class HostingsView(ListView):
         context['site_title'] = 'Hostings mas usados'
         context['site_description'] = 'Proveedores de hostings mas usados según DNS1'
 
-        context['hostings'] = get_hosting_usados(limit=100)
+        context['hostings'] = get_hosting_usados(limit=250)
         context['dominios_sin_dns'] = dominios_sin_dns(limit=0).count()
-        context['huerfanos'] = get_orphan_dns(limit=101)
+        context['huerfanos'] = get_orphan_dns(limit=250)
         context['value_is'] = 'Dominios'
         return context
 
