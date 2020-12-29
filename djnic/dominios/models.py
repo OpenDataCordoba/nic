@@ -2,6 +2,7 @@ from datetime import timedelta
 import logging
 import pytz
 from django.db import models
+from django.urls import reverse
 from django.utils import timezone
 from whoare.whoare import WhoAre
 from whoare.exceptions import TooManyQueriesError
@@ -41,6 +42,9 @@ class Dominio(models.Model):
     class Meta:
         unique_together = (('nombre', 'zona'), )
         
+    def get_absolute_url(self):
+        return reverse('dominio', kwargs={'pk': self.id})
+
     def get_zoned_date(self, field):
         """ put a datetime in the rigth timezone before move to string """
         

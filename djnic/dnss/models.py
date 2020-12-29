@@ -1,6 +1,8 @@
 import logging
 import re
 from django.db import models
+from django.urls import reverse
+
 
 logger = logging.getLogger(__name__)
 
@@ -18,6 +20,9 @@ class Empresa(models.Model):
         """ connect all DNSs to regexs """
         for rg in self.regexs.all():
             rg.detect_DNSs()
+
+    def get_absolute_url(self):
+        return reverse('hosting', kwargs={'pk': self.id})
     
     class Meta:
         ordering = ['nombre']
