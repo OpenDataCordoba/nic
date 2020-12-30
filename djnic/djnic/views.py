@@ -7,6 +7,8 @@ from dnss.models import Empresa
 class DominioSitemap(Sitemap):
     changefreq = "yearly"
     priority = 0.5
+    protocol = 'https'
+    limit = 20000
 
     def items(self):
         return Dominio.objects.all()
@@ -18,6 +20,8 @@ class DominioSitemap(Sitemap):
 class RegistranteSitemap(Sitemap):
     changefreq = "yearly"
     priority = 0.6
+    protocol = 'https'
+    limit = 20000
 
     def items(self):
         return Registrante.objects.all()
@@ -29,6 +33,8 @@ class RegistranteSitemap(Sitemap):
 class RubroSitemap(Sitemap):
     changefreq = "never"
     priority = 0.7
+    protocol = 'https'
+    limit = 20000
 
     def items(self):
         return TagForRegistrante.objects.all()
@@ -40,6 +46,8 @@ class RubroSitemap(Sitemap):
 class HostingSitemap(Sitemap):
     changefreq = "yearly"
     priority = 0.8
+    protocol = 'https'
+    limit = 20000
 
     def items(self):
         return Empresa.objects.all()
