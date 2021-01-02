@@ -7,7 +7,7 @@ from .views_registrante import (RegistranteView, RubrosView,
                                 RubroView, RegistrantesAntiguosView,
                                 MayoresRegistrantesView)
 from .views_dnss import HostingsView, Hostings30View, HostingView, DNSView
-from .views_plataforma import StatsReadVtoView, StatsReadGeneralView
+from .views_plataforma import StatsReadVtoView, StatsReadGeneralView, StatsRegistradosPorFechaView
 from .views_cambios import RenovacionesView, RenovacionesRarasView
 
 
@@ -15,8 +15,6 @@ urlpatterns = [
     path('', HomeView.as_view(), name='home'),
     path('dominio-<int:pk>', DominioView.as_view(), name='dominio'),
     path('about', AboutView.as_view(), name='about'),
-    path('stats-read-general', StatsReadGeneralView.as_view(), name='stats-read-general'),
-    path('stats-read-vto', StatsReadVtoView.as_view(), name='stats-read-vto'),
     path('registrante-<int:pk>', RegistranteView.as_view(), name='registrante'),
     path('search/', SearchResultsView.as_view(), name='search'),
 
@@ -40,4 +38,10 @@ urlpatterns = [
     path('hostings-30', Hostings30View.as_view(), name='hostings-30'),
     path('hosting-<int:pk>', HostingView.as_view(), name='hosting'),
     path('dns-<int:pk>', DNSView.as_view(), name='dns'),
+
+    # Estadísticas de la plataforma
+    path('stats-read-general', StatsReadGeneralView.as_view(), name='stats-read-general'),
+    path('stats-read-vto', StatsReadVtoView.as_view(), name='stats-read-vto'),
+    path('registrados-por-fecha', StatsRegistradosPorFechaView.as_view(), name='registrados-por-fecha'),
+    
 ]

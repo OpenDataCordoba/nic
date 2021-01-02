@@ -30,3 +30,17 @@ class StatsReadGeneralView(TemplateView):
         context['site_description'] = 'Estadistica de dominios revisados en la plataforma'
 
         return context
+
+
+@method_decorator(cache_control(max_age=settings.GENERAL_CACHE_SECONDS), name='dispatch')
+@method_decorator(cache_page(settings.GENERAL_CACHE_SECONDS), name='dispatch')
+class StatsRegistradosPorFechaView(TemplateView):
+
+    template_name = "web/bootstrap-base/plataforma/registrados-por-fecha.html"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['site_title'] = 'Estadisticas de registros de dominios'
+        context['site_description'] = 'Dominios registrados por fecha'
+
+        return context

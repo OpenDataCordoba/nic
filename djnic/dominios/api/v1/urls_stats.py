@@ -1,6 +1,6 @@
 from django.urls import path, include
 from rest_framework import routers
-from .views_stats import GeneralStatsView, PriorityView, ReadingStatsView
+from .views_stats import GeneralStatsView, PriorityView, ReadingStatsView, DominioPorFechaDeRegistroView
 
 
 urlpatterns = [
@@ -9,6 +9,5 @@ urlpatterns = [
     path('reading', ReadingStatsView.as_view()),
     path('reading/<str:desde_dias>', ReadingStatsView.as_view()),
     path('reading/<str:desde_dias>/<str:hasta_dias>', ReadingStatsView.as_view()),
-    
-
+    path('registrados-por-fecha', DominioPorFechaDeRegistroView.as_view()),
 ]

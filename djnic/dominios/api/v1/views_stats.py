@@ -7,12 +7,14 @@ from django.db.models.functions import Trunc
 from django.utils import timezone
 from django.views import View
 from django.http import JsonResponse
-from dominios.models import Dominio
 from django.utils.decorators import method_decorator
 from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.views.decorators.cache import cache_page, never_cache, cache_control
+from dominios.models import Dominio, STATUS_NO_DISPONIBLE
+
 
 logger = logging.getLogger(__name__)
+
 
 @method_decorator(cache_control(max_age=settings.GENERAL_CACHE_SECONDS), name='dispatch')
 @method_decorator(cache_page(settings.GENERAL_CACHE_SECONDS), name='dispatch')
@@ -104,7 +106,7 @@ class PriorityView(PermissionRequiredMixin, View):
         for c in [1, 5, 10, 50, 100, 1000, 5000, 10000, 20000]:
             if c < prioridades.count():
                 ret['prioridades'].append(
-                    {   'order': c,
+                    {'order': c,
                         'dominio': prioridades[c].full_domain(), 
                         'priority_to_update': prioridades[c].priority_to_update, 
                         'expire': prioridades[c].expire, 
@@ -175,5 +177,74 @@ class ReadingStatsView(PermissionRequiredMixin, View):
             google_chart_data.append(line)
 
         ret['google_chart_data'] = google_chart_data
+
+        return JsonResponse({'ok': True, 'data': ret}, status=200)
+
+
+@method_decorator(cache_control(max_age=settings.GENERAL_CACHE_SECONDS), name='dispatch')
+@method_decorator(cache_page(settings.GENERAL_CACHE_SECONDS), name='dispatch')
+class DominioPorFechaDeRegistroView(PermissionRequiredMixin, View):
+    """ Dominios no disponibles por fecha de registro """
+    permission_required = []
+
+    def get(self, request, **kwargs):
+        ret = {
+            'dominios': {},
+            'google_chart_data': {}
+        }
+
+        # Año
+        dominios = Dominio.objects.filter(estado=STATUS_NO_DISPONIBLE)\
+            .annotate(year_registered=Trunc('registered', 'year'))\
+            .order_by('year_registered')\
+            .values('year_registered')\
+            .annotate(total=Count('year_registered'))
+        
+        ret['dominios']['year'] = list(dominios)
+
+        # return also google chart comaptible data
+        headers = ['Año', 'dominios registrados']
+        google_chart_data = [headers]
+        for data in dominios:
+            line = [data['year_registered'], data['total']]
+            google_chart_data.append(line)
+
+        ret['google_chart_data']['year'] = google_chart_data
+
+        # SEMANA
+        dominios = Dominio.objects.filter(estado=STATUS_NO_DISPONIBLE)\
+            .annotate(week_registered=Trunc('registered', 'week'))\
+            .order_by('week_registered')\
+            .values('week_registered')\
+            .annotate(total=Count('week_registered'))
+        
+        ret['dominios']['week'] = list(dominios)
+
+        # return also google chart comaptible data
+        headers = ['Semana', 'dominios registrados']
+        google_chart_data = [headers]
+        for data in dominios:
+            line = [data['week_registered'], data['total']]
+            google_chart_data.append(line)
+
+        ret['google_chart_data']['week'] = google_chart_data
+
+        # DIA
+        dominios = Dominio.objects.filter(estado=STATUS_NO_DISPONIBLE)\
+            .annotate(day_registered=Trunc('registered', 'day'))\
+            .order_by('day_registered')\
+            .values('day_registered')\
+            .annotate(total=Count('day_registered'))
+        
+        ret['dominios']['day'] = list(dominios)
+
+        # return also google chart comaptible data
+        headers = ['Día', 'dominios registrados']
+        google_chart_data = [headers]
+        for data in dominios:
+            line = [data['day_registered'], data['total']]
+            google_chart_data.append(line)
+
+        ret['google_chart_data']['day'] = google_chart_data
 
         return JsonResponse({'ok': True, 'data': ret}, status=200)
