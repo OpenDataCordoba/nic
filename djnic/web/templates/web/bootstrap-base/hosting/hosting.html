@@ -54,19 +54,16 @@
         </div>
         <div class="table-responsive">
             <table id="data-table-basic" class="table table-striped">
-<thead>
-                    <tr>
-<th>DNS</th><th>Dominios conectados</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-{% for dns in hosting.regexs.nameservers.all %}
-<tr>
 
-<td><a href='{% url "dns" pk=dns.id %}'>{{ dns.dominio }}</a></td>
-<td>{{ dns.dominios.count }}</td>
+<thead><tr><th>DNS</th><th>Dominios conectados</th></tr></thead><tbody>
 
-</tr>
+{% for rgx in hosting.regexs.all %} 
+    {% for dns in rgx.nameservers.all %}
+        <tr>
+        <td><a href='{% url "dns" pk=dns.id %}'>{{ dns.dominio }}</a></td>
+        <td>{{ dns.dominios.count }}</td>
+        </tr>
+    {% endfor %}
 {% endfor %}                                 
                     </tbody>
             </table>
