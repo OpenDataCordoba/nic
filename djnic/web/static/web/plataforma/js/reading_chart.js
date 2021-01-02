@@ -36,7 +36,7 @@ function drawChart2() {
     var chartDiv2 = document.getElementById('chart_div2');
 
     var jsonData = $.ajax({
-        url: "/api/v1/dominios/stats/reading/-290/-410",
+        url: "/api/v1/dominios/stats/reading/-300/420",
         dataType: "json",
         async: false
         });
