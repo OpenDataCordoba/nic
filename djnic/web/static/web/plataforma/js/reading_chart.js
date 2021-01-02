@@ -12,7 +12,7 @@ function drawChart1() {
     var chartDiv1 = document.getElementById('chart_div1');
 
     var jsonData = $.ajax({
-        url: "/api/v1/dominios/stats/reading?o=91",
+        url: "/api/v1/dominios/stats/reading",
         dataType: "json",
         async: false
         });
