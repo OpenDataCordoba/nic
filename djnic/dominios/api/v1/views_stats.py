@@ -30,7 +30,7 @@ class GeneralStatsView(PermissionRequiredMixin, View):
         ret['estado'] = list(por_estado)
 
         # por dia de actualizacion, ultimos dias
-        starts = timezone.now() - timedelta(days=1)
+        starts = timezone.now() - timedelta(days=7)
         por_horas = dominios.filter(data_readed__gt=starts)\
             .annotate(hora_readed=Trunc('data_readed', 'hour'))\
             .order_by('hora_readed')\
@@ -39,7 +39,7 @@ class GeneralStatsView(PermissionRequiredMixin, View):
         ret['actualizados_ultimas_horas'] = list(por_horas)
 
         # por dia de actualizacion, ultimos dias
-        starts = timezone.now() - timedelta(days=15)
+        starts = timezone.now() - timedelta(days=45)
         por_dias = dominios.filter(data_readed__gt=starts)\
             .annotate(dia_readed=Trunc('data_readed', 'day'))\
             .order_by('dia_readed')\
@@ -48,7 +48,7 @@ class GeneralStatsView(PermissionRequiredMixin, View):
         ret['actualizados_ultimos_dias'] = list(por_dias)
 
         # por semana de actualizacion, ultimas semanas
-        starts = timezone.now() - timedelta(weeks=15)
+        starts = timezone.now() - timedelta(weeks=45)
         por_semanas = dominios.filter(data_readed__gt=starts)\
             .annotate(week_readed=Trunc('data_readed', 'week'))\
             .order_by('week_readed')\
