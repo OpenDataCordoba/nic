@@ -23,7 +23,8 @@ function drawChart1() {
         isStacked: true,
         chart: {
             title: 'Lectura de dominios',
-            subtitle: 'Dias desde ultima lectura por dia de vencimiento de dominio'
+            subtitle: 'Dias desde ultima lectura por dia de vencimiento de dominio',
+            legend: { position: "none" },
             },
         }
 
@@ -47,7 +48,8 @@ function drawChart2() {
         isStacked: true,
         chart: {
             title: 'Lectura de dominios',
-            subtitle: 'Dias desde ultima lectura por dia de vencimiento de dominio'
+            subtitle: 'Dias desde ultima lectura por dia de vencimiento de dominio',
+            legend: { position: "none" },
             },
         }
 
