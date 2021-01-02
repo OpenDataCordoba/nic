@@ -23,7 +23,7 @@ class Empresa(models.Model):
 
     def get_absolute_url(self):
         return reverse('hosting', kwargs={'pk': self.id})
-    
+
     class Meta:
         ordering = ['nombre']
 
@@ -70,6 +70,9 @@ class DNS(models.Model):
 
     def __str__(self):
         return self.dominio
+
+    def get_absolute_url(self):
+        return reverse('dns', kwargs={'pk': self.id})
 
     def assign_empresa(self):
         for rgs in EmpresaRegexDomain.objects.all():

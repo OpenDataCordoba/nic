@@ -6,13 +6,14 @@ from django.urls import path, include
 from django.views.decorators.cache import cache_page
 from rest_framework.authtoken import views
 
-from .views import DominioSitemap, RegistranteSitemap, RubroSitemap, HostingSitemap
+from .views import DominioSitemap, RegistranteSitemap, RubroSitemap, HostingSitemap, DNSSitemap
 
 sitemaps = {
     'dominio': DominioSitemap,
     'registrante': RegistranteSitemap,
     'rubro': RubroSitemap,
-    'hosting': HostingSitemap
+    'hosting': HostingSitemap,
+    'dns': DNSSitemap
 }
 
 urlpatterns = [

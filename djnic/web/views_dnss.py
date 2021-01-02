@@ -4,7 +4,7 @@ from django.views.decorators.cache import cache_page, cache_control
 from django.views.generic.detail import DetailView
 from django.views.generic.list import ListView
 
-from dnss.models import Empresa
+from dnss.models import Empresa, DNS
 from dnss.data import get_hosting_usados, get_dominios_from_hosting, get_orphan_dns
 from dominios.data import dominios_sin_dns
 
@@ -61,4 +61,21 @@ class Hostings30View(ListView):
 
         context['hostings'] = get_hosting_usados(limit=100, days_ago=30)
         context['value_is'] = 'Dominios (ult 30 días)'
+        return context
+
+
+@method_decorator(cache_control(max_age=settings.GENERAL_CACHE_SECONDS), name='dispatch')
+@method_decorator(cache_page(settings.GENERAL_CACHE_SECONDS), name='dispatch')
+class DNSView(DetailView):
+
+    model = DNS
+    context_object_name = "dns"
+    template_name = "web/bootstrap-base/hosting/dns.html"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['site_title'] = f'DNS {self.object.dominio}'
+        context['site_description'] = f'Datos del DNS {self.object.dominio}'
+
+        context['dominios'] = self.object.dominios.order_by('dominio__nombre')
         return context

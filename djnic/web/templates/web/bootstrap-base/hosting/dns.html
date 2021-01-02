@@ -1,0 +1,47 @@
+{% extends "web/bootstrap-base/base.html" %}
+
+{% block main %}
+
+<div class="container">
+    <div class="row">
+        <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
+            <h2>DNS: {{dns.dominio }}</h2>
+
+            {% if dns.empresa_regex %}
+                <p>Asignado a la empresa de hosting: <b><a href='{% url "hosting" pk=dns.dns.empresa_regex.empresa.id %}'>{{ dns.empresa_regex.empresa.nombre }}</a></b> </p> 
+            {% else %}
+                <p>Desconocemos a que empresa de hosting corresponde</p>    
+            {% endif %}
+
+            <p>Dominios en este DNS: <b>{{ dominios.count }}</b></p>
+        </div>
+
+        <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
+            <div class="data-table-list">
+                <div class="basic-tb-hd">
+                    <h2>Dominios que lo usan</h2>
+                </div>
+                <div class="table-responsive">
+                    <table id="data-table-basic" class="table table-striped">
+<thead>
+                            <tr>
+<th>Dominio</th><th>orden</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+{% for domdns in dominios %}
+<tr>
+
+<td>{{ domdns.dominio.full_domain }}</td><td>{{ domdns.orden }}</td>
+
+</tr>
+{% endfor %}                                 
+                            </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+    
+{% endblock main %}

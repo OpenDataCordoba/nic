@@ -4,7 +4,7 @@
 
 <div class="container">
     <div class="row">
-        <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
+        <div class="col-lg-4 col-md-4 col-sm-4 col-xs-4">
             <h2>Hosting: {{hosting.nombre }}</h2>
             <p>Dominios en DNS: <b>{{ hosting.dominios.count }}</b></p>
 
@@ -18,7 +18,7 @@
         </div>
 
 
-        <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
+        <div class="col-lg-4 col-md-4 col-sm-4 col-xs-4">
             <div class="data-table-list">
                 <div class="basic-tb-hd">
                     <h2>DNS asignados</h2>
@@ -46,6 +46,36 @@
                 </div>
             </div>
         </div>
+
+<div class="col-lg-4 col-md-4 col-sm-4 col-xs-4">
+    <div class="data-table-list">
+        <div class="basic-tb-hd">
+            <h2>DNS encontrados</h2>
+        </div>
+        <div class="table-responsive">
+            <table id="data-table-basic" class="table table-striped">
+<thead>
+                    <tr>
+<th>DNS</th><th>Dominios conectados</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+{% for dns in hosting.regexs.nameservers %}
+<tr>
+
+<td><a href='{% url "dns" pk=dns.id %}'>{{ dns.dominio }}</a></td>
+<td>{{ dns.dominios.count }}</td>
+
+</tr>
+{% endfor %}                                 
+                    </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+
+
     </div>
 </div>
     

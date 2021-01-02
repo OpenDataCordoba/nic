@@ -33,6 +33,13 @@
 </tr>
 {% endfor %}
 
+{% for dns in dnss %}
+<tr>
+<td><a href='{% url "dns" pk=dns.id %}'>{{ dns.dominio }}</a></td>
+<td>DNS</td>
+</tr>
+{% endfor %}
+
                         </tbody>
                     </table>
                 </div>

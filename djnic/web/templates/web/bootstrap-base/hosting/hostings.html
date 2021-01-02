@@ -61,7 +61,7 @@
 
 <tr>
     <td>
-        {{ dns.dominio }}
+        <a href='{% url "dns" pk=dns.id %}'>{{ dns.dominio }}</a>
     </td>
     <td>
         {{ dns.total_dominios }}

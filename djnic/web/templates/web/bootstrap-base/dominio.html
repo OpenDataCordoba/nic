@@ -14,7 +14,7 @@
             <p>Estado: <b>{{ estado }}</b></p>
             <ul>
             {% for dns in dominio.dnss.all %}
-            <li>{{ dns.dns.dominio }} 
+            <li><a href='{% url "dns" pk=dns.dns.id %}'>{{ dns.dns.dominio }}</a>
                     {% if dns.dns.empresa_regex %} 
                         (HOSTING: <a href='{% url "hosting" pk=dns.dns.empresa_regex.empresa.id %}'>{{ dns.dns.empresa_regex.empresa.nombre }}</a>) 
                     {% endif %}</li>
