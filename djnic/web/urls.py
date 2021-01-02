@@ -7,7 +7,7 @@ from .views_registrante import (RegistranteView, RubrosView,
                                 RubroView, RegistrantesAntiguosView,
                                 MayoresRegistrantesView)
 from .views_dnss import HostingsView, Hostings30View, HostingView, DNSView
-from .views_plataforma import StatsView
+from .views_plataforma import StatsReadVtoView, StatsReadGeneralView
 from .views_cambios import RenovacionesView, RenovacionesRarasView
 
 
@@ -15,7 +15,8 @@ urlpatterns = [
     path('', HomeView.as_view(), name='home'),
     path('dominio-<int:pk>', DominioView.as_view(), name='dominio'),
     path('about', AboutView.as_view(), name='about'),
-    path('stats', StatsView.as_view(), name='stats'),
+    path('stats-read-general', StatsReadGeneralView.as_view(), name='stats-read-general'),
+    path('stats-read-vto', StatsReadVtoView.as_view(), name='stats-read-vto'),
     path('registrante-<int:pk>', RegistranteView.as_view(), name='registrante'),
     path('search/', SearchResultsView.as_view(), name='search'),
 

@@ -6,13 +6,27 @@ from django.views.generic.base import TemplateView
 
 @method_decorator(cache_control(max_age=settings.GENERAL_CACHE_SECONDS), name='dispatch')
 @method_decorator(cache_page(settings.GENERAL_CACHE_SECONDS), name='dispatch')
-class StatsView(TemplateView):
+class StatsReadVtoView(TemplateView):
 
-    template_name = "web/bootstrap-base/plataforma/stats.html"
+    template_name = "web/bootstrap-base/plataforma/stats-read-vto.html"
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['site_title'] = 'Estadisticas'
-        context['site_description'] = 'Estadísticas del proyecto de dominios argentinos'
+        context['site_title'] = 'Estadisticas de lecturas por vencimiento'
+        context['site_description'] = 'Dias desde la ultima lectura de domimios según fecha de vencimieeto del mismo'
+
+        return context
+
+
+@method_decorator(cache_control(max_age=settings.GENERAL_CACHE_SECONDS), name='dispatch')
+@method_decorator(cache_page(settings.GENERAL_CACHE_SECONDS), name='dispatch')
+class StatsReadGeneralView(TemplateView):
+
+    template_name = "web/bootstrap-base/plataforma/stats-read-general.html"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['site_title'] = 'Estadisticas de lecturas general de la plataforma'
+        context['site_description'] = 'Estadistica de dominios revisados en la plataforma'
 
         return context

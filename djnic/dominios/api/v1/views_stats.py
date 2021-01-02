@@ -17,14 +17,14 @@ logger = logging.getLogger(__name__)
 @method_decorator(cache_control(max_age=settings.GENERAL_CACHE_SECONDS), name='dispatch')
 @method_decorator(cache_page(settings.GENERAL_CACHE_SECONDS), name='dispatch')
 class GeneralStatsView(PermissionRequiredMixin, View):
-    
-    permission_required = ['dominios.dominio.can_view']
+
+    permission_required = []
 
     def get(self, request):
         ret = {}
         dominios = Dominio.objects.all()
         ret['total_dominios'] = dominios.count()
-        
+
         # por estado
         por_estado = dominios.values('estado').annotate(total=Count('estado'))
         ret['estado'] = list(por_estado)
@@ -33,7 +33,7 @@ class GeneralStatsView(PermissionRequiredMixin, View):
         starts = timezone.now() - timedelta(days=1)
         por_horas = dominios.filter(data_updated__gt=starts)\
             .annotate(hora_updated=Trunc('data_updated', 'hour'))\
-            .order_by('-hora_updated')\
+            .order_by('hora_updated')\
             .values('hora_updated')\
             .annotate(total=Count('hora_updated'))
         ret['actualizados_ultimas_horas'] = list(por_horas)
@@ -42,23 +42,47 @@ class GeneralStatsView(PermissionRequiredMixin, View):
         starts = timezone.now() - timedelta(days=15)
         por_dias = dominios.filter(data_updated__gt=starts)\
             .annotate(dia_updated=Trunc('data_updated', 'day'))\
-            .order_by('-dia_updated')\
+            .order_by('dia_updated')\
             .values('dia_updated')\
             .annotate(total=Count('dia_updated'))
         ret['actualizados_ultimos_dias'] = list(por_dias)
 
         # por semana de actualizacion, ultimas semanas
         starts = timezone.now() - timedelta(weeks=15)
-        por_dias = dominios.filter(data_updated__gt=starts)\
+        por_semanas = dominios.filter(data_updated__gt=starts)\
             .annotate(week_updated=Trunc('data_updated', 'week'))\
-            .order_by('-week_updated')\
+            .order_by('week_updated')\
             .values('week_updated')\
             .annotate(total=Count('week_updated'))
-        ret['actualizados_ultimas_semanas'] = list(por_dias)
+        ret['actualizados_ultimas_semanas'] = list(por_semanas)
 
         # por estado
         por_zona = dominios.values(nombre_zona=F('zona__nombre')).annotate(total=Count('zona'))
         ret['zona'] = list(por_zona)
+
+        headers = ['hora', 'dominios actualizados']
+        google_chart_data = [headers]
+        for hora in por_horas:
+            line = [hora['hora_updaed'], hora['total']]
+            google_chart_data.append(line)
+
+        ret['google_chart_data'] = {'hora': google_chart_data}
+
+        headers = ['dia', 'dominios actualizados']
+        google_chart_data = [headers]
+        for dia in por_dias:
+            line = [dia['dia_updaed'], dia['total']]
+            google_chart_data.append(line)
+
+        ret['google_chart_data']['dia'] = google_chart_data
+
+        headers = ['semana', 'dominios actualizados']
+        google_chart_data = [headers]
+        for semana in por_semanas:
+            line = [semana['week_updated'], semana['total']]
+            google_chart_data.append(line)
+
+        ret['google_chart_data']['semana'] = google_chart_data
 
         # return JsonResponse({'ok': False, 'error': 'Missing WhoAre version'}, status=400)
         return JsonResponse({'ok': True, 'data': ret}, status=200)
