@@ -8,7 +8,7 @@
             <h2>DNS: {{dns.dominio }}</h2>
 
             {% if dns.empresa_regex %}
-                <p>Asignado a la empresa de hosting: <b><a href='{% url "hosting" pk=dns.dns.empresa_regex.empresa.id %}'>{{ dns.empresa_regex.empresa.nombre }}</a></b> </p> 
+                <p>Asignado a la empresa de hosting: <b><a href='{% url "hosting" pk=dns.empresa_regex.empresa.id %}'>{{ dns.empresa_regex.empresa.nombre }}</a></b> </p> 
             {% else %}
                 <p>Desconocemos a que empresa de hosting corresponde</p>    
             {% endif %}
