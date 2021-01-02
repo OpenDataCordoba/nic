@@ -22,7 +22,9 @@ class HostingView(DetailView):
         context['site_title'] = f'Hosting {self.object.nombre}'
         context['site_description'] = f'Datos del proveedor de hosting {self.object.nombre}'
 
-        context['dominios'] = get_dominios_from_hosting(hosting=self.object, limit=5)
+        dominios = get_dominios_from_hosting(hosting=self.object, limit=0)
+        context['total_dominios'] = dominios.count()
+        context['ultimos_dominios'] = dominios[:5]
         return context
 
 
