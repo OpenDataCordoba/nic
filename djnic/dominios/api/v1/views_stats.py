@@ -95,9 +95,9 @@ class PriorityView(PermissionRequiredMixin, View):
 @method_decorator(cache_control(max_age=settings.GENERAL_CACHE_SECONDS), name='dispatch')
 @method_decorator(cache_page(settings.GENERAL_CACHE_SECONDS), name='dispatch')
 class ReadingStatsView(PermissionRequiredMixin, View):
-    
-    permission_required = ['dominios.dominio.can_view']
-    
+
+    permission_required = []
+
     def get(self, request, **kwargs):
         ret = {}
         desde_dias = kwargs.get('desde_dias', 90)
@@ -109,65 +109,49 @@ class ReadingStatsView(PermissionRequiredMixin, View):
         ends = timezone.now() + timedelta(days=hasta_dias)
         ret['start'] = starts
         ret['end'] = ends
-        dominios = Dominio.objects.exclude(data_readed__isnull=True).filter(expire__gt=starts, expire__lt=ends).order_by('-expire')
+        dominios = Dominio.objects.exclude(data_readed__isnull=True).filter(expire__gt=starts, expire__lt=ends).order_by('expire')
         data = {}
         total = 0
+        columns = ['+300', '150-300', '60-150', '30-60', '10-30', '5-10', '4', '3', '2', '1', '0']
+
         for dominio in dominios:
             expire = dominio.expire.strftime("%Y-%m-%d")
-            
+
             readed = dominio.data_readed
             if readed is None:  # (?)
                 continue
             readed_since = (timezone.now() - readed).days
 
-
             if expire not in data:
-                data[expire] = {}
-            
-            if readed_since >=300:
+                data[expire] = {k: 0 for k in columns}
+            if readed_since >= 300:
                 rs = '+300'
-            elif readed_since >=150:
+            elif readed_since >= 150:
                 rs = '150-300'
-            elif readed_since >=60:
+            elif readed_since >= 60:
                 rs = '60-150'
-            elif readed_since >=30:
+            elif readed_since >= 30:
                 rs = '30-60'
-            elif readed_since >=10:
+            elif readed_since >= 10:
                 rs = '10-30'
-            elif readed_since >=5:
+            elif readed_since >= 5:
                 rs = '5-10'
             else:
                 rs = str(readed_since)
-            
-            if rs not in data[expire]:
-                data[expire][rs] = 0
-            
+
             data[expire][rs] += 1
             total += 1
 
         ret['total'] = total
         ret['dates'] = data
-            
 
-        # TODO HELP ====================================
-        # # now = Value(timezone.now(), output_field=fields.DateTimeField())
-        # now = timezone.now()
-        # # now = 'NOW()'
-        # # now = 'epoch'
-        # calc_read_since_days = ExpressionWrapper(
-        #     now - F('data_readed'), 
-        #     output_field=fields.DurationField()
-        #     )
-        # data = dominios.filter(expire__gt=starts, expire__lt=ends, data_readed__isnull=False)\
-        #     .annotate(readed_day=Trunc('data_readed', 'day'))\
-        #     .annotate(expire_day=Trunc('expire', 'day'))\
-        #     .values('expire_day', 'readed_day')\
-        #     .annotate(total=Count('expire_day'))\
-        #     .order_by('-total')
+        # return google chart comaptible data
+        headers = ['date'] + columns
+        google_chart_data = [headers]
+        for expire_day in data:
+            line = [expire_day] + [data[expire_day][k] for k in data[expire_day]]
+            google_chart_data.append(line)
 
-        # # for res in data:
-        # #     res['readed_since'] = res['readed_since'].total_seconds() / 86400
-        # ret['expires'] = list(data)
+        ret['google_chart_data'] = google_chart_data
 
-        
         return JsonResponse({'ok': True, 'data': ret}, status=200)
