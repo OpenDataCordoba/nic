@@ -250,3 +250,72 @@ class DominioPorFechaDeRegistroView(PermissionRequiredMixin, View):
         ret['google_chart_data']['day'] = google_chart_data
 
         return JsonResponse({'ok': True, 'data': ret}, status=200)
+
+
+@method_decorator(cache_control(max_age=settings.GENERAL_CACHE_SECONDS), name='dispatch')
+@method_decorator(cache_page(settings.GENERAL_CACHE_SECONDS), name='dispatch')
+class DominioPorFechaDeVencimientoView(PermissionRequiredMixin, View):
+    """ Dominios por fecha de vencimiento """
+    permission_required = []
+
+    def get(self, request, **kwargs):
+        ret = {
+            'dominios': {},
+            'google_chart_data': {}
+        }
+
+        # Año
+        dominios = Dominio.objects.filter(estado=STATUS_NO_DISPONIBLE)\
+            .annotate(year_expire=Trunc('expire', 'year'))\
+            .order_by('year_expire')\
+            .values('year_expire')\
+            .annotate(total=Count('year_expire'))
+        
+        ret['dominios']['year'] = list(dominios)
+
+        # return also google chart comaptible data
+        headers = ['Año', 'dominios a expirar']
+        google_chart_data = [headers]
+        for data in dominios:
+            line = [data['year_expire'], data['total']]
+            google_chart_data.append(line)
+
+        ret['google_chart_data']['year'] = google_chart_data
+
+        # SEMANA
+        dominios = Dominio.objects.filter(estado=STATUS_NO_DISPONIBLE)\
+            .annotate(week_expire=Trunc('expire', 'week'))\
+            .order_by('week_expire')\
+            .values('week_expire')\
+            .annotate(total=Count('week_expire'))
+        
+        ret['dominios']['week'] = list(dominios)
+
+        # return also google chart comaptible data
+        headers = ['Semana', 'dominios a expirar']
+        google_chart_data = [headers]
+        for data in dominios:
+            line = [data['week_expire'], data['total']]
+            google_chart_data.append(line)
+
+        ret['google_chart_data']['week'] = google_chart_data
+
+        # DIA
+        dominios = Dominio.objects.filter(estado=STATUS_NO_DISPONIBLE)\
+            .annotate(day_expire=Trunc('expire', 'day'))\
+            .order_by('day_expire')\
+            .values('day_expire')\
+            .annotate(total=Count('day_expire'))
+        
+        ret['dominios']['day'] = list(dominios)
+
+        # return also google chart comaptible data
+        headers = ['Día', 'dominios a expirar']
+        google_chart_data = [headers]
+        for data in dominios:
+            line = [data['day_expire'], data['total']]
+            google_chart_data.append(line)
+
+        ret['google_chart_data']['day'] = google_chart_data
+
+        return JsonResponse({'ok': True, 'data': ret}, status=200)

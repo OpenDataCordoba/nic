@@ -38,7 +38,7 @@ def get_renovaciones(limit=50, solo_fallados=False):
         .annotate(dnuevo=Cast('nuevo', DateTimeField()))\
         .annotate(danterior=Cast('anterior', DateTimeField()))\
         .annotate(tdiff=ExpressionWrapper(F('dnuevo') - F('danterior'), output_field=DurationField()))
-    
+
     if solo_fallados:
         cambios = cambios.filter(
             Q(tdiff__gt=timedelta(days=370)) | Q(tdiff__lt=timedelta(days=360))
