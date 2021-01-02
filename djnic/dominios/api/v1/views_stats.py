@@ -100,10 +100,8 @@ class ReadingStatsView(PermissionRequiredMixin, View):
 
     def get(self, request, **kwargs):
         ret = {}
-        desde_dias = kwargs.get('desde_dias', 90)
-        hasta_dias = kwargs.get('hasta_dias', 45)
-        desde_dias = min(desde_dias, 90)
-        hasta_dias = min(hasta_dias, 45)
+        desde_dias = int(kwargs.get('desde_dias', '90'))
+        hasta_dias = int(kwargs.get('hasta_dias', '45'))
         # por semana de actualizacion, ultimas semanas
         starts = timezone.now() - timedelta(days=desde_dias)
         ends = timezone.now() + timedelta(days=hasta_dias)
