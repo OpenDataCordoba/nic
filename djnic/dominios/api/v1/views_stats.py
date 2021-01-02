@@ -264,8 +264,10 @@ class DominioPorFechaDeVencimientoView(PermissionRequiredMixin, View):
             'google_chart_data': {}
         }
 
+        starts = timezone.now() - timedelta(days=60)
+
         # Año
-        dominios = Dominio.objects.filter(estado=STATUS_NO_DISPONIBLE)\
+        dominios = Dominio.objects.filter(estado=STATUS_NO_DISPONIBLE, expire__gt=starts)\
             .annotate(year_expire=Trunc('expire', 'year'))\
             .order_by('year_expire')\
             .values('year_expire')\
@@ -283,7 +285,7 @@ class DominioPorFechaDeVencimientoView(PermissionRequiredMixin, View):
         ret['google_chart_data']['year'] = google_chart_data
 
         # SEMANA
-        dominios = Dominio.objects.filter(estado=STATUS_NO_DISPONIBLE)\
+        dominios = Dominio.objects.filter(estado=STATUS_NO_DISPONIBLE, expire__gt=starts)\
             .annotate(week_expire=Trunc('expire', 'week'))\
             .order_by('week_expire')\
             .values('week_expire')\
@@ -301,7 +303,7 @@ class DominioPorFechaDeVencimientoView(PermissionRequiredMixin, View):
         ret['google_chart_data']['week'] = google_chart_data
 
         # DIA
-        dominios = Dominio.objects.filter(estado=STATUS_NO_DISPONIBLE)\
+        dominios = Dominio.objects.filter(estado=STATUS_NO_DISPONIBLE, expire__gt=starts)\
             .annotate(day_expire=Trunc('expire', 'day'))\
             .order_by('day_expire')\
             .values('day_expire')\

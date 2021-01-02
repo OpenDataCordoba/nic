@@ -22,7 +22,7 @@ function drawChart1() {
 
     var materialOptions = {
         chart: {
-            title: 'Dominios registrados por año'},
+            title: 'Dominios que vencen por año'},
             legend: { position: "none" },
         }
     var materialChart = new google.charts.Bar(chartDiv1);
@@ -31,7 +31,7 @@ function drawChart1() {
     var data = google.visualization.arrayToDataTable(jsonData.responseJSON.data.google_chart_data.day);
     var materialOptions = {
         chart: {
-            title: 'Dominios registrados por día'},
+            title: 'Dominios que vencen cada día'},
             legend: { position: "none" },
         }
     var materialChart = new google.charts.Bar(chartDiv2);
@@ -39,7 +39,7 @@ function drawChart1() {
 
     var data = google.visualization.arrayToDataTable(jsonData.responseJSON.data.google_chart_data.week);
     var materialOptions = {
-        chart: {title: 'Dominios registrados por semana'},
+        chart: {title: 'Dominios que vencen cada semana'},
         legend: { position: "none" },
     }
     var materialChart = new google.charts.Bar(chartDiv3);
