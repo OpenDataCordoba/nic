@@ -63,7 +63,7 @@ class GeneralStatsView(PermissionRequiredMixin, View):
         headers = ['hora', 'dominios actualizados']
         google_chart_data = [headers]
         for hora in por_horas:
-            line = [hora['hora_updaed'], hora['total']]
+            line = [hora['hora_updated'], hora['total']]
             google_chart_data.append(line)
 
         ret['google_chart_data'] = {'hora': google_chart_data}
@@ -71,7 +71,7 @@ class GeneralStatsView(PermissionRequiredMixin, View):
         headers = ['dia', 'dominios actualizados']
         google_chart_data = [headers]
         for dia in por_dias:
-            line = [dia['dia_updaed'], dia['total']]
+            line = [dia['dia_updated'], dia['total']]
             google_chart_data.append(line)
 
         ret['google_chart_data']['dia'] = google_chart_data
