@@ -212,7 +212,8 @@ class DominioPorFechaDeRegistroView(PermissionRequiredMixin, View):
         ret['google_chart_data']['year'] = google_chart_data
 
         # SEMANA
-        dominios = Dominio.objects.filter(estado=STATUS_NO_DISPONIBLE)\
+        starts = timezone.now() - timedelta(weeks=150)
+        dominios = Dominio.objects.filter(estado=STATUS_NO_DISPONIBLE, registered__gt=starts)\
             .annotate(week_registered=Trunc('registered', 'week'))\
             .order_by('week_registered')\
             .values('week_registered')\
@@ -230,7 +231,8 @@ class DominioPorFechaDeRegistroView(PermissionRequiredMixin, View):
         ret['google_chart_data']['week'] = google_chart_data
 
         # DIA
-        dominios = Dominio.objects.filter(estado=STATUS_NO_DISPONIBLE)\
+        starts = timezone.now() - timedelta(days=366)
+        dominios = Dominio.objects.filter(estado=STATUS_NO_DISPONIBLE, registered__gt=starts)\
             .annotate(day_registered=Trunc('registered', 'day'))\
             .order_by('day_registered')\
             .values('day_registered')\
