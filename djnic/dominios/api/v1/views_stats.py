@@ -31,29 +31,29 @@ class GeneralStatsView(PermissionRequiredMixin, View):
 
         # por dia de actualizacion, ultimos dias
         starts = timezone.now() - timedelta(days=1)
-        por_horas = dominios.filter(data_updated__gt=starts)\
-            .annotate(hora_updated=Trunc('data_updated', 'hour'))\
-            .order_by('hora_updated')\
-            .values('hora_updated')\
-            .annotate(total=Count('hora_updated'))
+        por_horas = dominios.filter(data_readed__gt=starts)\
+            .annotate(hora_readed=Trunc('data_readed', 'hour'))\
+            .order_by('hora_readed')\
+            .values('hora_readed')\
+            .annotate(total=Count('hora_readed'))
         ret['actualizados_ultimas_horas'] = list(por_horas)
 
         # por dia de actualizacion, ultimos dias
         starts = timezone.now() - timedelta(days=15)
-        por_dias = dominios.filter(data_updated__gt=starts)\
-            .annotate(dia_updated=Trunc('data_updated', 'day'))\
-            .order_by('dia_updated')\
-            .values('dia_updated')\
-            .annotate(total=Count('dia_updated'))
+        por_dias = dominios.filter(data_readed__gt=starts)\
+            .annotate(dia_readed=Trunc('data_readed', 'day'))\
+            .order_by('dia_readed')\
+            .values('dia_readed')\
+            .annotate(total=Count('dia_readed'))
         ret['actualizados_ultimos_dias'] = list(por_dias)
 
         # por semana de actualizacion, ultimas semanas
         starts = timezone.now() - timedelta(weeks=15)
-        por_semanas = dominios.filter(data_updated__gt=starts)\
-            .annotate(week_updated=Trunc('data_updated', 'week'))\
-            .order_by('week_updated')\
-            .values('week_updated')\
-            .annotate(total=Count('week_updated'))
+        por_semanas = dominios.filter(data_readed__gt=starts)\
+            .annotate(week_readed=Trunc('data_readed', 'week'))\
+            .order_by('week_readed')\
+            .values('week_readed')\
+            .annotate(total=Count('week_readed'))
         ret['actualizados_ultimas_semanas'] = list(por_semanas)
 
         # por estado
@@ -63,7 +63,7 @@ class GeneralStatsView(PermissionRequiredMixin, View):
         headers = ['hora', 'dominios actualizados']
         google_chart_data = [headers]
         for hora in por_horas:
-            line = [hora['hora_updated'], hora['total']]
+            line = [hora['hora_readed'], hora['total']]
             google_chart_data.append(line)
 
         ret['google_chart_data'] = {'hora': google_chart_data}
@@ -71,7 +71,7 @@ class GeneralStatsView(PermissionRequiredMixin, View):
         headers = ['dia', 'dominios actualizados']
         google_chart_data = [headers]
         for dia in por_dias:
-            line = [dia['dia_updated'], dia['total']]
+            line = [dia['dia_readed'], dia['total']]
             google_chart_data.append(line)
 
         ret['google_chart_data']['dia'] = google_chart_data
@@ -79,7 +79,7 @@ class GeneralStatsView(PermissionRequiredMixin, View):
         headers = ['semana', 'dominios actualizados']
         google_chart_data = [headers]
         for semana in por_semanas:
-            line = [semana['week_updated'], semana['total']]
+            line = [semana['week_readed'], semana['total']]
             google_chart_data.append(line)
 
         ret['google_chart_data']['semana'] = google_chart_data
