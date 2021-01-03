@@ -5,6 +5,7 @@ google.charts.setOnLoadCallback(drawCharts);
 function drawCharts() {
     drawChart1();
     drawChart2();
+    drawChart3();
 }
 
 function drawChart1() {
