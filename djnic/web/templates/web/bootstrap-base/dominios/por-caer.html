@@ -1,0 +1,42 @@
+{% extends "web/bootstrap-base/base.html" %}
+
+{% block main %}
+
+<div class="container">
+    <div class="row">
+        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+            <div class="data-table-list">
+                <div class="basic-tb-hd">
+                    <h2>Dominios por caer</h2>
+                    <p>Estos dominios vencieron hace 45 días y debería caer hoy o mañana</p>
+                </div>
+                <div class="table-responsive">
+                    <table id="data-table-basic" class="table table-striped">
+                        <thead>
+                            <tr>
+<th>Dominio</th><th>Registrante</th><th>Venció</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+{% for dominio in por_caer %}
+<tr>
+<td>{{ dominio.nombre }}.{{ dominio.zona.nombre }}</td>
+<td>
+    {% if dominio.registrante %}
+    <a href='{% url "registrante" pk=dominio.registrante.id %}'>{{ dominio.registrante.name }}</a>
+    {% else %}
+    ERROR
+    {% endif %}
+    </td>
+</tr>
+<td>{{ dominio.expire|date:"Y-m-d H:i:s" }}</td>
+{% endfor %}                                 
+                            </tbody>
+</table>
+              </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock main %}

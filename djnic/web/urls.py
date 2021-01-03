@@ -2,7 +2,8 @@ from django.urls import path, include
 from .views import HomeView, AboutView, SearchResultsView
 from .views_dominio import (DominioView, UltimosCaidos,
                             UltimosRegistrados, Judicializados,
-                            DominiosAntiguosView, DominiosVencimientoLargoView)
+                            DominiosAntiguosView, DominiosVencimientoLargoView,
+                            PorCaerView)
 from .views_registrante import (RegistranteView, RubrosView,
                                 RubroView, RegistrantesAntiguosView,
                                 MayoresRegistrantesView)
@@ -27,6 +28,7 @@ urlpatterns = [
     path('dominios-futuros', DominiosVencimientoLargoView.as_view(), name='dominios-futuros'),
     path('renovaciones', RenovacionesView.as_view(), name='renovaciones'),
     path('renovaciones-raras', RenovacionesRarasView.as_view(), name='renovaciones-raras'),
+    path('por-caer', PorCaerView.as_view(), name='por-caer'),
     
     # registrantes
     path('registrantes-antiguos', RegistrantesAntiguosView.as_view(), name='registrantes-antiguos'),

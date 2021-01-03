@@ -7,7 +7,8 @@ from django.views.generic.detail import DetailView
 from dominios.models import Dominio, STATUS_DISPONIBLE
 from cambios.data import get_ultimos_caidos
 from dominios.data import (get_ultimos_registrados, get_judicializados,
-                           get_primeros_registrados, get_futuros)
+                           get_primeros_registrados, get_futuros,
+                           get_por_caer)
 
 
 @method_decorator(cache_control(max_age=settings.GENERAL_CACHE_SECONDS), name='dispatch')
@@ -107,5 +108,21 @@ class DominiosVencimientoLargoView(TemplateView):
         context['site_description'] = 'Dominios que vencen más en el futuro'
 
         context['dominios'] = get_futuros(limit=500)
+
+        return context
+
+
+@method_decorator(cache_control(max_age=settings.GENERAL_CACHE_SECONDS), name='dispatch')
+@method_decorator(cache_page(settings.GENERAL_CACHE_SECONDS), name='dispatch')
+class PorCaerView(TemplateView):
+
+    template_name = "web/bootstrap-base/dominios/por-caer.html"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['site_title'] = 'Dominios apunto de caer'
+        context['site_description'] = 'Dominios vencidos y listos para liberarse'
+
+        context['por_caer'] = get_por_caer(limit=500)
 
         return context

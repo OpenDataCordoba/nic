@@ -58,3 +58,26 @@ def dominios_sin_dns(limit=5):
         dominios = dominios[:limit]
 
     return dominios
+
+
+def get_por_caer(limit=5, de_registrantes_etiquetados=False, etiqueta=None):
+
+    # TODO esto es para Argentina. Cada pais deberá tener sus reglas
+    starts = timezone.now() - timedelta(days=44)
+    ends = timezone.now() - timedelta(days=48)
+    dominios = Dominio.objects.filter(
+        estado=STATUS_NO_DISPONIBLE,
+        expire__lt=starts,
+        expire__gt=ends)
+
+    if de_registrantes_etiquetados:
+        dominios = dominios.annotate(tags=Count('registrante__tags')).filter(tags__gt=0)
+
+    if etiqueta is not None:
+        dominios = dominios.filter(registrante__tags__tag=etiqueta)
+
+    dominios = dominios.order_by('expire')
+    if limit > 0:
+        dominios = dominios[:limit]
+
+    return dominios
