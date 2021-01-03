@@ -10,7 +10,7 @@ from .views_registrante import (RegistranteView, RubrosView,
 from .views_dnss import HostingsView, Hostings30View, HostingView, DNSView
 from .views_plataforma import (StatsReadVtoView, StatsReadGeneralView, 
                                StatsRegistradosPorFechaView, StatsVencimientosPorFechaView)
-from .views_cambios import RenovacionesView, RenovacionesRarasView
+from .views_cambios import RenovacionesView, RenovacionesRarasView, RenovacionesHaciaAtrasView
 
 
 urlpatterns = [
@@ -28,6 +28,7 @@ urlpatterns = [
     path('dominios-futuros', DominiosVencimientoLargoView.as_view(), name='dominios-futuros'),
     path('renovaciones', RenovacionesView.as_view(), name='renovaciones'),
     path('renovaciones-raras', RenovacionesRarasView.as_view(), name='renovaciones-raras'),
+    path('renovaciones-para-atras', RenovacionesHaciaAtrasView.as_view(), name='renovaciones-raras'),
     path('por-caer', PorCaerView.as_view(), name='por-caer'),
     
     # registrantes

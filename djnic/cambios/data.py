@@ -29,7 +29,7 @@ def get_ultimas_transferencias(limit=5):
     return transferencias[:limit]
 
 
-def get_renovaciones(limit=50, solo_fallados=False):
+def get_renovaciones(limit=50, solo_fallados=False, solo_hacia_atras=False):
     """ Dominios que cambia la fecha en que expira """
     cambios = CampoCambio.objects\
         .filter(campo='dominio_expire')\
@@ -44,6 +44,11 @@ def get_renovaciones(limit=50, solo_fallados=False):
             Q(tdiff__gt=timedelta(days=370)) | Q(tdiff__lt=timedelta(days=360))
         )
 
+    if solo_hacia_atras:
+        cambios = cambios.filter(
+            Q(nuevo__lt=F('anterior'))
+        )
+    
     cambios = cambios.order_by('-cambio__momento')
 
     return cambios[:limit]

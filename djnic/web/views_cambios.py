@@ -38,9 +38,28 @@ class RenovacionesRarasView(ListView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['site_title'] = 'Renovaciones de dominio'
-        context['site_description'] = 'Lista de últimos dominios renovados'
+        context['site_description'] = 'Lista de últimos dominios renovados con cambios diferente a 365 días'
 
         # ordenar los cambios
         context['campos'] = get_renovaciones(limit=200, solo_fallados=True)
+
+        return context
+
+
+@method_decorator(cache_control(max_age=settings.GENERAL_CACHE_SECONDS), name='dispatch')
+@method_decorator(cache_page(settings.GENERAL_CACHE_SECONDS), name='dispatch')
+class RenovacionesHaciaAtrasView(ListView):
+
+    model = CampoCambio
+    context_object_name = "campo"
+    template_name = "web/bootstrap-base/dominios/renovaciones.html"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['site_title'] = 'Renovaciones de dominio hacia atras'
+        context['site_description'] = 'Lista de últimos dominios renovados con fecha de vencimiento que cambia hacia el pasado'
+
+        # ordenar los cambios
+        context['campos'] = get_renovaciones(limit=200, solo_hacia_atras=True)
 
         return context
