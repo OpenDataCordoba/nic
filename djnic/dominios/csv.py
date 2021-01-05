@@ -1,5 +1,5 @@
 from core.csv import queryset_as_csv_view
-from dominios.models import Dominio
+from dominios.models import Dominio, STATUS_NO_DISPONIBLE
 
 
 def csv_dominios(request):
@@ -9,7 +9,7 @@ def csv_dominios(request):
     override_fields = {
         'zona__nombre': 'zona'
     }
-    queryset = Dominio.objects.values(*fields)
+    queryset = Dominio.objects.filter(estado=STATUS_NO_DISPONIBLE).values(*fields)
     response = queryset_as_csv_view(
         filename='dominios.csv',
         queryset=queryset,
