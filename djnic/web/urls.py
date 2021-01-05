@@ -1,4 +1,6 @@
-from django.urls import path, include
+from django.urls import path
+from django.views.decorators.cache import cache_page
+
 from .views import HomeView, AboutView, SearchResultsView
 from .views_dominio import (DominioView, UltimosCaidos,
                             UltimosRegistrados, Judicializados,
@@ -11,6 +13,8 @@ from .views_dnss import HostingsView, Hostings30View, HostingView, DNSView
 from .views_plataforma import (StatsReadVtoView, StatsReadGeneralView, 
                                StatsRegistradosPorFechaView, StatsVencimientosPorFechaView)
 from .views_cambios import RenovacionesView, RenovacionesRarasView, RenovacionesHaciaAtrasView
+from dnss.csv import csv_empresas, csv_dns
+from dominios.csv import csv_dominios
 
 
 urlpatterns = [
@@ -48,5 +52,10 @@ urlpatterns = [
     path('stats-read-vto', StatsReadVtoView.as_view(), name='stats-read-vto'),
     path('registrados-por-fecha', StatsRegistradosPorFechaView.as_view(), name='registrados-por-fecha'),
     path('vencimientos-por-fecha', StatsVencimientosPorFechaView.as_view(), name='registrados-por-fecha'),
-    
+
+    # descargas CSV
+    path('descargas/empresas.csv', cache_page(86400 * 7)(csv_empresas), name='csv-empresas'),
+    path('descargas/dnss.csv', cache_page(86400 * 7)(csv_dns), name='csv-dnss'),
+    path('descargas/dominios.csv', cache_page(86400 * 7)(csv_dominios), name='csv-dominios'),
+
 ]
