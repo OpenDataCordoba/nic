@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     'cambios',
     'web',
     'core',
+    'analytics',
 ]
 
 MIDDLEWARE = [

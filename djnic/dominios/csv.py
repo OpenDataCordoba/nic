@@ -11,6 +11,7 @@ def csv_dominios(request):
     }
     queryset = Dominio.objects.filter(estado=STATUS_NO_DISPONIBLE).values(*fields)
     response = queryset_as_csv_view(
+        request=request,
         filename='dominios.csv',
         queryset=queryset,
         fields=fields,

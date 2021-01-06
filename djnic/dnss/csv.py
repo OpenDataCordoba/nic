@@ -7,7 +7,7 @@ def csv_empresas(request):
 
     fields = ['id', 'nombre']
     queryset = Empresa.objects.all()
-    response = queryset_as_csv_view(filename='empresas.csv', queryset=queryset, fields=fields)
+    response = queryset_as_csv_view(request=request, filename='empresas.csv', queryset=queryset, fields=fields)
     return response
 
 
@@ -21,6 +21,7 @@ def csv_dns(request):
     }
     queryset = DNS.objects.values(*fields)
     response = queryset_as_csv_view(
+        request=request,
         filename='dnss.csv',
         queryset=queryset,
         fields=fields,

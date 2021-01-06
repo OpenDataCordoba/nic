@@ -1,9 +1,11 @@
 import csv
 from http import HTTPStatus
+from django.contrib.auth.models import AnonymousUser
 from django.http import HttpResponse
+from analytics.models import Analytic
 
 
-def queryset_as_csv_view(filename, queryset, fields, override_fields={}):
+def queryset_as_csv_view(request, filename, queryset, fields, override_fields={}):
     """ create a CSV to download
         queryset: could be a queryset or a list of dicts (using .values('field1', 'field2'))
         fields: real fields in queryset
@@ -34,4 +36,11 @@ def queryset_as_csv_view(filename, queryset, fields, override_fields={}):
             final_row = {fixed_fields[k]: getattr(row, k) for k in fields}
         writer.writerow(final_row)
 
+    user = None if request.user.is_anonymous else request.user
+    Analytic.objects.create(
+        evento='download',
+        user=user,
+        referencia=filename,
+        extras=Analytic.request_as_dict(request)
+    )
     return response
