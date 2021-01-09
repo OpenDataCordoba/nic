@@ -5,68 +5,68 @@ import uuid
 
 
 def gen_uuid(apps, schema_editor, model_real_name):
-    MyModel = apps.get_model('dnss', model_real_name)
+    MyModel = apps.get_model('registrantes', model_real_name)
     c = 0
     while MyModel.objects.filter(uid__isnull=True).exists():
         c += 1
-        print('model_real_name: {} = {}'.format(model_real_name, c))
+        print('model_real_name: {} = {} - {}'.format(model_real_name, c, MyModel.objects.filter(uid__isnull=True).count()))
         with transaction.atomic():
             for row in MyModel.objects.filter(uid__isnull=True)[:1000]:
-                row.uuid = uuid.uuid4()
+                row.uid = uuid.uuid4()
                 row.save(update_fields=['uid'])
 
 
-def update_dns(apps, schema_editor):
-    gen_uuid(apps, schema_editor, model_real_name='DNS')
+def update_registrante(apps, schema_editor):
+    gen_uuid(apps, schema_editor, model_real_name='Registrante')
 
 
-def update_empresa(apps, schema_editor):
-    gen_uuid(apps, schema_editor, model_real_name='Empresa')
+def update_rt(apps, schema_editor):
+    gen_uuid(apps, schema_editor, model_real_name='RegistranteTag')
 
 
-def update_empresar(apps, schema_editor):
-    gen_uuid(apps, schema_editor, model_real_name='EmpresaRegexDomain')
+def update_tr(apps, schema_editor):
+    gen_uuid(apps, schema_editor, model_real_name='TagForRegistrante')
 
 
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('dnss', '0005_auto_20201128_1004'),
+        ('registrantes', '0005_auto_20201128_1327'),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='dns',
+            model_name='registrante',
             name='uid',
             field=models.UUIDField(null=True),
         ),
-        migrations.RunPython(update_dns, reverse_code=migrations.RunPython.noop),
+        migrations.RunPython(update_registrante, reverse_code=migrations.RunPython.noop),
         migrations.AlterField(
-            model_name='dns',
+            model_name='registrante',
             name='uid',
             field=models.UUIDField(default=uuid.uuid4, editable=False, unique=True),
         ),
 
         migrations.AddField(
-            model_name='empresa',
+            model_name='registrantetag',
             name='uid',
             field=models.UUIDField(null=True),
         ),
-        migrations.RunPython(update_empresa, reverse_code=migrations.RunPython.noop),
+        migrations.RunPython(update_rt, reverse_code=migrations.RunPython.noop),
         migrations.AlterField(
-            model_name='empresa',
+            model_name='registrantetag',
             name='uid',
             field=models.UUIDField(default=uuid.uuid4, editable=False, unique=True),
         ),
 
         migrations.AddField(
-            model_name='empresaregexdomain',
+            model_name='tagforregistrante',
             name='uid',
             field=models.UUIDField(null=True),
         ),
-        migrations.RunPython(update_empresar, reverse_code=migrations.RunPython.noop),
+        migrations.RunPython(update_tr, reverse_code=migrations.RunPython.noop),
         migrations.AlterField(
-            model_name='empresaregexdomain',
+            model_name='tagforregistrante',
             name='uid',
             field=models.UUIDField(default=uuid.uuid4, editable=False, unique=True),
         ),

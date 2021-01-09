@@ -9,10 +9,10 @@ def gen_uuid(apps, schema_editor, model_real_name):
     c = 0
     while MyModel.objects.filter(uid__isnull=True).exists():
         c += 1
-        print('model_real_name: {} = {}'.format(model_real_name, c))
+        print('model_real_name: {} = {} - {}'.format(model_real_name, c, MyModel.objects.filter(uid__isnull=True).count()))
         with transaction.atomic():
             for row in MyModel.objects.filter(uid__isnull=True)[:1000]:
-                row.uuid = uuid.uuid4()
+                row.uid = uuid.uuid4()
                 row.save(update_fields=['uid'])
 
 
