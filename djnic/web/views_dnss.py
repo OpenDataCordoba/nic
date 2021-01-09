@@ -17,6 +17,9 @@ class HostingView(DetailView):
     context_object_name = "hosting"
     template_name = "web/bootstrap-base/hosting/hosting.html"
 
+    def get_object(self):
+        return Empresa.objects.get(uid=self.kwargs['uid'])
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['site_title'] = f'Hosting {self.object.nombre}'
@@ -73,6 +76,9 @@ class DNSView(DetailView):
     model = DNS
     context_object_name = "dns"
     template_name = "web/bootstrap-base/hosting/dns.html"
+
+    def get_object(self):
+        return DNS.objects.get(uid=self.kwargs['uid'])
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)

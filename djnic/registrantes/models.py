@@ -1,4 +1,5 @@
 import pytz
+import uuid
 from django.db import models
 from django.urls import reverse
 from django.utils import timezone
@@ -8,6 +9,7 @@ class Registrante(models.Model):
     
     name = models.CharField(max_length=240)
     legal_uid = models.CharField(max_length=90, db_index=True)
+    uid = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)
     zone = models.CharField(max_length=10, default='AR', help_text='Para identificar en el pais donde esta')
     created = models.DateTimeField(null=True, blank=True)
     changed = models.DateTimeField(null=True, blank=True)
@@ -15,7 +17,7 @@ class Registrante(models.Model):
     object_modified = models.DateTimeField(auto_now=True)
 
     def get_absolute_url(self):
-        return reverse('registrante', kwargs={'pk': self.id})
+        return reverse('registrante', kwargs={'uid': self.uid})
 
     class Meta:
         unique_together = (('legal_uid', 'zone'))
@@ -39,6 +41,7 @@ class Registrante(models.Model):
 class TagForRegistrante(models.Model):
     """ etiqueta para los registrantes """
     nombre = models.CharField(max_length=190)
+    uid = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)
     object_created = models.DateTimeField(auto_now_add=True)
     object_modified = models.DateTimeField(auto_now=True)
 
@@ -46,11 +49,12 @@ class TagForRegistrante(models.Model):
         return self.nombre
 
     def get_absolute_url(self):
-        return reverse('rubro', kwargs={'pk': self.id})
+        return reverse('rubro', kwargs={'uid': self.uid})
 
 
 class RegistranteTag(models.Model):
     registrante = models.ForeignKey(Registrante, on_delete=models.CASCADE, related_name='tags')
+    uid = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)
     tag = models.ForeignKey(TagForRegistrante, on_delete=models.CASCADE, related_name='registrantes')
     object_created = models.DateTimeField(auto_now_add=True)
     object_modified = models.DateTimeField(auto_now=True)

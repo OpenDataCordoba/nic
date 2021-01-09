@@ -16,7 +16,7 @@
 {% for rubro in rubros %}
 <tr>
     <td>
-        <a href='{% url "rubro" pk=rubro.id %}'>
+        <a href='{% url "rubro" uid=rubro.uid %}'>
         <b>{{ rubro.nombre }}</b>
         </a>
     </td>
@@ -24,7 +24,7 @@
 {% for rt in rubro.registrantes.all %}
 <tr>
     <td>
-    <a href='{% url "registrante" pk=rt.registrante.id %}'>{{ rt.registrante.name }}</a>
+    <a href='{% url "registrante" uid=rt.registrante.uid %}'>{{ rt.registrante.name }}</a>
     </td>
 </tr>
 {% endfor %}

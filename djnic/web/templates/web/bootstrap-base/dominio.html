@@ -14,9 +14,9 @@
             <p>Estado: <b>{{ estado }}</b></p>
             <ul>
             {% for dns in dominio.dnss.all %}
-            <li><a href='{% url "dns" pk=dns.dns.id %}'>{{ dns.dns.dominio }}</a>
+            <li><a href='{% url "dns" uid=dns.dns.uid %}'>{{ dns.dns.dominio }}</a>
                     {% if dns.dns.empresa_regex %} 
-                        (HOSTING: <a href='{% url "hosting" pk=dns.dns.empresa_regex.empresa.id %}'>{{ dns.dns.empresa_regex.empresa.nombre }}</a>) 
+                        (HOSTING: <a href='{% url "hosting" uid=dns.dns.empresa_regex.empresa.uid %}'>{{ dns.dns.empresa_regex.empresa.nombre }}</a>) 
                     {% endif %}</li>
             {% endfor %}
             </ul>
@@ -25,7 +25,7 @@
     {% if dominio.registrante %}
         <div class="col-lg-4 col-md-4 col-sm-4 col-xs-4">
             <h3>Registrante</h3>
-            <p><b><a href='{% url "registrante" pk=dominio.registrante.id %}'>{{ dominio.registrante.name }}</a></b></p>
+            <p><b><a href='{% url "registrante" uid=dominio.registrante.uid %}'>{{ dominio.registrante.name }}</a></b></p>
         </div>
     {% endif %}
     

@@ -14,28 +14,28 @@
 
 {% for res in dominios %}
 <tr>
-<td><a href='{% url "dominio" pk=res.id %}'>{{ res.full_domain }}</a></td>
+<td><a href='{% url "dominio" uid=res.uid %}'>{{ res.full_domain }}</a></td>
 <td>Dominio</td>
 </tr>
 {% endfor %}
 
 {% for res in registrantes %}
 <tr>
-<td><a href='{% url "registrante" pk=res.id %}'>{{ res.name }}</a></td>
+<td><a href='{% url "registrante" uid=res.uid %}'>{{ res.name }}</a></td>
 <td>Registrante</td>
 </tr>
 {% endfor %}
 
 {% for res in hostings %}
 <tr>
-<td><a href='{% url "hosting" pk=res.id %}'>{{ res.nombre }}</a></td>
+<td><a href='{% url "hosting" uid=res.uid %}'>{{ res.nombre }}</a></td>
 <td>Hosting</td>
 </tr>
 {% endfor %}
 
 {% for dns in dnss %}
 <tr>
-<td><a href='{% url "dns" pk=dns.id %}'>{{ dns.dominio }}</a></td>
+<td><a href='{% url "dns" uid=dns.uid %}'>{{ dns.dominio }}</a></td>
 <td>DNS</td>
 </tr>
 {% endfor %}

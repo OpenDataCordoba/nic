@@ -17,7 +17,7 @@
 <td>
     <button onclick="$('#ultimo_caido_{{ campo.id }}').toggle();">+</button>
 
-    <a href='{% url "dominio" pk=campo.cambio.dominio.id %}'>
+    <a href='{% url "dominio" uid=campo.cambio.dominio.uid %}'>
     {{ campo.cambio.dominio.full_domain }}
     </a>
 
@@ -53,13 +53,13 @@
 <tr>
 <td>
     <button onclick="$('#ultimo_registrado_{{ dominio.id }}').toggle();">+</button>
-    <a href='{% url "dominio" pk=dominio.id %}'>
+    <a href='{% url "dominio" uid=dominio.uid %}'>
     {{ dominio.nombre }}.{{ dominio.zona.nombre }}
     </a>
     
 <div style="display: none" id="ultimo_registrado_{{ dominio.id }}">
     Registrante 
-    <b><a href='{% url "registrante" pk=dominio.registrante.id %}'>{{ dominio.registrante.name }}</a></b>
+    <b><a href='{% url "registrante" uid=dominio.registrante.uid %}'>{{ dominio.registrante.name }}</a></b>
     <br />Registrado: {{ dominio.registered|date:"Y-m-d H:i:s" }}
     <br />Detectado: {{ dominio.data_updated|date:"Y-m-d H:i:s" }}
 </div>
@@ -146,13 +146,13 @@
 
 <td>
     <button onclick="$('#ultimo_registrado_tag_{{ nuevo.id }}').toggle();">+</button>
-    <a href='{% url "dominio" pk=nuevo.id %}'>
+    <a href='{% url "dominio" uid=nuevo.uid %}'>
     {{ nuevo.full_domain }}
     </a>
 
 <div style="display: none" id="ultimo_registrado_tag_{{ nuevo.id }}">
     Registrante 
-    <b><a href='{% url "registrante" pk=nuevo.registrante.id %}'>{{ nuevo.registrante.name }}</a></b>
+    <b><a href='{% url "registrante" uid=nuevo.registrante.uid %}'>{{ nuevo.registrante.name }}</a></b>
     
     <br />Registrado: {{ nuevo.registered|date:"Y-m-d H:i:s" }}
     <br />Detectado: {{ nuevo.data_updated|date:"Y-m-d H:i:s" }}
@@ -188,7 +188,7 @@
 <td>
     <button onclick="$('#transferencia_{{ campo.id }}').toggle();">+</button>
 
-    <a href='{% url "dominio" pk=campo.cambio.dominio.id %}'>
+    <a href='{% url "dominio" uid=campo.cambio.dominio.uid %}'>
     {{ campo.cambio.dominio.full_domain }}
     </a>
     
@@ -196,9 +196,9 @@
     {% with r=campo.cambio.registrantes_en_cambio %}
     De 
     <b></b>
-    <b><a href='{% url "registrante" pk=r.0.id %}'>{{ r.0.name }}</a></b> 
+    <b><a href='{% url "registrante" uid=r.0.uid %}'>{{ r.0.name }}</a></b> 
     a 
-    <b><a href='{% url "registrante" pk=r.1.id %}'>{{ r.1.name }}</a></b> 
+    <b><a href='{% url "registrante" uid=r.1.uid %}'>{{ r.1.name }}</a></b> 
     {% endwith %}
     <br />Detectado: {{ campo.cambio.momento|date:"Y-m-d H:i:s" }}
 </div>

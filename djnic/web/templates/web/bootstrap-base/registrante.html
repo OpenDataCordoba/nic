@@ -19,7 +19,7 @@
             <ul>
             {% for dominio in registrante.dominios.all %}
                 <li>
-                    <a href='{% url "dominio" pk=dominio.id %}'>{{ dominio.full_domain }}</a>
+                    <a href='{% url "dominio" uid=dominio.uid %}'>{{ dominio.full_domain }}</a>
                 </li>
             {% endfor %}
             </ul>

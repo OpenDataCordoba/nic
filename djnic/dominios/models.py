@@ -1,6 +1,7 @@
 from datetime import timedelta
 import logging
 import pytz
+import uuid
 from django.db import models
 from django.urls import reverse
 from django.utils import timezone
@@ -20,6 +21,7 @@ logger = logging.getLogger(__name__)
 class Dominio(models.Model):
     nombre = models.CharField(max_length=240, db_index=True, help_text='Nombre solo sin la zona')
     zona = models.ForeignKey('zonas.Zona', on_delete=models.CASCADE, related_name='dominios', help_text="Lo que va al final y no es parte del dominio")
+    uid = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)
     registrante = models.ForeignKey('registrantes.Registrante', null=True, blank=True, on_delete=models.SET_NULL, related_name='dominios')
     
     data_updated = models.DateTimeField(null=True, blank=True, help_text='When this record was updated')
@@ -43,7 +45,7 @@ class Dominio(models.Model):
         unique_together = (('nombre', 'zona'), )
         
     def get_absolute_url(self):
-        return reverse('dominio', kwargs={'pk': self.id})
+        return reverse('dominio', kwargs={'uid': self.uid})
 
     def get_zoned_date(self, field):
         """ put a datetime in the rigth timezone before move to string """
@@ -226,7 +228,7 @@ class Dominio(models.Model):
         else:
             w_name, w_legal_uid, w_created, w_changed = ('', '', '', '') 
         
-        if r_name != w_name:
+        if r_name.lower() != w_name.lower():
             cambios.append({"campo": "registrant_name", "anterior": r_name, "nuevo": w_name})
         
         if r_legal_uid != w_legal_uid:
@@ -296,6 +298,7 @@ class Dominio(models.Model):
 
 
 class DNSDominio(models.Model):
+    uid = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)
     dominio = models.ForeignKey(Dominio, on_delete=models.RESTRICT, related_name='dnss')
     dns = models.ForeignKey('dnss.DNS', on_delete=models.RESTRICT, related_name='dominios')
     orden = models.IntegerField()
@@ -309,6 +312,7 @@ class DNSDominio(models.Model):
 class PreDominio(models.Model):
     """ dominios que creo que podrían ser nuevos para pa bases de datos 
         Si ya existen en la tabla principal no deben estar acá """
+    uid = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)
     dominio = models.CharField(max_length=250, unique=True)
     priority = models.IntegerField(default=50)
     object_created = models.DateTimeField(auto_now_add=True)

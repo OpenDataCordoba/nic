@@ -18,7 +18,7 @@
 {% for registrante in registrantes %}
 <tr>
 <td>
-    <a href='{% url "registrante" pk=registrante.id %}'>{{ registrante.name }}</a>
+    <a href='{% url "registrante" uid=registrante.uid %}'>{{ registrante.name }}</a>
 </td>
 <td>    
     {{ registrante.created|date:"Y-m-d H:i:s" }}

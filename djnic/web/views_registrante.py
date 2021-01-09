@@ -17,6 +17,9 @@ class RegistranteView(DetailView):
     context_object_name = "registrante"
     template_name = "web/bootstrap-base/registrante.html"
 
+    def get_object(self):
+        return Registrante.objects.get(uid=self.kwargs['uid'])
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['site_title'] = f'Registrante de dominio {self.object.name}'
@@ -82,6 +85,9 @@ class RubroView(DetailView):
     model = TagForRegistrante
     context_object_name = "rubro"
     template_name = "web/bootstrap-base/registrantes/rubro.html"
+
+    def get_object(self):
+        return TagForRegistrante.objects.get(uid=self.kwargs['uid'])
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)

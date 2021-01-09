@@ -18,9 +18,9 @@ from dominios.csv import csv_dominios
 
 urlpatterns = [
     path('', HomeView.as_view(), name='home'),
-    path('dominio-<int:pk>', DominioView.as_view(), name='dominio'),
+    path('dominio-<str:uid>', DominioView.as_view(), name='dominio'),
     path('about', AboutView.as_view(), name='about'),
-    path('registrante-<int:pk>', RegistranteView.as_view(), name='registrante'),
+    path('registrante-<str:uid>', RegistranteView.as_view(), name='registrante'),
     path('search/', SearchResultsView.as_view(), name='search'),
 
     # dominios
@@ -37,14 +37,14 @@ urlpatterns = [
     # registrantes
     path('registrantes-antiguos', RegistrantesAntiguosView.as_view(), name='registrantes-antiguos'),
     path('rubros', RubrosView.as_view(), name='rubros'),
-    path('rubro-<int:pk>', RubroView.as_view(), name='rubro'),
+    path('rubro-<str:uid>', RubroView.as_view(), name='rubro'),
     path('mayores-registrantes', MayoresRegistrantesView.as_view(), name='mayores-registrantes'),
 
     # Hostings
     path('hostings', HostingsView.as_view(), name='hostings'),
     path('hostings-30', Hostings30View.as_view(), name='hostings-30'),
-    path('hosting-<int:pk>', HostingView.as_view(), name='hosting'),
-    path('dns-<int:pk>', DNSView.as_view(), name='dns'),
+    path('hosting-<str:uid>', HostingView.as_view(), name='hosting'),
+    path('dns-<str:uid>', DNSView.as_view(), name='dns'),
 
     # Estadísticas de la plataforma
     path('stats-read-general', StatsReadGeneralView.as_view(), name='stats-read-general'),
