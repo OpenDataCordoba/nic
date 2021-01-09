@@ -6,7 +6,10 @@ import uuid
 
 def gen_uuid(apps, schema_editor, model_real_name):
     MyModel = apps.get_model('dominios', model_real_name)
+    c = 0
     while MyModel.objects.filter(uid__isnull=True).exists():
+        c += 1
+        print('model_real_name: {} = {}'.format(model_real_name, c))
         with transaction.atomic():
             for row in MyModel.objects.filter(uid__isnull=True)[:1000]:
                 row.uuid = uuid.uuid4()
@@ -54,7 +57,7 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='dominio',
             name='uid',
-            field=models.UUIDField(default=uuid.uuid4, editable=False),
+            field=models.UUIDField(default=uuid.uuid4, editable=False, unique=True),
         ),
 
         migrations.AddField(
@@ -66,7 +69,7 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='predominio',
             name='uid',
-            field=models.UUIDField(default=uuid.uuid4, editable=False),
+            field=models.UUIDField(default=uuid.uuid4, editable=False, unique=True),
         ),
         
     ]
