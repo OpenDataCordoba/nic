@@ -23,7 +23,7 @@
 <td>{{ dominio.nombre }}.{{ dominio.zona.nombre }}</td>
 <td>
     {% if dominio.registrante %}
-    <a href='{% url "registrante" pk=dominio.registrante.id %}'>{{ dominio.registrante.name }}</a>
+    <a href='{% url "registrante" uid=dominio.registrante.uid %}'>{{ dominio.registrante.name }}</a>
     {% else %}
     ERROR
     {% endif %}

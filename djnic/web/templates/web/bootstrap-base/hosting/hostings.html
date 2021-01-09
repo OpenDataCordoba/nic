@@ -26,7 +26,7 @@
 
 <tr>
     <td>
-        <a href='{% url "hosting" pk=host.id %}'>{{ host.nombre }}</a>
+        <a href='{% url "hosting" uid=host.uid %}'>{{ host.nombre }}</a>
     </td>
     <td>
         {{ host.total_dominios }}
@@ -61,7 +61,7 @@
 
 <tr>
     <td>
-        <a href='{% url "dns" pk=dns.id %}'>{{ dns.dominio }}</a>
+        <a href='{% url "dns" uid=dns.uid %}'>{{ dns.dominio }}</a>
     </td>
     <td>
         {{ dns.total_dominios }}

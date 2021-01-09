@@ -149,6 +149,7 @@ class NextPriorityDomainViewSet(viewsets.ModelViewSet):
         res = PreDominio.objects.filter(pk=random_item.id)
         return res
 
+
 @method_decorator(cache_page(settings.GENERAL_CACHE_SECONDS), name='dispatch')
 class UltimosCaidosViewSet(viewsets.ModelViewSet):
     """ ultimo dominios que pasaron a estar disponibles """

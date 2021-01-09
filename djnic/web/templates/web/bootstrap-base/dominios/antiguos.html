@@ -19,7 +19,7 @@
 <tr>
 <td>
     <button onclick="$('#ultimo_registrado_{{ dominio.id }}').toggle();">+</button>
-    <a href='{% url "dominio" pk=dominio.id %}'>
+    <a href='{% url "dominio" uid=dominio.uid %}'>
     {{ dominio.nombre }}.{{ dominio.zona.nombre }}
     </a>
     
@@ -30,7 +30,7 @@
 </td>
 <td>
     {% if dominio.registrante %}
-    <a href='{% url "registrante" pk=dominio.registrante.id %}'>{{ dominio.registrante.name }}</a>
+    <a href='{% url "registrante" uid=dominio.registrante.uid %}'>{{ dominio.registrante.name }}</a>
     {% else %}
     ERROR
     {% endif %}

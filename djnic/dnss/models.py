@@ -1,5 +1,6 @@
 import logging
 import re
+import uuid
 from django.db import models
 from django.urls import reverse
 
@@ -10,6 +11,7 @@ logger = logging.getLogger(__name__)
 class Empresa(models.Model):
     """ una empresa de hosting """
     nombre = models.CharField(max_length=90, unique=True)
+    uid = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)
     object_created = models.DateTimeField(auto_now_add=True)
     object_modified = models.DateTimeField(auto_now=True)
     
@@ -22,7 +24,7 @@ class Empresa(models.Model):
             rg.detect_DNSs()
 
     def get_absolute_url(self):
-        return reverse('hosting', kwargs={'pk': self.id})
+        return reverse('hosting', kwargs={'uid': self.uid})
 
     class Meta:
         ordering = ['nombre']
@@ -31,6 +33,7 @@ class Empresa(models.Model):
 class EmpresaRegexDomain(models.Model):
     """ cada una de las expresiones regulares para detectar dominios que le pertenecen """
     empresa = models.ForeignKey(Empresa, on_delete=models.CASCADE, related_name='regexs')
+    uid = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)
     regex_dns = models.CharField(max_length=190,
                                  help_text='Experesion regular para encontrar los DNSs que le pertenecen',
                                  null=True, blank=True, unique=True)
@@ -59,6 +62,7 @@ class EmpresaRegexDomain(models.Model):
 
 
 class DNS(models.Model):
+    uid = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)
     empresa_regex = models.ForeignKey(
         EmpresaRegexDomain, 
         null=True, blank=True, 
@@ -72,7 +76,7 @@ class DNS(models.Model):
         return self.dominio
 
     def get_absolute_url(self):
-        return reverse('dns', kwargs={'pk': self.id})
+        return reverse('dns', kwargs={'uid': self.uid})
 
     def assign_empresa(self):
         for rgs in EmpresaRegexDomain.objects.all():

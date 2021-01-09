@@ -43,13 +43,13 @@ class APIDominioTestCase(TestCase):
         ep = '/api/v1/dominios/stats/reading'
         
         resp = self.anon_client.get(ep)
-        self.assertEqual(resp.status_code, 302)  # redirect to login
+        self.assertEqual(resp.status_code, 200)  # redirect to login
 
         resp = self.regular_user_client.get(ep)
-        self.assertEqual(resp.status_code, 403)
+        self.assertEqual(resp.status_code, 200)
         
         resp = self.tokened_regular_client.get(ep)
-        self.assertEqual(resp.status_code, 302)
+        self.assertEqual(resp.status_code, 200)
         
         resp = self.admin_user_client.get(ep)
         self.assertEqual(resp.status_code, 200)

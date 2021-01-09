@@ -19,6 +19,9 @@ class DominioView(DetailView):
     context_object_name = "dominio"
     template_name = "web/bootstrap-base/dominio.html"
 
+    def get_object(self):
+        return Dominio.objects.get(uid=self.kwargs['uid'])
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['site_title'] = f'Dominio {self.object.full_domain()}'

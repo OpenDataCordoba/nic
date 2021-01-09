@@ -14,7 +14,7 @@
 {% for campo in ultimos_caidos %}
 <tr>
 <td>
-    <a href='{% url "dominio" pk=campo.cambio.dominio.id %}'>
+    <a href='{% url "dominio" uid=campo.cambio.dominio.uid %}'>
     {{ campo.cambio.dominio.full_domain }}
     </a>
 </td>

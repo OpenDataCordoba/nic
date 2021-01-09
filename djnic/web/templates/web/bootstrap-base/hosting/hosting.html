@@ -11,7 +11,7 @@
             <p>Ultimos registrados
             <ul>
             {% for dominio in ultimos_dominios %}
-            <li><a href='{% url "dominio" pk=dominio.id %}'>{{ dominio.full_domain }}</a></li>
+            <li><a href='{% url "dominio" uid=dominio.uid %}'>{{ dominio.full_domain }}</a></li>
             {% endfor %}
             </ul>
             </p>
@@ -60,7 +60,7 @@
 {% for rgx in hosting.regexs.all %} 
     {% for dns in rgx.nameservers.all %}
         <tr>
-        <td><a href='{% url "dns" pk=dns.id %}'>{{ dns.dominio }}</a></td>
+        <td><a href='{% url "dns" uid=dns.uid %}'>{{ dns.dominio }}</a></td>
         <td>{{ dns.dominios.count }}</td>
         </tr>
     {% endfor %}
