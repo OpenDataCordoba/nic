@@ -266,6 +266,8 @@ class Dominio(models.Model):
                     nuevo=cambio['nuevo'])
             
             self.data_updated = timezone.now()
+            self.next_update_priority = timezone.now() + timedelta(days=15)
+            
         else:
             logger.info(f' - SIN CAMBIOS {self}')
         
@@ -292,7 +294,7 @@ class Dominio(models.Model):
             raise Exception('Unknown domain')
 
         self.priority_to_update = priority
-        self.next_update_priority = timezone.now() + timedelta(days=5)
+        self.next_update_priority = timezone.now() + timedelta(days=2)
         self.save()
         return self
 

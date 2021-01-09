@@ -118,7 +118,7 @@ class NextPriorityDomainViewSet(viewsets.ModelViewSet):
         
         # remove priority
         random_item.priority_to_update = 0
-        random_item.next_update_priority = timezone.now() + timedelta(days=15)    
+        random_item.next_update_priority = timezone.now() + timedelta(days=5)
         random_item.save()
         self.serializer_class = FlatDominioSerializer
         res = Dominio.objects.filter(pk=random_item.id)
