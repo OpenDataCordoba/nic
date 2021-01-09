@@ -18,7 +18,7 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
 
-        dominios = Dominio.objects.all()
+        dominios = Dominio.objects.filter(next_update_priority__lt=timezone.now())
         
         c = 0
         for dominio in dominios:
