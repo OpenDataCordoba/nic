@@ -1,10 +1,14 @@
 from datetime import timedelta
+import logging
 from django.db.models import Count, Q, DurationField, F, ExpressionWrapper, DateTimeField, IntegerField
 from django.db.models.functions import Trunc, Cast
 from django.utils import timezone
 from dominios.models import STATUS_NO_DISPONIBLE, STATUS_DISPONIBLE
 from cambios.models import CampoCambio
 from dnss.models import DNS
+
+
+logger = logging.getLogger(__name__)
 
 
 def get_ultimos_caidos(limit=5):
@@ -55,31 +59,47 @@ def get_renovaciones(limit=50, solo_fallados=False, solo_hacia_atras=False):
     return cambios[:limit]
 
 
+def _get_empresa_from_dominio_dns(dominio):
+    dnss = DNS.objects.filter(dominio=dominio)
+
+    if dnss.count() == 0:
+        return None
+    dns = dnss[0]
+
+    if dns.empresa_regex is None:
+        return None
+    return dns.empresa_regex.empresa
+
+
 def get_perdidas_dns(limit=0, days_ago=30):
     """ cambios de DNS """
+    logger.info('Get perdidas')
     starts = timezone.now() - timedelta(days=days_ago)
     cambios = CampoCambio.objects\
         .filter(cambio__momento__gt=starts)\
         .filter(campo='DNS1')\
         .exclude(anterior__exact="")
 
-    cambios = cambios.order_by('-cambio__momento')
-
     if limit > 0:
         cambios = cambios[:limit]
 
+    logger.info(f' - Cambios: {cambios.count()}')
     # detectar empresa anterior y empresa nueva
     final = {}
+    c = 0
+    cache_dns = {}
     for cambio in cambios:
-        dnss = DNS.objects.filter(dominio=cambio.anterior)
-        if dnss.count() == 0:
-            # TODO ver que pasa, no debería pasar
+        c += 1
+        if cambio.anterior in cache_dns:
+            e1 = cache_dns[cambio.anterior]
+        else:
+            e1 = _get_empresa_from_dominio_dns(cambio.anterior)
+
+        cache_dns[cambio.anterior] = e1
+    
+        if e1 is None:
             continue
-        dns = dnss[0]
-        # Me interesan solo los que tienen una empresa
-        if dns.empresa_regex is None:
-            continue
-        e1 = dns.empresa_regex.empresa
+
         if e1.id not in final:
             final[e1.id] = {
                 'anterior': e1,
@@ -88,17 +108,16 @@ def get_perdidas_dns(limit=0, days_ago=30):
             }
 
         final[e1.id]['perdidas'] += 1
+        logger.info(f' - {c} {e1.nombre}: {final[e1.id]["perdidas"]}')
 
-        if cambio.nuevo == '':
+        if cambio.nuevo in cache_dns:
+            e2 = cache_dns[cambio.nuevo]
+        else:
+            e2 = _get_empresa_from_dominio_dns(cambio.nuevo)
+
+        if e2 is None:
             continue
-        dnss = DNS.objects.filter(dominio=cambio.nuevo)
-        if dnss.count() == 0:
-            # TODO ver que pasa, no debería pasar
-            continue
-        dns = dnss[0]
-        if dns.empresa_regex is None:
-            continue
-        e2 = dns.empresa_regex.empresa
+
         if e2 == e1:
             # al final no era una pérdida
             final[e1.id]['perdidas'] -= 1

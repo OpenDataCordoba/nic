@@ -87,6 +87,11 @@ class DNS(models.Model):
                 return
         logger.error(f'No regex found for {self.dominio}')
     
+    def get_empresa(self):
+        if self.empresa_regex is None:
+            return None
+        return self.empresa_regex.empresa
+        
     def save(self, **kwargs):
         if self.empresa_regex is None:
             logger.info('Adding empresa_regex')
