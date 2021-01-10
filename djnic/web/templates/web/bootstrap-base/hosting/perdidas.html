@@ -26,9 +26,14 @@
 <td>
     {% for k, migracion in perdida.migraciones.items %}
     Hacia 
+    {% if migracion.empresa %}
         <a href='{% url "hosting" uid=migracion.empresa.uid %}'>
             {{ migracion.empresa.nombre }}
-        </a>: {{ migracion.total }} <br/>
+        </a>: {{ migracion.total }} 
+    {% else%}
+        Ninguno (probable caída)
+    {% endif %}
+        <br/>
     {% endfor %}
 </td>
 
