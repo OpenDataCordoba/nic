@@ -78,7 +78,7 @@ def get_perdidas_dns(limit=0, days_ago=30):
     cambios = CampoCambio.objects\
         .filter(cambio__momento__gt=starts)\
         .filter(campo='DNS1')\
-        .exclude(anterior__exact="")
+        .exclude(anterior__exact="").distinct()
 
     if limit > 0:
         cambios = cambios[:limit]
@@ -115,18 +115,16 @@ def get_perdidas_dns(limit=0, days_ago=30):
         else:
             e2 = _get_empresa_from_dominio_dns(cambio.nuevo)
 
-        if e2 is None:
-            continue
-
-        if e2 == e1:
+        if e2.id == e1.id:
             # al final no era una pérdida
             final[e1.id]['perdidas'] -= 1
         else:
-            if e2.id not in final[e1.id]['migraciones']:
-                final[e1.id]['migraciones'][e2.id] = {
+            e2id = 0 if e2 is None else e2.id
+            if e2id not in final[e1.id]['migraciones']:
+                final[e1.id]['migraciones'][e2id] = {
                     'empresa': e2,
                     'total': 0
                 }
-            final[e1.id]['migraciones'][e2.id]['total'] += 1
+            final[e1.id]['migraciones'][e2id]['total'] += 1
 
     return final

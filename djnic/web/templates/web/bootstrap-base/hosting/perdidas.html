@@ -8,6 +8,7 @@
             <div class="data-table-list">
                 <div class="basic-tb-hd">
                     <h2>Dominios peridos por las empresas de hosting</h2>
+                    <p>En los últimos 30 días</p>
                 </div>
                 <div class="table-responsive">
                     <table id="data-table-basic" class="table table-striped">
@@ -27,7 +28,7 @@
     Hacia 
         <a href='{% url "hosting" uid=migracion.empresa.uid %}'>
             {{ migracion.empresa.nombre }}
-        </a>: {{ migracion.total }}
+        </a>: {{ migracion.total }} <br/>
     {% endfor %}
 </td>
 
