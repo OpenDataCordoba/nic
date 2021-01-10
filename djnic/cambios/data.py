@@ -94,9 +94,8 @@ def get_perdidas_dns(limit=0, days_ago=30):
             e1 = cache_dns[cambio.anterior]
         else:
             e1 = _get_empresa_from_dominio_dns(cambio.anterior)
+            cache_dns[cambio.anterior] = e1
 
-        cache_dns[cambio.anterior] = e1
-    
         if e1 is None:
             continue
 

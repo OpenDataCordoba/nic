@@ -29,11 +29,11 @@
     {% if migracion.empresa %}
         <a href='{% url "hosting" uid=migracion.empresa.uid %}'>
             {{ migracion.empresa.nombre }}
-        </a>: {{ migracion.total }} 
-    {% else%}
+        </a> 
+    {% else %}
         Ninguno (probable caída)
     {% endif %}
-        <br/>
+        : {{ migracion.total }} <br/>
     {% endfor %}
 </td>
 
