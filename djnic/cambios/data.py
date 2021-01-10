@@ -115,11 +115,12 @@ def get_perdidas_dns(limit=0, days_ago=30):
         else:
             e2 = _get_empresa_from_dominio_dns(cambio.nuevo)
 
-        if e2.id == e1.id:
+        e2id = 0 if e2 is None else e2.id
+
+        if e2id == e1.id:
             # al final no era una pérdida
             final[e1.id]['perdidas'] -= 1
         else:
-            e2id = 0 if e2 is None else e2.id
             if e2id not in final[e1.id]['migraciones']:
                 final[e1.id]['migraciones'][e2id] = {
                     'empresa': e2,
