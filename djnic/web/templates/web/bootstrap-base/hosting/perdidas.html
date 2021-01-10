@@ -31,7 +31,7 @@
             {{ migracion.empresa.nombre }}
         </a> 
     {% else %}
-        Ninguno (probable caída)
+        Ninguno (caídas y DNS no identificados) <!-- DESCONOCIDOS {{ migracion.desconocidos }} -->
     {% endif %}
         : {{ migracion.total }} <br/>
     {% endfor %}

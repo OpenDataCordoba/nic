@@ -64,10 +64,12 @@ def _get_empresa_from_dominio_dns(dominio):
 
     if dnss.count() == 0:
         return None
+
     dns = dnss[0]
 
     if dns.empresa_regex is None:
         return None
+
     return dns.empresa_regex.empresa
 
 
@@ -113,6 +115,7 @@ def get_perdidas_dns(limit=0, days_ago=30):
             e2 = cache_dns[cambio.nuevo]
         else:
             e2 = _get_empresa_from_dominio_dns(cambio.nuevo)
+            cache_dns[cambio.nuevo] = e2
 
         e2id = 0 if e2 is None else e2.id
 
@@ -123,8 +126,11 @@ def get_perdidas_dns(limit=0, days_ago=30):
             if e2id not in final[e1.id]['migraciones']:
                 final[e1.id]['migraciones'][e2id] = {
                     'empresa': e2,
-                    'total': 0
+                    'total': 0,
+                    'desconocidos': set()
                 }
             final[e1.id]['migraciones'][e2id]['total'] += 1
+            if e2id == 0:
+                final[e1.id]['migraciones'][e2id]['desconocidos'].add(cambio.nuevo)
 
     return final
