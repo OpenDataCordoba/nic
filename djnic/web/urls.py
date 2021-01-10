@@ -8,7 +8,7 @@ from .views_dominio import (DominioView, UltimosCaidos,
 from .views_registrante import (RegistranteView, RubrosView,
                                 RubroView, RegistrantesAntiguosView,
                                 MayoresRegistrantesView)
-from .views_dnss import HostingsView, Hostings30View, HostingView, DNSView
+from .views_dnss import HostingsView, Hostings30View, HostingView, DNSView, PerdidasView
 from .views_plataforma import (StatsReadVtoView, StatsReadGeneralView, 
                                StatsRegistradosPorFechaView, StatsVencimientosPorFechaView)
 from .views_cambios import RenovacionesView, RenovacionesRarasView, RenovacionesHaciaAtrasView
@@ -45,7 +45,8 @@ urlpatterns = [
     path('hostings-30', Hostings30View.as_view(), name='hostings-30'),
     path('hosting-<str:uid>', HostingView.as_view(), name='hosting'),
     path('dns-<str:uid>', DNSView.as_view(), name='dns'),
-
+    path('hostings-perdidas-30', PerdidasView.as_view(), name='hostings-perdidas-30'),
+    
     # Estadísticas de la plataforma
     path('stats-read-general', StatsReadGeneralView.as_view(), name='stats-read-general'),
     path('stats-read-vto', StatsReadVtoView.as_view(), name='stats-read-vto'),

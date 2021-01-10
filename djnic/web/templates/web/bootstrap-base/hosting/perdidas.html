@@ -1,0 +1,44 @@
+{% extends "web/bootstrap-base/base.html" %}
+
+{% block main %}
+
+<div class="container">
+    <div class="row">
+        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+            <div class="data-table-list">
+                <div class="basic-tb-hd">
+                    <h2>Dominios peridos por las empresas de hosting</h2>
+                </div>
+                <div class="table-responsive">
+                    <table id="data-table-basic" class="table table-striped">
+<thead><tr><th>Hosting</th><th>Perdidas</th><th>Detalles</th></tr></thead>
+<tbody>
+{% for k, perdida in perdidas.items %}
+<tr>
+<td>
+    <a href='{% url "hosting" uid=perdida.anterior.uid %}'>
+    {{ perdida.anterior.nombre }}
+    </a>
+</td>
+<td>{{ perdida.perdidas }}</td>
+
+<td>
+    {% for k, migracion in perdida.migraciones.items %}
+    Hacia 
+        <a href='{% url "hosting" uid=migracion.empresa.uid %}'>
+            {{ migracion.empresa.nombre }}
+        </a>: {{ migracion.total }}
+    {% endfor %}
+</td>
+
+</tr>
+{% endfor %}                                 
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+    
+{% endblock main %}

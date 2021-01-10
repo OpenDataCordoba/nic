@@ -88,4 +88,3 @@ class CambioDominioTestCase(TestCase):
         # nothing change until here
         self.assertEqual(dominio.cambios.count(), 3)
         self.assertEqual(dominio.dnss.count(), 0)
-        
