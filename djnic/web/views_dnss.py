@@ -105,6 +105,6 @@ class PerdidasView(ListView):
         context['site_description'] = 'Perdidas de clientes por empresas de hosting'
 
         # ordenar los cambios
-        context['perdidas'] = get_perdidas_dns(days_ago=1930)
+        context['perdidas'] = get_perdidas_dns(days_ago=30)
 
         return context
