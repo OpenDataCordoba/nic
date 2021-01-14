@@ -1,4 +1,4 @@
-{% load static %}{% load humanize %}
+{% load static %}{% load humanize %}{% load webpush_notifications %}
 <!doctype html>
 <html lang="es">
   <head>
@@ -11,7 +11,7 @@
 
       gtag('config', 'G-XHM7JHZZGF');
     </script>
-    
+    {% webpush_header %}
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>{{ site_title }}</title>

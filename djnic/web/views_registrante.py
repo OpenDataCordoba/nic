@@ -98,4 +98,6 @@ class RubroView(DetailView):
         context['ultimos_registrados'] = get_ultimos_registrados(limit=100, etiqueta=self.object)
         context['mayores_registrantes'] = get_mayores_registrantes(limit=50, etiqueta=self.object)
         
+        webpush = {"group": f'rubro-{self.kwargs["uid"]}'}
+        context['webpush'] = webpush
         return context

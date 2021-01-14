@@ -25,5 +25,6 @@ urlpatterns = [
     path('', include('web.urls')),
     # Sitemap https://docs.djangoproject.com/en/3.1/ref/contrib/sitemaps/#creating-a-sitemap-index
     path('sitemap.xml', cache_page(86400)(sitemap_views.index), {'sitemaps': sitemaps}),
-    path('sitemap-<section>.xml', cache_page(86400)(sitemap_views.sitemap), {'sitemaps': sitemaps}, name='django.contrib.sitemaps.views.sitemap')
+    path('sitemap-<section>.xml', cache_page(86400)(sitemap_views.sitemap), {'sitemaps': sitemaps}, name='django.contrib.sitemaps.views.sitemap'),
+    path('webpush/', include('webpush.urls')),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
