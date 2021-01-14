@@ -32,6 +32,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'django_filters',
     'rest_framework.authtoken',
+    'webpush',
 
     'dominios',
     'registrantes',
@@ -42,6 +43,12 @@ INSTALLED_APPS = [
     'core',
     'analytics',
 ]
+
+WEBPUSH_SETTINGS = {
+    "VAPID_PUBLIC_KEY": "Vapid Public Key",
+    "VAPID_PRIVATE_KEY":"Vapid Private Key",
+    "VAPID_ADMIN_EMAIL": "admin@example.com"
+}
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',

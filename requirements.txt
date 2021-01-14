@@ -8,3 +8,4 @@ django-filter==2.4.0
 djangorestframework==3.12.1
 Markdown==3.3.2
 requests>=2.24.0
+django-webpush>=0.3.3
