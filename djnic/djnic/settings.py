@@ -84,17 +84,31 @@ WSGI_APPLICATION = 'djnic.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/3.1/ref/settings/#databases
 
+
+""" postgis DB
+
+sudo su - postgres
+psql
+
+CREATE USER nicuser02 WITH PASSWORD 'nicpass03';
+ALTER ROLE nicuser02 SUPERUSER;
+CREATE EXTENSION postgis;
+CREATE DATABASE nicdb01 OWNER nicuser02;
+"""
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
-    }
+         'ENGINE': 'django.contrib.gis.db.backends.postgis',
+         'NAME': 'nic',
+         'USER': 'nic',
+         'PASSWORD': 'nic',
+         'HOST': 'localhost',
+         'PORT': 5432
+    },
 }
 
 CACHES = {
     'default': {
-        'BACKEND': 'django.core.cache.backends.db.DatabaseCache',
-        'LOCATION': 'cache_tbl',
+        'BACKEND': 'django.core.cache.backends.dummy.DummyCache',
     }
 }
 
