@@ -10,3 +10,4 @@ Markdown==3.3.2
 requests>=2.24.0
 django-webpush>=0.3.3
 arrow>=0.17.0
+social-auth-app-django>=4.0.0
