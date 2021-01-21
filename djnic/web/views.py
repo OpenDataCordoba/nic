@@ -38,6 +38,33 @@ class HomeView(TemplateView):
 
 @method_decorator(cache_control(max_age=settings.GENERAL_CACHE_SECONDS), name='dispatch')
 @method_decorator(cache_page(settings.GENERAL_CACHE_SECONDS), name='dispatch')
+class TermsView(TemplateView):
+
+    template_name = "web/bootstrap-base/terms_of_service.html"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['site_title'] = 'Términos y condiciones'
+        context['site_description'] = 'Términos y condiciones de la app DominiosAR'
+
+        return context
+
+
+@method_decorator(cache_control(max_age=settings.GENERAL_CACHE_SECONDS), name='dispatch')
+@method_decorator(cache_page(settings.GENERAL_CACHE_SECONDS), name='dispatch')
+class PrivaciPolicyView(TemplateView):
+
+    template_name = "web/bootstrap-base/privacy_policy.html"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['site_title'] = 'Política de privacidad'
+        context['site_description'] = 'Política de privacidad de la app DominiosAR'
+
+        return context
+
+@method_decorator(cache_control(max_age=settings.GENERAL_CACHE_SECONDS), name='dispatch')
+@method_decorator(cache_page(settings.GENERAL_CACHE_SECONDS), name='dispatch')
 class AboutView(TemplateView):
 
     template_name = "web/bootstrap-base/about.html"
@@ -48,7 +75,6 @@ class AboutView(TemplateView):
         context['site_description'] = 'Dominios Argentinos es un proyecto de OpenDataCordoba'
 
         return context
-
 
 @method_decorator(cache_control(max_age=settings.GENERAL_CACHE_SECONDS), name='dispatch')
 @method_decorator(cache_page(settings.GENERAL_CACHE_SECONDS), name='dispatch')

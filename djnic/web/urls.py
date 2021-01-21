@@ -1,5 +1,6 @@
 from django.urls import path
-from .views import HomeView, AboutView, SearchResultsView
+from .views import (HomeView, AboutView, SearchResultsView,
+                    PrivaciPolicyView, TermsView)
 
 from .views_dominio import (DominioView, UltimosCaidos,
                             UltimosRegistrados, Judicializados,
@@ -20,6 +21,8 @@ urlpatterns = [
     path('', HomeView.as_view(), name='home'),
     path('dominio-<str:uid>', DominioView.as_view(), name='dominio'),
     path('about', AboutView.as_view(), name='about'),
+    path('terminos-y-condiciones', TermsView.as_view(), name='terminos-y-condiciones'),
+    path('politica-de-privacidad', PrivaciPolicyView.as_view(), name='politica-de-privacidad'),
     path('registrante-<str:uid>', RegistranteView.as_view(), name='registrante'),
     path('search/', SearchResultsView.as_view(), name='search'),
 
