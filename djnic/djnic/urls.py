@@ -19,19 +19,18 @@ sitemaps = {
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('accounts/', include('django.contrib.auth.urls')),
     path('api-auth/', include('rest_framework.urls')),
     path('api/', include('djnic.api.urls')),
     path('api-token-auth/', views.obtain_auth_token),
     # Sitemap https://docs.djangoproject.com/en/3.1/ref/contrib/sitemaps/#creating-a-sitemap-index
     path('sitemap.xml', cache_page(86400)(sitemap_views.index), {'sitemaps': sitemaps}),
     path('sitemap-<section>.xml', cache_page(86400)(sitemap_views.sitemap), {'sitemaps': sitemaps}, name='django.contrib.sitemaps.views.sitemap'),
-    path('webpush/', include('webpush.urls')),
-    path('social-auth/', include('social_django.urls', namespace="social")),
-    path('logout/', auth_views.LogoutView.as_view(), name='logout'),
 
-    # TODO
-    # https://nic.opendatacordoba.org/callback/github
+    # webpush
+    path('webpush/', include('webpush.urls')),
+
+    # all auth
+    path('accounts/', include('allauth.urls')),
 
     # all website
     path('', include('web.urls')),

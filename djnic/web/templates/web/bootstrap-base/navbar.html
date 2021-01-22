@@ -1,4 +1,4 @@
-{% load webpush_notifications %}
+{% load webpush_notifications %} {% load socialaccount %}
 <nav class="navbar navbar-expand-lg navbar-light bg-light">
   <div class="container-fluid">
     <a class="navbar-brand" href="/">DominiosAr</a>
@@ -87,7 +87,7 @@
           </a>
           <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
             <li>
-              <a class="dropdown-item" href="{% url 'logout' %}">Salir</a>
+              <a class="dropdown-item" href="{% url 'account_logout' %}">Salir</a>
             </li>
           </ul>
         </li>
@@ -96,12 +96,12 @@
         
         <li class="nav-item dropdown">
           <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-            Login
+            Acceder
           </a>
           <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
             <li>
-              <a class="dropdown-item" href="{% url 'social:begin' 'github' %}">GitHub</a>
-              <!-- <a class="dropdown-item" href="{% url 'social:begin' 'google' %}">Google</a> -->
+              <a class="dropdown-item" href="{% provider_login_url 'github' %}">GitHub</a>
+              <!-- <a class="dropdown-item" href="{% provider_login_url 'google' %}">Google/Gmail</a> -->
             </li>
           </ul>
         </li>
@@ -109,9 +109,11 @@
         {% endif %}
         
       </ul>
+      <!-- 
       {% if webpush %}
       {% webpush_button %}
       {% endif %}
+      -->
       <form class="d-flex" action="{% url 'search' %}" method="get">
         <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search" name="query">
         <button class="btn btn-outline-success" type="submit">Search</button>

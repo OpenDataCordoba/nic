@@ -29,11 +29,19 @@ INSTALLED_APPS = [
     'django.contrib.humanize',
     'django.contrib.sitemaps',
 
+    'django.contrib.sites',  # for allauth
+
     'rest_framework',
     'django_filters',
     'rest_framework.authtoken',
     'webpush',
-    'social_django',
+    
+    'allauth',
+    'allauth.account',
+    'allauth.socialaccount',
+    # ... include the providers you want to enable:
+    'allauth.socialaccount.providers.github',
+    'allauth.socialaccount.providers.google',
 
     'dominios',
     'registrantes',
@@ -74,13 +82,38 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+
+                # `allauth` needs this from django
+                'django.template.context_processors.request',
             ],
         },
     },
 ]
 
-WSGI_APPLICATION = 'djnic.wsgi.application'
+AUTHENTICATION_BACKENDS = [
+    # Django admin login, regardless of `allauth`
+    'django.contrib.auth.backends.ModelBackend',
 
+    # `allauth` specific authentication methods, such as login by e-mail
+    'allauth.account.auth_backends.AuthenticationBackend',
+]
+
+WSGI_APPLICATION = 'djnic.wsgi.application'
+SITE_ID = 1
+ACCOUNT_EMAIL_VERIFICATION = "none"
+LOGIN_REDIRECT_URL = "home"
+ACCOUNT_LOGOUT_ON_GET = True
+
+# Provider specific settings
+SOCIALACCOUNT_PROVIDERS = {
+    'google': {
+        'APP': {
+            'client_id': '123',
+            'secret': '456',
+            'key': ''
+        }
+    }
+}
 
 # Database
 # https://docs.djangoproject.com/en/3.1/ref/settings/#databases
@@ -217,23 +250,10 @@ OLD_DB_NAME = ''
 
 GENERAL_CACHE_SECONDS = 60 * 60 * 24
 
-# django social auth
+# django all auth
 
-# SOCIAL_AUTH_AUTHENTICATION_BACKENDS
-AUTHENTICATION_BACKENDS = [
-    # 'social_core.backends.google.GoogleOAuth2',
-    # 'social_core.backends.linkedin.LinkedinOAuth2',
-    # 'social_core.backends.instagram.InstagramOAuth2',
-    # 'social_core.backends.facebook.FacebookOAuth2',
-    # 'social_core.backends.twitter.TwitterOAuth2',
-    'social_core.backends.github.GithubOAuth2',
-    'django.contrib.auth.backends.ModelBackend',
-]
 
-LOGIN_URL = 'login'
-LOGIN_REDIRECT_URL = ''
-LOGOUT_URL = 'logout'
-LOGOUT_REDIRECT_URL = 'login'
+
 
 try:
     from .local_settings import *
