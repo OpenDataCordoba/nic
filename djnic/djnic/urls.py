@@ -27,8 +27,11 @@ urlpatterns = [
     path('sitemap.xml', cache_page(86400)(sitemap_views.index), {'sitemaps': sitemaps}),
     path('sitemap-<section>.xml', cache_page(86400)(sitemap_views.sitemap), {'sitemaps': sitemaps}, name='django.contrib.sitemaps.views.sitemap'),
     path('webpush/', include('webpush.urls')),
-    path("logout/", auth_views.LogoutView.as_view(), name="logout"),
     path('social-auth/', include('social_django.urls', namespace="social")),
+    path('logout/', auth_views.LogoutView.as_view(), name='logout'),
+
+    # TODO
+    # https://nic.opendatacordoba.org/callback/github
 
     # all website
     path('', include('web.urls')),
