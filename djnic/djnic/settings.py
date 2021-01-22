@@ -219,13 +219,14 @@ GENERAL_CACHE_SECONDS = 60 * 60 * 24
 
 # django social auth
 
+# SOCIAL_AUTH_AUTHENTICATION_BACKENDS
 AUTHENTICATION_BACKENDS = [
-    'social_core.backends.google.GoogleOAuth2',
+    # 'social_core.backends.google.GoogleOAuth2',
     # 'social_core.backends.linkedin.LinkedinOAuth2',
     # 'social_core.backends.instagram.InstagramOAuth2',
     # 'social_core.backends.facebook.FacebookOAuth2',
     # 'social_core.backends.twitter.TwitterOAuth2',
-    # 'social_core.backends.github.GitHubOAuth2',
+    'social_core.backends.github.GithubOAuth2',
     'django.contrib.auth.backends.ModelBackend',
 ]
 
@@ -233,9 +234,6 @@ LOGIN_URL = 'login'
 LOGIN_REDIRECT_URL = ''
 LOGOUT_URL = 'logout'
 LOGOUT_REDIRECT_URL = 'login'
-
-SOCIAL_AUTH_GOOGLE_OAUTH2_KEY = ''
-SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET = ''
 
 try:
     from .local_settings import *
