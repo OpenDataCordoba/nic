@@ -35,7 +35,7 @@ INSTALLED_APPS = [
     'django_filters',
     'rest_framework.authtoken',
     'webpush',
-    
+
     'allauth',
     'allauth.account',
     'allauth.socialaccount',
@@ -55,7 +55,7 @@ INSTALLED_APPS = [
 
 WEBPUSH_SETTINGS = {
     "VAPID_PUBLIC_KEY": "Vapid Public Key",
-    "VAPID_PRIVATE_KEY":"Vapid Private Key",
+    "VAPID_PRIVATE_KEY": "Vapid Private Key",
     "VAPID_ADMIN_EMAIL": "admin@example.com"
 }
 
@@ -103,17 +103,7 @@ SITE_ID = 1
 ACCOUNT_EMAIL_VERIFICATION = "none"
 LOGIN_REDIRECT_URL = "home"
 ACCOUNT_LOGOUT_ON_GET = True
-
-# Provider specific settings
-SOCIALACCOUNT_PROVIDERS = {
-    'google': {
-        'APP': {
-            'client_id': '123',
-            'secret': '456',
-            'key': ''
-        }
-    }
-}
+ACCOUNT_DEFAULT_HTTP_PROTOCOL = 'https'
 
 # Database
 # https://docs.djangoproject.com/en/3.1/ref/settings/#databases
@@ -131,12 +121,12 @@ CREATE DATABASE nicdb01 OWNER nicuser02;
 """
 DATABASES = {
     'default': {
-         'ENGINE': 'django.contrib.gis.db.backends.postgis',
-         'NAME': 'nic',
-         'USER': 'nic',
-         'PASSWORD': 'nic',
-         'HOST': 'localhost',
-         'PORT': 5432
+        'ENGINE': 'django.contrib.gis.db.backends.postgis',
+        'NAME': 'nic',
+        'USER': 'nic',
+        'PASSWORD': 'nic',
+        'HOST': 'localhost',
+        'PORT': 5432
     },
 }
 
@@ -249,11 +239,6 @@ OLD_DB_PASS = ''
 OLD_DB_NAME = ''
 
 GENERAL_CACHE_SECONDS = 60 * 60 * 24
-
-# django all auth
-
-
-
 
 try:
     from .local_settings import *

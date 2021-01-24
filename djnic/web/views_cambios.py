@@ -8,8 +8,6 @@ from cambios.models import CampoCambio
 from cambios.data import get_renovaciones
 
 
-@method_decorator(cache_control(max_age=settings.GENERAL_CACHE_SECONDS), name='dispatch')
-@method_decorator(cache_page(settings.GENERAL_CACHE_SECONDS), name='dispatch')
 class RenovacionesView(ListView):
 
     model = CampoCambio
@@ -27,8 +25,6 @@ class RenovacionesView(ListView):
         return context
 
 
-@method_decorator(cache_control(max_age=settings.GENERAL_CACHE_SECONDS), name='dispatch')
-@method_decorator(cache_page(settings.GENERAL_CACHE_SECONDS), name='dispatch')
 class RenovacionesRarasView(ListView):
 
     model = CampoCambio
@@ -46,8 +42,6 @@ class RenovacionesRarasView(ListView):
         return context
 
 
-@method_decorator(cache_control(max_age=settings.GENERAL_CACHE_SECONDS), name='dispatch')
-@method_decorator(cache_page(settings.GENERAL_CACHE_SECONDS), name='dispatch')
 class RenovacionesHaciaAtrasView(ListView):
 
     model = CampoCambio

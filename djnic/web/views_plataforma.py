@@ -4,8 +4,6 @@ from django.views.decorators.cache import cache_page, cache_control
 from django.views.generic.base import TemplateView
 
 
-@method_decorator(cache_control(max_age=settings.GENERAL_CACHE_SECONDS), name='dispatch')
-@method_decorator(cache_page(settings.GENERAL_CACHE_SECONDS), name='dispatch')
 class StatsReadVtoView(TemplateView):
 
     template_name = "web/bootstrap-base/plataforma/stats-read-vto.html"
@@ -18,8 +16,6 @@ class StatsReadVtoView(TemplateView):
         return context
 
 
-@method_decorator(cache_control(max_age=settings.GENERAL_CACHE_SECONDS), name='dispatch')
-@method_decorator(cache_page(settings.GENERAL_CACHE_SECONDS), name='dispatch')
 class StatsReadGeneralView(TemplateView):
 
     template_name = "web/bootstrap-base/plataforma/stats-read-general.html"
@@ -32,8 +28,6 @@ class StatsReadGeneralView(TemplateView):
         return context
 
 
-@method_decorator(cache_control(max_age=settings.GENERAL_CACHE_SECONDS), name='dispatch')
-@method_decorator(cache_page(settings.GENERAL_CACHE_SECONDS), name='dispatch')
 class StatsRegistradosPorFechaView(TemplateView):
 
     template_name = "web/bootstrap-base/plataforma/registrados-por-fecha.html"
@@ -46,8 +40,6 @@ class StatsRegistradosPorFechaView(TemplateView):
         return context
 
 
-@method_decorator(cache_control(max_age=settings.GENERAL_CACHE_SECONDS), name='dispatch')
-@method_decorator(cache_page(settings.GENERAL_CACHE_SECONDS), name='dispatch')
 class StatsVencimientosPorFechaView(TemplateView):
 
     template_name = "web/bootstrap-base/plataforma/vencimientos-por-fecha.html"

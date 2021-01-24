@@ -11,3 +11,4 @@ requests>=2.24.0
 django-webpush>=0.3.3
 arrow>=0.17.0
 django-allauth>=0.44.0
+django-cache-memoize>=0.1.7

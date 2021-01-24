@@ -11,8 +11,6 @@ from dominios.data import (get_ultimos_registrados, get_judicializados,
                            get_por_caer)
 
 
-@method_decorator(cache_control(max_age=settings.GENERAL_CACHE_SECONDS), name='dispatch')
-@method_decorator(cache_page(settings.GENERAL_CACHE_SECONDS), name='dispatch')
 class DominioView(DetailView):
 
     model = Dominio
@@ -34,8 +32,6 @@ class DominioView(DetailView):
         return context
 
 
-@method_decorator(cache_control(max_age=settings.GENERAL_CACHE_SECONDS), name='dispatch')
-@method_decorator(cache_page(settings.GENERAL_CACHE_SECONDS), name='dispatch')
 class UltimosCaidos(TemplateView):
 
     template_name = "web/bootstrap-base/dominios/ultimos-caidos.html"
@@ -50,8 +46,6 @@ class UltimosCaidos(TemplateView):
         return context
 
 
-@method_decorator(cache_control(max_age=settings.GENERAL_CACHE_SECONDS), name='dispatch')
-@method_decorator(cache_page(settings.GENERAL_CACHE_SECONDS), name='dispatch')
 class UltimosRegistrados(TemplateView):
 
     template_name = "web/bootstrap-base/dominios/ultimos-registrados.html"
@@ -66,8 +60,6 @@ class UltimosRegistrados(TemplateView):
         return context
 
 
-@method_decorator(cache_control(max_age=settings.GENERAL_CACHE_SECONDS), name='dispatch')
-@method_decorator(cache_page(settings.GENERAL_CACHE_SECONDS), name='dispatch')
 class DominiosAntiguosView(TemplateView):
 
     template_name = "web/bootstrap-base/dominios/antiguos.html"
@@ -82,8 +74,6 @@ class DominiosAntiguosView(TemplateView):
         return context
 
 
-@method_decorator(cache_control(max_age=settings.GENERAL_CACHE_SECONDS), name='dispatch')
-@method_decorator(cache_page(settings.GENERAL_CACHE_SECONDS), name='dispatch')
 class Judicializados(TemplateView):
 
     template_name = "web/bootstrap-base/dominios/judicializados.html"
@@ -98,8 +88,6 @@ class Judicializados(TemplateView):
         return context
 
 
-@method_decorator(cache_control(max_age=settings.GENERAL_CACHE_SECONDS), name='dispatch')
-@method_decorator(cache_page(settings.GENERAL_CACHE_SECONDS), name='dispatch')
 class DominiosVencimientoLargoView(TemplateView):
     """ Dominios que vencen más en el futuro """
 
@@ -115,8 +103,6 @@ class DominiosVencimientoLargoView(TemplateView):
         return context
 
 
-@method_decorator(cache_control(max_age=settings.GENERAL_CACHE_SECONDS), name='dispatch')
-@method_decorator(cache_page(settings.GENERAL_CACHE_SECONDS), name='dispatch')
 class PorCaerView(TemplateView):
 
     template_name = "web/bootstrap-base/dominios/por-caer.html"

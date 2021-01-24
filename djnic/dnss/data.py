@@ -3,8 +3,11 @@ from django.db.models import Count, Q
 from django.utils import timezone
 from dnss.models import Empresa, DNS
 from dominios.models import Dominio
+from cache_memoize import cache_memoize
+from django.conf import settings
 
 
+@cache_memoize(settings.GENERAL_CACHE_SECONDS)
 def get_hosting_usados(days_ago=0, limit=5):
 
     # Empresas de hosting más usadas
@@ -23,17 +26,19 @@ def get_hosting_usados(days_ago=0, limit=5):
     return hostings
 
 
+@cache_memoize(settings.GENERAL_CACHE_SECONDS)
 def get_dominios_from_hosting(hosting, limit=5):
     dominios = Dominio.objects.filter(
         dnss__dns__empresa_regex__empresa=hosting
     ).distinct().order_by('-registered')
-    
+
     if limit > 0:
         dominios = dominios[:limit]
 
     return dominios
 
 
+@cache_memoize(settings.GENERAL_CACHE_SECONDS)
 def get_orphan_dns(limit=5):
     orphans = DNS.objects.filter(
         empresa_regex__isnull=True

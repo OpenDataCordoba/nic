@@ -1,10 +1,12 @@
 from datetime import timedelta
-from django.db.models import Count, Q
-from django.db.models.functions import Trunc
+from django.db.models import Count
 from django.utils import timezone
 from dominios.models import Dominio, STATUS_NO_DISPONIBLE
+from cache_memoize import cache_memoize
+from django.conf import settings
 
 
+@cache_memoize(settings.GENERAL_CACHE_SECONDS)
 def get_ultimos_registrados(limit=5, de_registrantes_etiquetados=False, etiqueta=None):
     ultimos = Dominio.objects.filter(estado=STATUS_NO_DISPONIBLE)
 
@@ -18,6 +20,7 @@ def get_ultimos_registrados(limit=5, de_registrantes_etiquetados=False, etiqueta
     return ultimos
 
 
+@cache_memoize(settings.GENERAL_CACHE_SECONDS)
 def get_primeros_registrados(limit=5, de_registrantes_etiquetados=False, etiqueta=None):
     ultimos = Dominio.objects.filter(estado=STATUS_NO_DISPONIBLE, registered__isnull=False)
 
@@ -31,6 +34,7 @@ def get_primeros_registrados(limit=5, de_registrantes_etiquetados=False, etiquet
     return ultimos
 
 
+@cache_memoize(settings.GENERAL_CACHE_SECONDS)
 def get_judicializados(limit=50, days_ago=300):
     """ dominios que vencieron hace mucho pero no cayeron
         TODO ver si el registrante "NIC Juridicos" es mejor """
@@ -43,6 +47,7 @@ def get_judicializados(limit=50, days_ago=300):
     return dominios
 
 
+@cache_memoize(settings.GENERAL_CACHE_SECONDS)
 def get_futuros(limit=5, de_registrantes_etiquetados=False, etiqueta=None):
     """ Dominios que vencen más en el futuro """
     starts = timezone.now() + timedelta(days=366)
@@ -50,16 +55,18 @@ def get_futuros(limit=5, de_registrantes_etiquetados=False, etiqueta=None):
     return ultimos
 
 
+@cache_memoize(settings.GENERAL_CACHE_SECONDS)
 def dominios_sin_dns(limit=5):
     # agregar los que no tienen DNS
     dominios = Dominio.objects.filter(estado=STATUS_NO_DISPONIBLE, dnss__isnull=True)
-    
+
     if limit > 0:
         dominios = dominios[:limit]
 
     return dominios
 
 
+@cache_memoize(settings.GENERAL_CACHE_SECONDS)
 def get_por_caer(limit=5, de_registrantes_etiquetados=False, etiqueta=None):
 
     # TODO esto es para Argentina. Cada pais deberá tener sus reglas

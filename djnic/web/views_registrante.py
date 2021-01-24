@@ -9,8 +9,6 @@ from dominios.data import get_ultimos_registrados
 from registrantes.data import get_primeros_reg_creados, get_mayores_registrantes
 
 
-@method_decorator(cache_control(max_age=settings.GENERAL_CACHE_SECONDS), name='dispatch')
-@method_decorator(cache_page(settings.GENERAL_CACHE_SECONDS), name='dispatch')
 class RegistranteView(DetailView):
 
     model = Registrante
@@ -24,12 +22,10 @@ class RegistranteView(DetailView):
         context = super().get_context_data(**kwargs)
         context['site_title'] = f'Registrante de dominio {self.object.name}'
         context['site_description'] = f'Datos del registrante {self.object.name}'
-        
+
         return context
 
 
-@method_decorator(cache_control(max_age=settings.GENERAL_CACHE_SECONDS), name='dispatch')
-@method_decorator(cache_page(settings.GENERAL_CACHE_SECONDS), name='dispatch')
 class RegistrantesAntiguosView(ListView):
 
     model = Registrante
@@ -40,13 +36,11 @@ class RegistrantesAntiguosView(ListView):
         context = super().get_context_data(**kwargs)
         context['site_title'] = 'Registrantes de dominio más antiguos'
         context['site_description'] = 'Lista de registrantes de dominio más antiguos'
-        
+
         context['registrantes'] = get_primeros_reg_creados(limit=500)
         return context
 
 
-@method_decorator(cache_control(max_age=settings.GENERAL_CACHE_SECONDS), name='dispatch')
-@method_decorator(cache_page(settings.GENERAL_CACHE_SECONDS), name='dispatch')
 class MayoresRegistrantesView(ListView):
 
     model = Registrante
@@ -62,8 +56,6 @@ class MayoresRegistrantesView(ListView):
         return context
 
 
-@method_decorator(cache_control(max_age=settings.GENERAL_CACHE_SECONDS), name='dispatch')
-@method_decorator(cache_page(settings.GENERAL_CACHE_SECONDS), name='dispatch')
 class RubrosView(ListView):
 
     model = TagForRegistrante
@@ -74,12 +66,10 @@ class RubrosView(ListView):
         context = super().get_context_data(**kwargs)
         context['site_title'] = 'Rubros o Tags para registrante de dominio'
         context['site_description'] = 'Lista de rubros o Tags para registrante de dominio'
-        
+
         return context
 
 
-@method_decorator(cache_control(max_age=settings.GENERAL_CACHE_SECONDS), name='dispatch')
-@method_decorator(cache_page(settings.GENERAL_CACHE_SECONDS), name='dispatch')
 class RubroView(DetailView):
 
     model = TagForRegistrante
@@ -97,7 +87,7 @@ class RubroView(DetailView):
         # TODO context['ultimos_caidos'] = get_ultimos_caidos(limit=100)
         context['ultimos_registrados'] = get_ultimos_registrados(limit=100, etiqueta=self.object)
         context['mayores_registrantes'] = get_mayores_registrantes(limit=50, etiqueta=self.object)
-        
+
         webpush = {"group": f'rubro-{self.kwargs["uid"]}'}
         context['webpush'] = webpush
         return context

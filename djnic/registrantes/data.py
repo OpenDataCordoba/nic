@@ -3,18 +3,23 @@ from django.db.models import Count, Q
 from django.db.models.functions import Trunc
 from django.utils import timezone
 from registrantes.models import Registrante
+from cache_memoize import cache_memoize
+from django.conf import settings
 
 
+@cache_memoize(settings.GENERAL_CACHE_SECONDS)
 def get_ultimos_reg_creados(limit=5, de_registrantes_etiquetados=False, etiqueta=None):
     ultimos = Registrante.objects.order_by('-created')[:limit]
     return ultimos
 
 
+@cache_memoize(settings.GENERAL_CACHE_SECONDS)
 def get_primeros_reg_creados(limit=5, de_registrantes_etiquetados=False, etiqueta=None):
     ultimos = Registrante.objects.order_by('created')[:limit]
     return ultimos
 
 
+@cache_memoize(settings.GENERAL_CACHE_SECONDS)
 def get_mayores_registrantes(limit=5, de_registrantes_etiquetados=False, etiqueta=None):
     """ registrantes con más dominios """
     regs = Registrante.objects.annotate(total_dominios=Count('dominios'))

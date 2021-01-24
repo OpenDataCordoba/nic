@@ -1,3 +1,5 @@
+from cache_memoize import cache_memoize
+from django.conf import settings
 from datetime import timedelta
 import logging
 from django.db.models import Count, Q, DurationField, F, ExpressionWrapper, DateTimeField, IntegerField
@@ -11,6 +13,7 @@ from dnss.models import DNS
 logger = logging.getLogger(__name__)
 
 
+@cache_memoize(settings.GENERAL_CACHE_SECONDS)
 def get_ultimos_caidos(limit=5):
     ultimos_caidos = CampoCambio.objects\
         .filter(campo='estado', anterior=STATUS_NO_DISPONIBLE, nuevo=STATUS_DISPONIBLE)\
@@ -19,6 +22,7 @@ def get_ultimos_caidos(limit=5):
     return ultimos_caidos
 
 
+@cache_memoize(settings.GENERAL_CACHE_SECONDS)
 def get_ultimas_transferencias(limit=5):
     """ Dominios que pasan de un registrante a otros
         Pueden no ser transferencias sino sino solo casos
@@ -34,6 +38,7 @@ def get_ultimas_transferencias(limit=5):
     return transferencias[:limit]
 
 
+@cache_memoize(settings.GENERAL_CACHE_SECONDS)
 def get_renovaciones(limit=50, solo_fallados=False, solo_hacia_atras=False):
     """ Dominios que cambia la fecha en que expira """
     cambios = CampoCambio.objects\
@@ -59,6 +64,7 @@ def get_renovaciones(limit=50, solo_fallados=False, solo_hacia_atras=False):
     return cambios[:limit]
 
 
+@cache_memoize(settings.GENERAL_CACHE_SECONDS)
 def _get_empresa_from_dominio_dns(dominio):
     dnss = DNS.objects.filter(dominio=dominio)
 
@@ -73,6 +79,7 @@ def _get_empresa_from_dominio_dns(dominio):
     return dns.empresa_regex.empresa
 
 
+@cache_memoize(settings.GENERAL_CACHE_SECONDS)
 def get_perdidas_dns(limit=0, days_ago=30):
     """ cambios de DNS """
     logger.info('Get perdidas')

@@ -11,8 +11,6 @@ from dnss.data import get_hosting_usados, get_dominios_from_hosting, get_orphan_
 from dominios.data import dominios_sin_dns
 
 
-@method_decorator(cache_control(max_age=settings.GENERAL_CACHE_SECONDS), name='dispatch')
-@method_decorator(cache_page(settings.GENERAL_CACHE_SECONDS), name='dispatch')
 class HostingView(DetailView):
 
     model = Empresa
@@ -33,8 +31,6 @@ class HostingView(DetailView):
         return context
 
 
-@method_decorator(cache_control(max_age=settings.GENERAL_CACHE_SECONDS), name='dispatch')
-@method_decorator(cache_page(settings.GENERAL_CACHE_SECONDS), name='dispatch')
 class HostingsView(ListView):
 
     model = Empresa
@@ -53,8 +49,6 @@ class HostingsView(ListView):
         return context
 
 
-@method_decorator(cache_control(max_age=settings.GENERAL_CACHE_SECONDS), name='dispatch')
-@method_decorator(cache_page(settings.GENERAL_CACHE_SECONDS), name='dispatch')
 class Hostings30View(ListView):
 
     model = Empresa
@@ -71,8 +65,6 @@ class Hostings30View(ListView):
         return context
 
 
-@method_decorator(cache_control(max_age=settings.GENERAL_CACHE_SECONDS), name='dispatch')
-@method_decorator(cache_page(settings.GENERAL_CACHE_SECONDS), name='dispatch')
 class DNSView(DetailView):
 
     model = DNS
@@ -91,8 +83,6 @@ class DNSView(DetailView):
         return context
 
 
-@method_decorator(cache_control(max_age=settings.GENERAL_CACHE_SECONDS), name='dispatch')
-@method_decorator(cache_page(settings.GENERAL_CACHE_SECONDS), name='dispatch')
 class PerdidasView(ListView):
 
     model = CampoCambio

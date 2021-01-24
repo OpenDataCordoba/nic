@@ -15,8 +15,6 @@ from registrantes.models import Registrante
 from dnss.models import Empresa, DNS
 
 
-@method_decorator(cache_control(max_age=settings.GENERAL_CACHE_SECONDS), name='dispatch')
-@method_decorator(cache_page(settings.GENERAL_CACHE_SECONDS), name='dispatch')
 class HomeView(TemplateView):
 
     template_name = "web/bootstrap-base/home.html"
@@ -36,8 +34,6 @@ class HomeView(TemplateView):
         return context
 
 
-@method_decorator(cache_control(max_age=settings.GENERAL_CACHE_SECONDS), name='dispatch')
-@method_decorator(cache_page(settings.GENERAL_CACHE_SECONDS), name='dispatch')
 class TermsView(TemplateView):
 
     template_name = "web/bootstrap-base/terms_of_service.html"
@@ -50,8 +46,6 @@ class TermsView(TemplateView):
         return context
 
 
-@method_decorator(cache_control(max_age=settings.GENERAL_CACHE_SECONDS), name='dispatch')
-@method_decorator(cache_page(settings.GENERAL_CACHE_SECONDS), name='dispatch')
 class PrivaciPolicyView(TemplateView):
 
     template_name = "web/bootstrap-base/privacy_policy.html"
@@ -63,8 +57,7 @@ class PrivaciPolicyView(TemplateView):
 
         return context
 
-@method_decorator(cache_control(max_age=settings.GENERAL_CACHE_SECONDS), name='dispatch')
-@method_decorator(cache_page(settings.GENERAL_CACHE_SECONDS), name='dispatch')
+
 class AboutView(TemplateView):
 
     template_name = "web/bootstrap-base/about.html"
@@ -76,8 +69,7 @@ class AboutView(TemplateView):
 
         return context
 
-@method_decorator(cache_control(max_age=settings.GENERAL_CACHE_SECONDS), name='dispatch')
-@method_decorator(cache_page(settings.GENERAL_CACHE_SECONDS), name='dispatch')
+
 class SearchResultsView(FormView):
 
     form_class = SearchForm
@@ -97,5 +89,5 @@ class SearchResultsView(FormView):
         ).order_by('name')[:50]
         context['hostings'] = Empresa.objects.filter(nombre__icontains=query).order_by('nombre')[:50]
         context['dnss'] = DNS.objects.filter(dominio__icontains=query).order_by('dominio')[:50]
-        
+
         return context
