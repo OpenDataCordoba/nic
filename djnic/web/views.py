@@ -1,5 +1,4 @@
 from django.conf import settings
-from django.db.models import Q
 from django.utils.decorators import method_decorator
 from django.views.decorators.cache import cache_page, cache_control
 from django.views.generic.base import TemplateView
@@ -9,6 +8,7 @@ from web.forms import SearchForm
 from cambios.data import get_ultimos_caidos, get_ultimas_transferencias
 from dominios.data import get_ultimos_registrados
 from dnss.data import get_hosting_usados
+from core.data import get_search_results
 
 from dominios.models import Dominio
 from registrantes.models import Registrante
@@ -82,12 +82,7 @@ class SearchResultsView(FormView):
 
         query = self.request.GET.get('query')
         context['query'] = query
-        # TODO esto es muy básico
-        context['dominios'] = Dominio.objects.filter(nombre__icontains=query).order_by('nombre')[:50]
-        context['registrantes'] = Registrante.objects.filter(
-            Q(name__icontains=query) | Q(legal_uid__icontains=query)
-        ).order_by('name')[:50]
-        context['hostings'] = Empresa.objects.filter(nombre__icontains=query).order_by('nombre')[:50]
-        context['dnss'] = DNS.objects.filter(dominio__icontains=query).order_by('dominio')[:50]
+
+        context.update(get_search_results(query))
 
         return context

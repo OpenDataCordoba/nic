@@ -26,8 +26,8 @@ def get_ultimos_caidos(limit=5):
 def get_ultimas_transferencias(limit=5):
     """ Dominios que pasan de un registrante a otros
         Pueden no ser transferencias sino sino solo casos
-            donde el dominio esta libre poco tiempo y 
-            lo registra otra persona. Pasa con dominios valiosos 
+            donde el dominio esta libre poco tiempo y
+            lo registra otra persona. Pasa con dominios valiosos
         """
     transferencias = CampoCambio.objects\
         .filter(campo='registrant_legal_uid')\
