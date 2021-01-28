@@ -22,6 +22,9 @@ def queryset_as_csv_view(request, filename, queryset, fields, override_fields={}
         extras=Analytic.request_as_dict(request)
     )
 
+    if user is None:
+        return HttpResponse('Descarga habilitada para usuarios registrados', status=HTTPStatus.NO_CONTENT)
+
     # revisar la carpata de descargas
     # ver si la ultima grabacion está dentro del tiempo de cache
     if not os.path.isdir(settings.DOWNLOADS_ROOT):
