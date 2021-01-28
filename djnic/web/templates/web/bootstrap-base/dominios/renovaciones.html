@@ -10,6 +10,11 @@
                     <h2>Últimos dominios renovados</h2>
                     <p>debería ser todos de 365 días<p>
                     <p>{{ site_description }}</p>
+                    <p>
+                    {% if not user.is_authenticated %}
+                    Para ver la lista ampliada debes <a href='{% url "clogin" %}'>acceder</a> al sistema
+                    {% endif %}
+                    </p>
                 </div>
                 <div class="table-responsive">
                     <table id="data-table-basic" class="table table-striped">

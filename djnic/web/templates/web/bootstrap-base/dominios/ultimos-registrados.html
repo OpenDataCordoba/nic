@@ -7,6 +7,13 @@
         <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
             <div class="data-table-list">
                 <div class="basic-tb-hd"><h2>Últimos registrados</h2></div>
+                
+                <p>
+                {% if not user.is_authenticated %}
+                Para ver la lista ampliada debes <a href='{% url "clogin" %}'>acceder</a> al sistema
+                {% endif %}
+                </p>
+                
                 <div class="table-responsive">
                     <table id="data-table-basic" class="table table-striped">
                         <thead>

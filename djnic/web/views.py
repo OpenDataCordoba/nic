@@ -86,3 +86,15 @@ class SearchResultsView(FormView):
         context.update(get_search_results(query))
 
         return context
+
+
+class LoginView(TemplateView):
+
+    template_name = "web/bootstrap-base/login.html"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['site_title'] = 'Login'
+        context['site_description'] = 'Registrarse o acceder a DominiosAR'
+
+        return context

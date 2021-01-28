@@ -43,6 +43,10 @@ class UltimosCaidos(TemplateView):
 
         context['ultimos_caidos'] = get_ultimos_caidos(limit=500)
 
+        # limit for non logged users
+        if not self.request.user.is_authenticated:
+            context['ultimos_caidos'] = context['ultimos_caidos'][:5]
+
         return context
 
 
@@ -56,6 +60,10 @@ class UltimosRegistrados(TemplateView):
         context['site_description'] = 'Lista de los últimos dominios caidos'
 
         context['ultimos_registrados'] = get_ultimos_registrados(limit=500)
+
+        # limit for non logged users
+        if not self.request.user.is_authenticated:
+            context['ultimos_registrados'] = context['ultimos_registrados'][:5]
 
         return context
 
@@ -71,6 +79,10 @@ class DominiosAntiguosView(TemplateView):
 
         context['dominios'] = get_primeros_registrados(limit=500)
 
+        # limit for non logged users
+        if not self.request.user.is_authenticated:
+            context['dominios'] = context['dominios'][:5]
+
         return context
 
 
@@ -84,6 +96,10 @@ class Judicializados(TemplateView):
         context['site_description'] = 'Lista de los dominios vencidos sin caer'
 
         context['dominios'] = get_judicializados(limit=500)
+
+        # limit for non logged users
+        if not self.request.user.is_authenticated:
+            context['dominios'] = context['dominios'][:5]
 
         return context
 
@@ -100,6 +116,10 @@ class DominiosVencimientoLargoView(TemplateView):
 
         context['dominios'] = get_futuros(limit=500)
 
+        # limit for non logged users
+        if not self.request.user.is_authenticated:
+            context['dominios'] = context['dominios'][:5]
+
         return context
 
 
@@ -113,5 +133,9 @@ class PorCaerView(TemplateView):
         context['site_description'] = 'Dominios vencidos y listos para liberarse'
 
         context['por_caer'] = get_por_caer(limit=500)
+
+        # limit for non logged users
+        if not self.request.user.is_authenticated:
+            context['por_caer'] = context['por_caer'][:5]
 
         return context

@@ -9,6 +9,11 @@
                 <div class="basic-tb-hd">
                     <h2>Dominios judicializados</h2>
                     <p>Interpretamos como judicializados a los dominios vencidos hace mucho tiempo y sin caer<p>
+                        <p>
+                            {% if not user.is_authenticated %}
+                            Para ver la lista ampliada debes <a href='{% url "clogin" %}'>acceder</a> al sistema
+                            {% endif %}
+                            </p>
                 </div>
                 <div class="table-responsive">
                     <table id="data-table-basic" class="table table-striped">

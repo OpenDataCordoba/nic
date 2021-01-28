@@ -1,0 +1,39 @@
+{% extends "web/bootstrap-base/base.html" %}
+{% load socialaccount %}
+
+{% block main %}
+
+<div class="container">
+    <div class="row">
+
+        <div class="col-lg-8 col-md-8 col-sm-8 col-xs-8">
+            <p>Acceder o registrarte</p>
+            <hr>
+            <a class="btn btn-block btn-social btn-lg btn-github" href="{% provider_login_url 'github' %}">
+                <i class="fa fa-github"></i>Sign in with GitHub
+            </a>
+
+            <hr>
+            <a class="btn btn-block btn-social btn-lg btn-google" href="{% provider_login_url 'google' %}">
+                <i class="fa fa-google"></i>Sign in with Google
+            </a>
+
+            <hr>
+
+        </div>
+
+        <div class="col-lg-4 col-md-4 col-sm-4 col-xs-4">
+            <h3>¿Porque es necesario registrarte?</h3>
+            <p>
+                Este proyecto es administrado por 
+                <a href="https://www.opendatacordoba.org/">OpenDataCordoba</a>
+                como parte de una experiencia que busca promover el uso 
+                de datos abiertos con la finalidad de transparentar este mercado
+                y conocer a sus usuarios.
+            </p>
+        </div>
+
+    </div>
+</div>
+
+{% endblock main %}

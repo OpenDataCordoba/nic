@@ -9,6 +9,11 @@
                 <div class="basic-tb-hd">
                     <h2>Dominios que vencen más en el futuro</h2>
                     <p>NIC Argentina solo permite un año<p>
+                        <p>
+                            {% if not user.is_authenticated %}
+                            Para ver la lista ampliada debes <a href='{% url "clogin" %}'>acceder</a> al sistema
+                            {% endif %}
+                            </p>
                 </div>
                 <div class="table-responsive">
                     <table id="data-table-basic" class="table table-striped">
