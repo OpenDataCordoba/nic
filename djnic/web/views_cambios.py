@@ -22,6 +22,10 @@ class RenovacionesView(ListView):
         # ordenar los cambios
         context['campos'] = get_renovaciones(limit=200)
 
+        # limit for non logged users
+        if not self.request.user.is_authenticated:
+            context['campos'] = context['campos'][:5]
+
         return context
 
 
@@ -39,6 +43,10 @@ class RenovacionesRarasView(ListView):
         # ordenar los cambios
         context['campos'] = get_renovaciones(limit=200, solo_fallados=True)
 
+        # limit for non logged users
+        if not self.request.user.is_authenticated:
+            context['campos'] = context['campos'][:5]
+
         return context
 
 
@@ -55,5 +63,9 @@ class RenovacionesHaciaAtrasView(ListView):
 
         # ordenar los cambios
         context['campos'] = get_renovaciones(limit=200, solo_hacia_atras=True)
+
+        # limit for non logged users
+        if not self.request.user.is_authenticated:
+            context['campos'] = context['campos'][:5]
 
         return context
