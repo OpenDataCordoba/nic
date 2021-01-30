@@ -24,5 +24,6 @@ class Analytic(models.Model):
             'remote_host': request.META.get('REMOTE_HOST', None),
             'user_agent': request.headers.get('User-Agent', 'Unknown'),
             'accept_language': request.headers.get('Accept-Language', None),
-            'referer': request.META.get('HTTP_REFERER', None)
+            'referer': request.META.get('HTTP_REFERER', None),
+            'path': request.path,
         }
