@@ -4,6 +4,7 @@ from django.views.decorators.cache import cache_page, cache_control
 from django.views.generic.base import TemplateView
 from django.views.generic.detail import DetailView
 
+from core.views import AnalyticsViewMixin
 from dominios.models import Dominio, STATUS_DISPONIBLE
 from cambios.data import get_ultimos_caidos
 from dominios.data import (get_ultimos_registrados, get_judicializados,
@@ -11,7 +12,7 @@ from dominios.data import (get_ultimos_registrados, get_judicializados,
                            get_por_caer)
 
 
-class DominioView(DetailView):
+class DominioView(AnalyticsViewMixin, DetailView):
 
     model = Dominio
     context_object_name = "dominio"
@@ -32,7 +33,7 @@ class DominioView(DetailView):
         return context
 
 
-class UltimosCaidos(TemplateView):
+class UltimosCaidos(AnalyticsViewMixin, TemplateView):
 
     template_name = "web/bootstrap-base/dominios/ultimos-caidos.html"
 
@@ -50,7 +51,7 @@ class UltimosCaidos(TemplateView):
         return context
 
 
-class UltimosRegistrados(TemplateView):
+class UltimosRegistrados(AnalyticsViewMixin, TemplateView):
 
     template_name = "web/bootstrap-base/dominios/ultimos-registrados.html"
 
@@ -68,7 +69,7 @@ class UltimosRegistrados(TemplateView):
         return context
 
 
-class DominiosAntiguosView(TemplateView):
+class DominiosAntiguosView(AnalyticsViewMixin, TemplateView):
 
     template_name = "web/bootstrap-base/dominios/antiguos.html"
 
@@ -86,7 +87,7 @@ class DominiosAntiguosView(TemplateView):
         return context
 
 
-class Judicializados(TemplateView):
+class Judicializados(AnalyticsViewMixin, TemplateView):
 
     template_name = "web/bootstrap-base/dominios/judicializados.html"
 
@@ -104,7 +105,7 @@ class Judicializados(TemplateView):
         return context
 
 
-class DominiosVencimientoLargoView(TemplateView):
+class DominiosVencimientoLargoView(AnalyticsViewMixin, TemplateView):
     """ Dominios que vencen más en el futuro """
 
     template_name = "web/bootstrap-base/dominios/futuros.html"
@@ -123,7 +124,7 @@ class DominiosVencimientoLargoView(TemplateView):
         return context
 
 
-class PorCaerView(TemplateView):
+class PorCaerView(AnalyticsViewMixin, TemplateView):
 
     template_name = "web/bootstrap-base/dominios/por-caer.html"
 

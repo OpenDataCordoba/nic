@@ -3,8 +3,10 @@ from django.utils.decorators import method_decorator
 from django.views.decorators.cache import cache_page, cache_control
 from django.views.generic.base import TemplateView
 
+from core.views import AnalyticsViewMixin
 
-class StatsReadVtoView(TemplateView):
+
+class StatsReadVtoView(AnalyticsViewMixin, TemplateView):
 
     template_name = "web/bootstrap-base/plataforma/stats-read-vto.html"
 
@@ -16,7 +18,7 @@ class StatsReadVtoView(TemplateView):
         return context
 
 
-class StatsReadGeneralView(TemplateView):
+class StatsReadGeneralView(AnalyticsViewMixin, TemplateView):
 
     template_name = "web/bootstrap-base/plataforma/stats-read-general.html"
 
@@ -28,7 +30,7 @@ class StatsReadGeneralView(TemplateView):
         return context
 
 
-class StatsRegistradosPorFechaView(TemplateView):
+class StatsRegistradosPorFechaView(AnalyticsViewMixin, TemplateView):
 
     template_name = "web/bootstrap-base/plataforma/registrados-por-fecha.html"
 
@@ -40,7 +42,7 @@ class StatsRegistradosPorFechaView(TemplateView):
         return context
 
 
-class StatsVencimientosPorFechaView(TemplateView):
+class StatsVencimientosPorFechaView(AnalyticsViewMixin, TemplateView):
 
     template_name = "web/bootstrap-base/plataforma/vencimientos-por-fecha.html"
 

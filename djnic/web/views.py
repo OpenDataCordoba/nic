@@ -10,12 +10,13 @@ from dominios.data import get_ultimos_registrados
 from dnss.data import get_hosting_usados
 from core.data import get_search_results
 
+from core.views import AnalyticsViewMixin
 from dominios.models import Dominio
 from registrantes.models import Registrante
 from dnss.models import Empresa, DNS
 
 
-class HomeView(TemplateView):
+class HomeView(AnalyticsViewMixin, TemplateView):
 
     template_name = "web/bootstrap-base/home.html"
 
@@ -34,7 +35,7 @@ class HomeView(TemplateView):
         return context
 
 
-class TermsView(TemplateView):
+class TermsView(AnalyticsViewMixin, TemplateView):
 
     template_name = "web/bootstrap-base/terms_of_service.html"
 
@@ -46,7 +47,7 @@ class TermsView(TemplateView):
         return context
 
 
-class PrivaciPolicyView(TemplateView):
+class PrivaciPolicyView(AnalyticsViewMixin, TemplateView):
 
     template_name = "web/bootstrap-base/privacy_policy.html"
 
@@ -58,7 +59,7 @@ class PrivaciPolicyView(TemplateView):
         return context
 
 
-class AboutView(TemplateView):
+class AboutView(AnalyticsViewMixin, TemplateView):
 
     template_name = "web/bootstrap-base/about.html"
 
@@ -70,7 +71,7 @@ class AboutView(TemplateView):
         return context
 
 
-class SearchResultsView(FormView):
+class SearchResultsView(AnalyticsViewMixin, FormView):
 
     form_class = SearchForm
     template_name = "web/bootstrap-base/search.html"

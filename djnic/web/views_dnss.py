@@ -4,6 +4,7 @@ from django.views.decorators.cache import cache_page, cache_control
 from django.views.generic.detail import DetailView
 from django.views.generic.list import ListView
 
+from core.views import AnalyticsViewMixin
 from cambios.models import CampoCambio
 from dnss.models import Empresa, DNS
 from cambios.data import get_perdidas_dns
@@ -11,7 +12,7 @@ from dnss.data import get_hosting_usados, get_dominios_from_hosting, get_orphan_
 from dominios.data import dominios_sin_dns
 
 
-class HostingView(DetailView):
+class HostingView(AnalyticsViewMixin, DetailView):
 
     model = Empresa
     context_object_name = "hosting"
@@ -31,7 +32,7 @@ class HostingView(DetailView):
         return context
 
 
-class HostingsView(ListView):
+class HostingsView(AnalyticsViewMixin, ListView):
 
     model = Empresa
     context_object_name = "hostings"
@@ -49,7 +50,7 @@ class HostingsView(ListView):
         return context
 
 
-class Hostings30View(ListView):
+class Hostings30View(AnalyticsViewMixin, ListView):
 
     model = Empresa
     context_object_name = "hostings"
@@ -65,7 +66,7 @@ class Hostings30View(ListView):
         return context
 
 
-class DNSView(DetailView):
+class DNSView(AnalyticsViewMixin, DetailView):
 
     model = DNS
     context_object_name = "dns"
@@ -83,7 +84,7 @@ class DNSView(DetailView):
         return context
 
 
-class PerdidasView(ListView):
+class PerdidasView(AnalyticsViewMixin, ListView):
 
     model = CampoCambio
     context_object_name = "campo"

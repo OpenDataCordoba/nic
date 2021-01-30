@@ -4,11 +4,12 @@ from django.views.decorators.cache import cache_page, cache_control
 from django.views.generic.base import TemplateView
 from django.views.generic.list import ListView
 
+from core.views import AnalyticsViewMixin
 from cambios.models import CampoCambio
 from cambios.data import get_renovaciones
 
 
-class RenovacionesView(ListView):
+class RenovacionesView(AnalyticsViewMixin, ListView):
 
     model = CampoCambio
     context_object_name = "campo"
@@ -29,7 +30,7 @@ class RenovacionesView(ListView):
         return context
 
 
-class RenovacionesRarasView(ListView):
+class RenovacionesRarasView(AnalyticsViewMixin, ListView):
 
     model = CampoCambio
     context_object_name = "campo"
@@ -50,7 +51,7 @@ class RenovacionesRarasView(ListView):
         return context
 
 
-class RenovacionesHaciaAtrasView(ListView):
+class RenovacionesHaciaAtrasView(AnalyticsViewMixin, ListView):
 
     model = CampoCambio
     context_object_name = "campo"

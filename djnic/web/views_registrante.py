@@ -4,12 +4,13 @@ from django.views.decorators.cache import cache_page, cache_control
 from django.views.generic.detail import DetailView
 from django.views.generic.list import ListView
 
+from core.views import AnalyticsViewMixin
 from registrantes.models import Registrante, TagForRegistrante
 from dominios.data import get_ultimos_registrados
 from registrantes.data import get_primeros_reg_creados, get_mayores_registrantes
 
 
-class RegistranteView(DetailView):
+class RegistranteView(AnalyticsViewMixin, DetailView):
 
     model = Registrante
     context_object_name = "registrante"
@@ -26,7 +27,7 @@ class RegistranteView(DetailView):
         return context
 
 
-class RegistrantesAntiguosView(ListView):
+class RegistrantesAntiguosView(AnalyticsViewMixin, ListView):
 
     model = Registrante
     context_object_name = "registrante"
@@ -41,7 +42,7 @@ class RegistrantesAntiguosView(ListView):
         return context
 
 
-class MayoresRegistrantesView(ListView):
+class MayoresRegistrantesView(AnalyticsViewMixin, ListView):
 
     model = Registrante
     context_object_name = "registrante"
@@ -56,7 +57,7 @@ class MayoresRegistrantesView(ListView):
         return context
 
 
-class RubrosView(ListView):
+class RubrosView(AnalyticsViewMixin, ListView):
 
     model = TagForRegistrante
     context_object_name = "rubros"
@@ -70,7 +71,7 @@ class RubrosView(ListView):
         return context
 
 
-class RubroView(DetailView):
+class RubroView(AnalyticsViewMixin, DetailView):
 
     model = TagForRegistrante
     context_object_name = "rubro"
