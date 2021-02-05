@@ -1,3 +1,4 @@
+from django.contrib.auth.decorators import login_required
 from django.urls import path
 from .views import (HomeView, AboutView, SearchResultsView,
                     PrivaciPolicyView, TermsView, LoginView)
@@ -13,6 +14,8 @@ from .views_dnss import HostingsView, Hostings30View, HostingView, DNSView, Perd
 from .views_plataforma import (StatsReadVtoView, StatsReadGeneralView, 
                                StatsRegistradosPorFechaView, StatsVencimientosPorFechaView)
 from .views_cambios import RenovacionesView, RenovacionesRarasView, RenovacionesHaciaAtrasView
+from .views_user import MensajeView
+
 from dnss.csv import csv_empresas, csv_dns
 from dominios.csv import csv_dominios
 
@@ -25,8 +28,7 @@ urlpatterns = [
     path('politica-de-privacidad', PrivaciPolicyView.as_view(), name='politica-de-privacidad'),
     path('registrante-<str:uid>', RegistranteView.as_view(), name='registrante'),
     path('search/', SearchResultsView.as_view(), name='search'),
-    path('login/', LoginView.as_view(), name='clogin'),
-
+    
     # dominios
     path('ultimos-caidos', UltimosCaidos.as_view(), name='ultimos-caidos'),
     path('ultimos-registrados', UltimosRegistrados.as_view(), name='ultimos-registrados'),
@@ -56,6 +58,10 @@ urlpatterns = [
     path('stats-read-vto', StatsReadVtoView.as_view(), name='stats-read-vto'),
     path('registrados-por-fecha', StatsRegistradosPorFechaView.as_view(), name='registrados-por-fecha'),
     path('vencimientos-por-fecha', StatsVencimientosPorFechaView.as_view(), name='registrados-por-fecha'),
+
+    # Usuarios
+    path('login/', LoginView.as_view(), name='clogin'),
+    path('mensajes/', login_required(MensajeView.as_view()), name='mensajes'),
 
     # descargas CSV
     path('descargas/empresas.csv', csv_empresas, name='csv-empresas'),

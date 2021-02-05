@@ -1,0 +1,37 @@
+{% extends "web/bootstrap-base/base.html" %}
+
+{% block main %}
+
+<div class="container">
+    <div class="row">
+        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+            <div class="data-table-list">
+                <div class="basic-tb-hd"><h2>Mensajes</h2></div>
+                <div class="table-responsive">
+                    <table id="data-table-basic" class="table table-striped">
+                        <thead>
+                            <tr>
+<th>Mensaje</th><th>Accriones</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+{% for mensaje in mensajes %}
+<tr>
+<td>
+    {{ mensaje.mensaje.titulo }}
+    {# TODO mostrar detalle y notificar lectura #}
+</td>
+<td>    
+    ABRIR - BORRAR
+</td>
+</tr>
+{% endfor %}                                 
+                            </tbody>
+</table>
+              </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock main %}
