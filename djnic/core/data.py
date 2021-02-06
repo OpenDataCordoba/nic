@@ -6,7 +6,7 @@ from cache_memoize import cache_memoize
 from django.conf import settings
 
 
-from mensajes.models import MensajeDestinado, EstadoMensaje
+from mensajes.models import MensajeDestinado
 
 
 @cache_memoize(settings.GENERAL_CACHE_SECONDS)
@@ -24,14 +24,20 @@ def get_search_results(query):
 
 def get_messages(user):
     """ Obtener todos los mensajes del usuario para la lista de novedades """
-    mensajes = MensajeDestinado.objects.filter(destinatario=user).exclude(estado=EstadoMensaje.DELETED)
+    if user.is_authenticated:
+        mensajes = MensajeDestinado.objects.filter(destinatario=user).exclude(estado=MensajeDestinado.DELETED)
+    else:
+        mensajes = []
     return mensajes
 
 
 def get_notifications(user):
     """ Obtener los mensajes no leidos del usuario """
-    mensajes = MensajeDestinado.objects.filter(
-        destinatario=user,
-        estado=EstadoMensaje.CREATED
-    )
+    if user.is_authenticated:
+        mensajes = MensajeDestinado.objects.filter(
+            destinatario=user,
+            estado=MensajeDestinado.CREATED
+        )
+    else:
+        mensajes = []
     return mensajes

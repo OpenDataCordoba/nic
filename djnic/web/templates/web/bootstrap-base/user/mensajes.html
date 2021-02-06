@@ -1,4 +1,12 @@
 {% extends "web/bootstrap-base/base.html" %}
+{% load static %}
+
+{% block extra_head %}
+{{ block.super }}
+<script type="text/javascript" src="{% static 'web/plataforma/js/mensajes.js' %}"></script>
+<link rel="stylesheet" href="{% static 'web/plataforma/css/mensajes.css' %}">
+{% endblock extra_head %}
+
 
 {% block main %}
 
@@ -11,18 +19,26 @@
                     <table id="data-table-basic" class="table table-striped">
                         <thead>
                             <tr>
-<th>Mensaje</th><th>Accriones</th>
+<th>Mensaje</th><th></th>
                                 </tr>
                             </thead>
                             <tbody>
 {% for mensaje in mensajes %}
 <tr>
 <td>
-    {{ mensaje.mensaje.titulo }}
-    {# TODO mostrar detalle y notificar lectura #}
+    <span 
+        class="msg_list" 
+        data-msg_id="{{ mensaje.id }}"
+        {% if mensaje.unread %} style="font-weight: bold;" {% endif %}>
+    {{ mensaje.mensaje.titulo }}</span>
+    <div class="msg_content" data-msg_id="{{ mensaje.id }}">
+        {{ mensaje.mensaje.texto|safe }}
+    </div>
 </td>
-<td>    
-    ABRIR - BORRAR
+<td>
+    <button type="button" class="btn btn-default btn-lg msg_del" data-msg_id="{{ mensaje.id }}">
+        <span class="fa fa-remove" aria-hidden="true"></span>
+    </button>
 </td>
 </tr>
 {% endfor %}                                 
