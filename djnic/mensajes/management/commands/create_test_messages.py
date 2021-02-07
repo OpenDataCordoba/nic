@@ -10,7 +10,7 @@ class Command(BaseCommand):
     help = 'Create test messages'
 
     def handle(self, *args, **options):
-        
+
         users = User.objects.all()
         now = timezone.now()
         html = '''

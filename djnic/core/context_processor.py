@@ -1,4 +1,4 @@
-from core.data import get_messages, get_notifications
+from mensajes.data import get_notifications
 
 
 def core_ctx(request):

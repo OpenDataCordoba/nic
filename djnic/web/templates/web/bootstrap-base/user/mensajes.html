@@ -24,11 +24,12 @@
                             </thead>
                             <tbody>
 {% for mensaje in mensajes %}
-<tr>
+<tr class='msg_row' data-msg_id="{{ mensaje.id }}">
 <td>
     <span 
         class="msg_list" 
         data-msg_id="{{ mensaje.id }}"
+        data-msg_status="{{ mensaje.estado }}"
         {% if mensaje.unread %} style="font-weight: bold;" {% endif %}>
     {{ mensaje.mensaje.titulo }}</span>
     <div class="msg_content" data-msg_id="{{ mensaje.id }}">
