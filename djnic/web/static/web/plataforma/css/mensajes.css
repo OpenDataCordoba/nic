@@ -1,0 +1,12 @@
+.msg_list {
+    text-decoration: underline;
+    cursor: pointer;
+}
+
+.msg_content {
+    display:none;
+    border: 1px solid black;
+    width: 100%;
+    padding: 15px;
+    overflow: overlay;
+}

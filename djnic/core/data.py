@@ -6,7 +6,6 @@ from cache_memoize import cache_memoize
 from django.conf import settings
 
 
-
 @cache_memoize(settings.GENERAL_CACHE_SECONDS)
 def get_search_results(query):
     res = {}
