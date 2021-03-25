@@ -28,7 +28,41 @@ class DominioView(AnalyticsViewMixin, DetailView):
         context['estado'] = 'Disponible' if self.object.estado == STATUS_DISPONIBLE else 'No disponible'
 
         # ordenar los cambios
-        context['cambios'] = self.object.cambios.order_by('-momento')
+        cambios = self.object.cambios.prefetch_related('campos').order_by('-momento')
+
+        # Por más que NIC lo haya publicado no es de nuestro interes publicar
+        # algunos datos persomnales
+        campos_a_ocultar = [
+            "admin_cp", "admin_domicilio", "admin_fax", "admin_tel", "reg_cp",
+            "reg_documento", "reg_domicilio", "reg_domicilio_exterior", "reg_fax",
+            "reg_fax_exterior", "reg_telefono", "reg_telefono_exterior",
+            "registrant_legal_uid", "resp_cp", "resp_domicilio", "resp_fax",
+            "resp_telefono", "tech_cp", "tech_domicilio", "tech_fax", "tech_telefono"
+        ]
+
+        ncambios = []
+        for cambio in cambios:
+            chg = {
+                'have_changes': cambio.have_changes,
+                'momento': cambio.momento,
+                'campos_cambiados': []
+            }
+            if cambio.have_changes:
+                for campo in cambio.campos.all():
+                    campo_dict = {
+                        'campo': campo.campo,
+                        'anterior': campo.anterior,
+                        'nuevo': campo.nuevo
+                    }
+                    if campo.campo in campos_a_ocultar:
+                        campo_dict['anterior'] = '[protegido]'
+                        campo_dict['nuevo'] = '[protegido]'
+
+                    chg['campos_cambiados'].append(campo_dict)
+
+            ncambios.append(chg)
+
+        context['cambios'] = ncambios
 
         return context
 
