@@ -7,11 +7,11 @@
 
 # Dominios en Argentina
 
-Proyecto de análisis de datos sobre dominios argentinos.
-Proyecto relacionado: [Whoare](https://github.com/OpenDataCordoba/whoare)
+Proyecto de análisis de datos sobre dominios argentinos.  
+Proyecto relacionado: [Whoare](https://github.com/OpenDataCordoba/whoare).  
 
 ## Como colaborar
 
-Abierto a recibir PRs o agregar issues. 
-[Proyecto Github](https://github.com/orgs/OpenDataCordoba/projects/1?fullscreen=true)
-En construcción. 
+Abierto a recibir PRs o agregar issues.  
+[Proyecto Github](https://github.com/orgs/OpenDataCordoba/projects/1?fullscreen=true).  
+En construcción.  
