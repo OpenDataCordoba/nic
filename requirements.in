@@ -1,0 +1,10 @@
+django==3.2.10
+whoare>=0.2.1
+psycopg2-binary>=2.8.3
+django-filter==2.4.0
+djangorestframework==3.13.1
+Markdown==3.3.6
+requests>=2.26.0
+django-webpush>=0.3.3
+django-allauth>=0.47.0
+django-cache-memoize>=0.1.10

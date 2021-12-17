@@ -133,5 +133,6 @@ djnic/static/
 
 # Local dev db
 djnic/nic_dev_db
+djnic/nic_dev_db-journal
 
 .vscode/
