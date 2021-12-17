@@ -15,3 +15,7 @@ Proyecto relacionado: [Whoare](https://github.com/OpenDataCordoba/whoare).
 Abierto a recibir PRs o agregar issues.  
 [Proyecto Github](https://github.com/orgs/OpenDataCordoba/projects/1?fullscreen=true).  
 En construcción.  
+
+## Desarrollo
+
+Documentacion para comendar [aquí](docs/dev-start.md).  
