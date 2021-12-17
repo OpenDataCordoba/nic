@@ -131,4 +131,7 @@ dmypy.json
 djnic/news.txt
 djnic/static/
 
+# Local dev db
+djnic/nic_dev_db
+
 .vscode/

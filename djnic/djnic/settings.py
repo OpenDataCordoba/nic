@@ -109,6 +109,7 @@ ACCOUNT_DEFAULT_HTTP_PROTOCOL = 'https'
 
 
 """ postgis DB
+'ENGINE': 'django.contrib.gis.db.backends.postgis',
 
 sudo su - postgres
 psql
@@ -118,14 +119,11 @@ ALTER ROLE nicuser02 SUPERUSER;
 CREATE EXTENSION postgis;
 CREATE DATABASE nicdb01 OWNER nicuser02;
 """
+
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.contrib.gis.db.backends.postgis',
-        'NAME': 'nic',
-        'USER': 'nic',
-        'PASSWORD': 'nic',
-        'HOST': 'localhost',
-        'PORT': 5432
+    'default': {        
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': 'nic_dev_db',
     },
 }
 
