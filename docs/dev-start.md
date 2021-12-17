@@ -23,5 +23,5 @@ Done, app running at http://localhost:8000/
 Run tests
 
 ```
-./manage runserver
+./manage test
 ```
