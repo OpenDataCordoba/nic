@@ -8,3 +8,4 @@ requests>=2.26.0
 django-webpush>=0.3.3
 django-allauth>=0.47.0
 django-cache-memoize>=0.1.10
+python_memcached==1.59

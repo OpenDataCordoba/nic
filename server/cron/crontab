@@ -1,4 +1,3 @@
-0 10,23 * * * cd /PATH/nic/djnic/ && . /PATH/env/bin/activate && /PATH/env/bin/python manage.py new_domains_AR_auto --days_ago 2
-0 2 * * * cd /PATH/nic/djnic/ && . /PATH/env/bin/activate && /PATH/env/bin/python manage.py clean_custom_changes_error --delete True
-10 2 * * 6 cd /PATH/nic/djnic/ && . /PATH/env/bin/activate && /PATH/env/bin/python manage.py update_priority --force True
-
+38 10,23 * * * cd /PATH/nic/djnic/ && . /PATH/env/bin/activate && /PATH/env/bin/python manage.py new_domains_AR_auto --days_ago 3 > /PATH/nic/new_domains.log
+0 4 * * * cd /PATH/nic/djnic/ && . /PATH/env/bin/activate && /PATH/env/bin/python manage.py clean_custom_changes_error --delete True > /PATH/nic/change_error.log
+30 4 * * * cd /PATH/nic/djnic/ && . /PATH/env/bin/activate && /PATH/env/bin/python manage.py update_priority > /PATH/nic/up_priority.log
