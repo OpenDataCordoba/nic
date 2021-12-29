@@ -237,6 +237,10 @@ OLD_DB_NAME = ''
 
 GENERAL_CACHE_SECONDS = 60 * 60 * 24
 
+# Login buttons goes directly to Google
+# If False, a new step is required to login
+SOCIALACCOUNT_LOGIN_ON_GET = True
+
 try:
     from .local_settings import *
 except:
