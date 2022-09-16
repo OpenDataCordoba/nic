@@ -40,11 +40,9 @@ http-ece==1.1.0
     # via pywebpush
 idna==3.3
     # via requests
-importlib-metadata==4.9.0
-    # via markdown
 markdown==3.3.6
     # via -r requirements.in
-oauthlib==3.1.1
+oauthlib==3.2.1
     # via requests-oauthlib
 psycopg2-binary==2.9.2
     # via -r requirements.in
@@ -54,7 +52,7 @@ pycparser==2.21
     # via cffi
 pyjwt[crypto]==2.3.0
     # via django-allauth
-python_memcached==1.59
+python-memcached==1.59
     # via -r requirements.in
 python3-openid==3.2.0
     # via django-allauth
@@ -82,5 +80,3 @@ urllib3==1.26.7
     # via requests
 whoare==0.2.1
     # via -r requirements.in
-zipp==3.6.0
-    # via importlib-metadata
