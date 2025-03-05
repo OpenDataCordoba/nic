@@ -23,15 +23,15 @@ class Dominio(models.Model):
     zona = models.ForeignKey('zonas.Zona', on_delete=models.CASCADE, related_name='dominios', help_text="Lo que va al final y no es parte del dominio")
     uid = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)
     registrante = models.ForeignKey('registrantes.Registrante', null=True, blank=True, on_delete=models.SET_NULL, related_name='dominios')
-    
+
     data_updated = models.DateTimeField(null=True, blank=True, help_text='When this record was updated')
     data_readed = models.DateTimeField(null=True, blank=True, help_text='When this record was readad (having changes or not)')
-    
+
     estado = models.CharField(null=True, max_length=90, db_index=True)
     registered = models.DateTimeField(null=True, blank=True)
     changed = models.DateTimeField(null=True, blank=True)
     expire = models.DateTimeField(null=True, blank=True)
-    
+
     priority_to_update = models.IntegerField(default=0, help_text='How mamy important is to update this domain')
     next_update_priority = models.DateTimeField(default=timezone.now, help_text='Next time I need to update the "priority"')
     extras = models.JSONField(null=True, blank=True)
@@ -40,16 +40,16 @@ class Dominio(models.Model):
     uid_anterior = models.IntegerField(default=0, db_index=True, help_text="to be deleted after migration")
     # 0 es no empezado, 1 es empezado, 2 es terminado OK
     changes_migrated = models.IntegerField(default=0)
-    
+
     class Meta:
         unique_together = (('nombre', 'zona'), )
-        
+
     def get_absolute_url(self):
         return reverse('dominio', kwargs={'uid': self.uid})
 
     def get_zoned_date(self, field):
         """ put a datetime in the rigth timezone before move to string """
-        
+
         if field == 'registered':
             timefield = self.registered
         elif field == 'changed':
@@ -58,7 +58,7 @@ class Dominio(models.Model):
             timefield = self.expire
         else:
             raise Exception('Bad field date')
-        
+
         logger.info(f'Transforming date {timefield} {self.zona.tz}')
         return timezone.localtime(timefield, pytz.timezone(self.zona.tz))
 

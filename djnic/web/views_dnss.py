@@ -1,6 +1,3 @@
-from django.conf import settings
-from django.utils.decorators import method_decorator
-from django.views.decorators.cache import cache_page, cache_control
 from django.views.generic.detail import DetailView
 from django.views.generic.list import ListView
 

@@ -14,7 +14,7 @@ class Empresa(models.Model):
     uid = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)
     object_created = models.DateTimeField(auto_now_add=True)
     object_modified = models.DateTimeField(auto_now=True)
-    
+
     def __str__(self):
         return self.nombre
 
