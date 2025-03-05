@@ -37,7 +37,7 @@ urlpatterns = [
     path('dominios-futuros', DominiosVencimientoLargoView.as_view(), name='dominios-futuros'),
     path('renovaciones', RenovacionesView.as_view(), name='renovaciones'),
     path('renovaciones-raras', RenovacionesRarasView.as_view(), name='renovaciones-raras'),
-    path('renovaciones-para-atras', RenovacionesHaciaAtrasView.as_view(), name='renovaciones-raras'),
+    path('renovaciones-para-atras', RenovacionesHaciaAtrasView.as_view(), name='renovaciones-para-atras'),
     path('por-caer', PorCaerView.as_view(), name='por-caer'),
     
     # registrantes
