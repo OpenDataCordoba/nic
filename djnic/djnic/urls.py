@@ -7,6 +7,7 @@ from django.views.decorators.cache import cache_page
 from rest_framework.authtoken import views
 
 from .views import DominioSitemap, RegistranteSitemap, RubroSitemap, HostingSitemap, DNSSitemap
+from web.views import robots_txt
 
 sitemaps = {
     'dominio': DominioSitemap,
@@ -17,6 +18,7 @@ sitemaps = {
 }
 
 urlpatterns = [
+    path('robots.txt', robots_txt, name='robots_txt'),
     path('admin/', admin.site.urls),
     path('api-auth/', include('rest_framework.urls')),
     path('api/', include('djnic.api.urls')),
