@@ -1,6 +1,6 @@
+import os
 from django.conf import settings
-from django.utils.decorators import method_decorator
-from django.views.decorators.cache import cache_page, cache_control
+from django.http import FileResponse, Http404
 from django.views.generic.base import TemplateView
 from django.views.generic import FormView
 
@@ -9,11 +9,7 @@ from cambios.data import get_ultimos_caidos, get_ultimas_transferencias
 from dominios.data import get_ultimos_registrados
 from dnss.data import get_hosting_usados
 from core.data import get_search_results
-
 from core.views import AnalyticsViewMixin
-from dominios.models import Dominio
-from registrantes.models import Registrante
-from dnss.models import Empresa, DNS
 
 
 class HomeView(AnalyticsViewMixin, TemplateView):
@@ -99,3 +95,14 @@ class LoginView(TemplateView):
         context['site_description'] = 'Registrarse o acceder a DominiosAR'
 
         return context
+
+
+def robots_txt(request):
+    """Serve robots.txt file"""
+
+    robots_path = os.path.join(settings.BASE_DIR, 'web', 'static', 'robots.txt')
+
+    try:
+        return FileResponse(open(robots_path, 'rb'), content_type='text/plain')
+    except FileNotFoundError:
+        raise Http404("robots.txt not found")

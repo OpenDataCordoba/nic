@@ -1,0 +1,12 @@
+User-agent: *
+Disallow: /
+
+# Allow sitemaps
+Allow: /sitemap.xml
+Allow: /sitemap-*.xml
+
+# Crawl delay to reduce server load
+Crawl-delay: 1
+
+# Sitemap location
+Sitemap: https://nic.opendatacordoba.org/sitemap.xml
