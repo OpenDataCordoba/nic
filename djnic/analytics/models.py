@@ -1,6 +1,8 @@
 from django.contrib.auth.models import User
 from django.db import models
 
+from core.bots import BotDetector
+
 
 class Analytic(models.Model):
     """ mediciones internas varias """
@@ -19,11 +21,17 @@ class Analytic(models.Model):
 
     @staticmethod
     def request_as_dict(request):
+        user_agent = request.headers.get('User-Agent', 'Unknown')
+        bot_detector = BotDetector()
+        is_bot, bot_type = bot_detector.detect_bot_by_user_agent(user_agent)
+
         return {
             'ip': request.META.get('HTTP_X_REAL_IP', request.META.get('REMOTE_ADDR', None)),
             'remote_host': request.META.get('REMOTE_HOST', None),
-            'user_agent': request.headers.get('User-Agent', 'Unknown'),
+            'user_agent': user_agent,
             'accept_language': request.headers.get('Accept-Language', None),
             'referer': request.META.get('HTTP_REFERER', None),
             'path': request.path,
+            'is_bot': is_bot,
+            'bot_type': bot_type
         }
