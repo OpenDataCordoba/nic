@@ -54,7 +54,7 @@ def queryset_as_csv_view(request, filename, queryset, fields, override_fields={}
         writer.writeheader()
 
         for row in queryset:
-            if type(row) == dict:
+            if isinstance(row, dict):
                 final_row = {fixed_fields[k]: row[k] for k in fields}
             else:
                 final_row = {fixed_fields[k]: getattr(row, k) for k in fields}

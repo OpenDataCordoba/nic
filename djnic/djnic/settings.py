@@ -110,7 +110,7 @@ ACCOUNT_DEFAULT_HTTP_PROTOCOL = 'https'
 
 """ postgis DB
 'ENGINE': 'django.contrib.gis.db.backends.postgis',
-
+sudo apt install postgis postgresql-XX-postgis
 sudo su - postgres
 psql
 
@@ -118,6 +118,10 @@ CREATE USER nicuser02 WITH PASSWORD 'nicpass03';
 ALTER ROLE nicuser02 SUPERUSER;
 CREATE EXTENSION postgis;
 CREATE DATABASE nicdb01 OWNER nicuser02;
+
+# Install postgis
+\c nicdb01
+CREATE EXTENSION postgis;
 """
 
 DATABASES = {
