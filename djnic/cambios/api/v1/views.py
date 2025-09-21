@@ -8,7 +8,7 @@ from rest_framework.permissions import DjangoModelPermissions
 from rest_framework.authentication import TokenAuthentication, SessionAuthentication
 from django_filters.rest_framework import DjangoFilterBackend
 from django.utils.decorators import method_decorator
-from django.views.decorators.cache import cache_page, never_cache, cache_control
+from django.views.decorators.cache import cache_page, cache_control
 from rest_framework import filters
 from rest_framework.decorators import action
 from .serializer import FullCambiosDominioSerializer, FullCampoCambioSerializer
