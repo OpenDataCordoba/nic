@@ -28,8 +28,8 @@ def get_hosting_usados(days_ago=0, limit=5, use_cache=True):
         total_dominios=Count('regexs__nameservers__dominios', filter=Q(regexs__nameservers__dominios__orden=1))
     ).order_by('-total_dominios')[:limit]
 
-    if use_cache:
-        cache.set(cache_key, hostings, timeout=86400)  # 24 hours
+    # Always cache the result when we calculate it
+    cache.set(cache_key, hostings, timeout=86400)  # 24 hours
 
     return hostings
 
@@ -49,8 +49,8 @@ def get_dominios_from_hosting(hosting, limit=5, use_cache=True):
     if limit > 0:
         dominios = dominios[:limit]
 
-    if use_cache:
-        cache.set(cache_key, dominios, timeout=86400)  # 24 hours
+    # Always cache the result when we calculate it
+    cache.set(cache_key, dominios, timeout=86400)  # 24 hours
 
     return dominios
 
@@ -71,8 +71,8 @@ def get_orphan_dns(limit=5, use_cache=True):
 
     result = orphans[:limit]
 
-    if use_cache:
-        cache.set(cache_key, result, timeout=86400)  # 24 hours
+    # Always cache the result when we calculate it
+    cache.set(cache_key, result, timeout=86400)  # 24 hours
 
     return result
 
@@ -88,7 +88,7 @@ def get_dominios_sin_dns_count(use_cache=True):
     from dominios.data import dominios_sin_dns
     count = dominios_sin_dns(limit=0).count()
 
-    if use_cache:
-        cache.set(cache_key, count, timeout=86400)  # 24 hours
+    # Always cache the result when we calculate it
+    cache.set(cache_key, count, timeout=86400)  # 24 hours
 
     return count
