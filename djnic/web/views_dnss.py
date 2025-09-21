@@ -1,12 +1,14 @@
+from django.utils.decorators import method_decorator
+from django.views.decorators.cache import cache_page, cache_control
 from django.views.generic.detail import DetailView
 from django.views.generic.list import ListView
+from django.core.cache import cache
 
 from core.views import AnalyticsViewMixin
 from cambios.models import CampoCambio
 from dnss.models import Empresa, DNS
 from cambios.data import get_perdidas_dns
-from dnss.data import get_hosting_usados, get_dominios_from_hosting, get_orphan_dns
-from dominios.data import dominios_sin_dns
+from dnss.data import get_hosting_usados, get_dominios_from_hosting, get_orphan_dns, get_dominios_sin_dns_count
 
 
 class HostingView(AnalyticsViewMixin, DetailView):
@@ -25,10 +27,12 @@ class HostingView(AnalyticsViewMixin, DetailView):
 
         dominios = get_dominios_from_hosting(hosting=self.object, limit=0)
         context['total_dominios'] = dominios.count()
-        context['ultimos_dominios'] = dominios[:5]
+        context['ultimos_dominios'] = get_dominios_from_hosting(hosting=self.object, limit=5)
         return context
 
 
+@method_decorator(cache_control(max_age=60 * 15), name='dispatch')  # Cachear por 15 minutos
+@method_decorator(cache_page(60 * 15), name='dispatch')
 class HostingsView(AnalyticsViewMixin, ListView):
 
     model = Empresa
@@ -41,12 +45,14 @@ class HostingsView(AnalyticsViewMixin, ListView):
         context['site_description'] = 'Proveedores de hostings mas usados según DNS1'
 
         context['hostings'] = get_hosting_usados(limit=250)
-        context['dominios_sin_dns'] = dominios_sin_dns(limit=0).count()
+        context['dominios_sin_dns'] = get_dominios_sin_dns_count()
         context['huerfanos'] = get_orphan_dns(limit=250)
         context['value_is'] = 'Dominios'
         return context
 
 
+@method_decorator(cache_control(max_age=60 * 15), name='dispatch')  # Cachear por 15 minutos
+@method_decorator(cache_page(60 * 15), name='dispatch')
 class Hostings30View(AnalyticsViewMixin, ListView):
 
     model = Empresa
@@ -81,6 +87,8 @@ class DNSView(AnalyticsViewMixin, DetailView):
         return context
 
 
+@method_decorator(cache_control(max_age=60 * 15), name='dispatch')  # Cachear por 15 minutos
+@method_decorator(cache_page(60 * 15), name='dispatch')
 class PerdidasView(AnalyticsViewMixin, ListView):
 
     model = CampoCambio
@@ -92,7 +100,11 @@ class PerdidasView(AnalyticsViewMixin, ListView):
         context['site_title'] = 'Perdidas de clientes'
         context['site_description'] = 'Perdidas de clientes por empresas de hosting'
 
-        # ordenar los cambios
-        context['perdidas'] = get_perdidas_dns(days_ago=30)
+        # Use cached data
+        cached_perdidas = cache.get('perdidas_dns_30')
+        if cached_perdidas:
+            context['perdidas'] = cached_perdidas
+        else:
+            context['perdidas'] = get_perdidas_dns(days_ago=30)
 
         return context
