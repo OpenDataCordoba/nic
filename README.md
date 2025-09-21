@@ -1,5 +1,4 @@
-[![Travis (.org)](https://img.shields.io/travis/OpenDataCordoba/nic)](https://travis-ci.org/github/OpenDataCordoba/nic)
-[![GitHub All Releases](https://img.shields.io/github/downloads/OpenDataCordoba/nic/total)](https://github.com/OpenDataCordoba/nic/releases)
+[![Tests](https://github.com/OpenDataCordoba/nic/workflows/CI/badge.svg)](https://github.com/OpenDataCordoba/nic/actions)
 [![GitHub Issues](https://img.shields.io/github/issues/OpenDataCordoba/nic)](https://github.com/OpenDataCordoba/nic/issues)
 [![GitHub PR](https://img.shields.io/github/issues-pr/OpenDataCordoba/nic)](https://github.com/OpenDataCordoba/nic/pulls)
 [![Licence](https://img.shields.io/github/license/OpenDataCordoba/nic)](https://github.com/OpenDataCordoba/nic/blob/main/LICENSE)
