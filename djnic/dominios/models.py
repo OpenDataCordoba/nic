@@ -329,10 +329,10 @@ class PreDominio(models.Model):
         domain_name, zone = wa.detect_zone(self.dominio)
         try:
             zona = Zona.objects.get(nombre=zone)
-        except:
-            logger.error(f'Bad zone {zone}')
+        except Exception as e:
+            logger.error(f'Bad zone {zone}: {e}')
             self.id = 0
-            return 
+            return
 
         dominios = Dominio.objects.filter(nombre=domain_name, zona=zona)
         if dominios.count() > 0:
