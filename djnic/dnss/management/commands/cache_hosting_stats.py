@@ -12,7 +12,7 @@ class Command(BaseCommand):
 
         # Cache main hostings data (limit 250)
         self.stdout.write('Caching main hostings data...')
-        get_hosting_usados(days_ago=0, limit=250, use_cache=False)
+        get_hosting_usados(limit=250, use_cache=False)
 
         # Cache 30-day hostings data (limit 100)
         self.stdout.write('Caching 30-day hostings data...')
