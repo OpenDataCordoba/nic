@@ -298,7 +298,14 @@ class Dominio(models.Model):
             raise Exception('Unknown domain')
 
         self.priority_to_update = priority
-        self.next_update_priority = timezone.now() + timedelta(days=3)
+        if priority == 0:
+            self.next_update_priority = timezone.now() + timedelta(days=180)
+        elif priority < 9000:
+            self.next_update_priority = timezone.now() + timedelta(days=120)
+        elif priority < 100000:
+            self.next_update_priority = timezone.now() + timedelta(days=15)
+        else:
+            self.next_update_priority = timezone.now() + timedelta(days=3)
         self.save()
         return self
 
