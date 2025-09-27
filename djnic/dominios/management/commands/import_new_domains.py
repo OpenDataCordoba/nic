@@ -30,7 +30,7 @@ class Command(BaseCommand):
             dominio = dominio.strip().lower()
             c += 1
             self.stdout.write(self.style.SUCCESS(f"{c} [{skipped}] {dominio}"))
-            
+
             pd, created = PreDominio.objects.get_or_create(dominio=dominio)
             # ID=0 si ya existe como dominio
             if not created or pd.id == 0:
@@ -38,6 +38,5 @@ class Command(BaseCommand):
 
             pd.priority=options['priority']
             pd.save()
-            
+
         self.stdout.write(self.style.SUCCESS(f"DONE. {c} processed {skipped} skipped"))
-        

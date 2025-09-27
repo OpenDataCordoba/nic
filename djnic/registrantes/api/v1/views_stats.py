@@ -12,14 +12,14 @@ logger = logging.getLogger(__name__)
 
 
 class GeneralStatsView(View, PermissionRequiredMixin):
-    
+
     permission_required = ['registrantes.registrante.can_view']
 
     def get(self, request):
         ret = {}
         registrantes = Registrante.objects.all()
         ret['total_registrantes'] = registrantes.count()
-        
+
         # por año de creacion
         por_anios = registrantes.annotate(year_created=Trunc('created', 'year'))\
             .order_by('-year_created')\

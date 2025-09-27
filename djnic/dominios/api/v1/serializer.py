@@ -18,7 +18,7 @@ class DominioSerializer(serializers.ModelSerializer):
 
 class FlatDominioSerializer(serializers.ModelSerializer):
     domain = serializers.CharField(read_only=True, source='full_domain')
-    
+
     class Meta:
         model = Dominio
         fields = ['id', 'domain', 'data_updated', 'data_readed', 'estado',
@@ -27,14 +27,14 @@ class FlatDominioSerializer(serializers.ModelSerializer):
 
 class FlatPreDominioSerializer(serializers.ModelSerializer):
     domain = serializers.CharField(read_only=True, source='dominio')
-    
+
     class Meta:
         model = PreDominio
         fields = ['id', 'domain']
 
 
 class PreDominioSerializer(serializers.ModelSerializer):
-    
+
     class Meta:
         model = PreDominio
         fields = ['id', 'dominio', 'priority']
@@ -50,7 +50,7 @@ class CambiosDominioSerializer(serializers.ModelSerializer):
 
 class MicroDominioSerializer(serializers.ModelSerializer):
     domain = serializers.CharField(read_only=True, source='full_domain')
-    
+
     class Meta:
         model = Dominio
         fields = ['id', 'domain']

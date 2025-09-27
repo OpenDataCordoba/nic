@@ -23,7 +23,7 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
 
         tz = pytz.timezone('America/Argentina/Cordoba')
-        
+
         logger.info('Connecting DB')
         connection = mysql.connector.connect(
             user=settings.OLD_DB_USER,
@@ -35,7 +35,7 @@ class Command(BaseCommand):
 
         cursor = connection.cursor(dictionary=True)  # sin el dictionary=True son tuplas sin nombres de campo
         cursor.execute("SET SESSION MAX_EXECUTION_TIME=100000000;")
-        
+
         # tables = ['cambios_2011', 'cambios_2012', 'cambios_2013', 'cambios_2014',
         #           'cambios_2015', 'cambios_2016', 'cambios_2017', 'cambios_2018',
         #           'cambios_2019', 'cambios']
@@ -43,7 +43,7 @@ class Command(BaseCommand):
         offset = options['offset']
         chunks = options['chunks']
         limit = options['limit']
-        
+
         c = offset
         errors = []
 
@@ -51,14 +51,14 @@ class Command(BaseCommand):
 
             if offset > limit:
                 break
-            
+
             query = f'''SELECT * FROM dominio_visto order by id ASC limit {chunks} offset {offset};'''
 
             cursor.execute(query)
 
-            # preparar la pagina que sigue 
-            offset += chunks 
-            
+            # preparar la pagina que sigue
+            offset += chunks
+
             for cambio in cursor:
                 c += 1
                 if cambio['momento'] is None:
@@ -78,7 +78,7 @@ class Command(BaseCommand):
                     dominio=dominio,
                     momento__gt=desde,
                     momento__lt=hasta)
-                
+
                 if closest_changes.count() == 0:
                     # crear uno nuevo
                     main_cambio = CambiosDominio.objects.create(
@@ -91,9 +91,9 @@ class Command(BaseCommand):
                     skipped = f'{c} SKIP {momento} because we have another change for {dominio} at {cc.momento}'
                     self.stdout.write(self.style.WARNING(skipped))
 
-                
+
             self.stdout.write(self.style.SUCCESS(f'Finished Page {offset}'))
-    
+
         cursor.close()
         connection.close()
 

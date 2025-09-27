@@ -11,7 +11,7 @@ from .views_registrante import (RegistranteView, RubrosView,
                                 RubroView, RegistrantesAntiguosView,
                                 MayoresRegistrantesView)
 from .views_dnss import HostingsView, Hostings30View, HostingView, DNSView, PerdidasView
-from .views_plataforma import (StatsReadVtoView, StatsReadGeneralView, 
+from .views_plataforma import (StatsReadVtoView, StatsReadGeneralView,
                                StatsRegistradosPorFechaView, StatsVencimientosPorFechaView)
 from .views_cambios import RenovacionesView, RenovacionesRarasView, RenovacionesHaciaAtrasView
 from .views_user import MensajeView
@@ -28,7 +28,7 @@ urlpatterns = [
     path('politica-de-privacidad', PrivaciPolicyView.as_view(), name='politica-de-privacidad'),
     path('registrante-<str:uid>', RegistranteView.as_view(), name='registrante'),
     path('search/', SearchResultsView.as_view(), name='search'),
-    
+
     # dominios
     path('ultimos-caidos', UltimosCaidos.as_view(), name='ultimos-caidos'),
     path('ultimos-registrados', UltimosRegistrados.as_view(), name='ultimos-registrados'),
@@ -39,7 +39,7 @@ urlpatterns = [
     path('renovaciones-raras', RenovacionesRarasView.as_view(), name='renovaciones-raras'),
     path('renovaciones-para-atras', RenovacionesHaciaAtrasView.as_view(), name='renovaciones-para-atras'),
     path('por-caer', PorCaerView.as_view(), name='por-caer'),
-    
+
     # registrantes
     path('registrantes-antiguos', RegistrantesAntiguosView.as_view(), name='registrantes-antiguos'),
     path('rubros', RubrosView.as_view(), name='rubros'),
@@ -52,7 +52,7 @@ urlpatterns = [
     path('hosting-<str:uid>', HostingView.as_view(), name='hosting'),
     path('dns-<str:uid>', DNSView.as_view(), name='dns'),
     path('hostings-perdidas-30', PerdidasView.as_view(), name='hostings-perdidas-30'),
-    
+
     # Estadísticas de la plataforma
     path('stats-read-general', StatsReadGeneralView.as_view(), name='stats-read-general'),
     path('stats-read-vto', StatsReadVtoView.as_view(), name='stats-read-vto'),

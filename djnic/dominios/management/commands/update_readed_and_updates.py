@@ -15,10 +15,10 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
 
-        
+
         dominios = Dominio.objects.filter(
-            Q(data_readed__isnull=True) | 
-            Q(data_updated__isnull=True) 
+            Q(data_readed__isnull=True) |
+            Q(data_updated__isnull=True)
         )
         errors = []
 
@@ -35,7 +35,7 @@ class Command(BaseCommand):
                 last_read = last_reads.first()
                 dominio.data_readed = last_read.momento
                 self.stdout.write(self.style.SUCCESS(f"{c} {dominio} READ "))
-            
+
             if dominio.data_updated is None:
                 last_reads = dominio.cambios.filter(have_changes=True).order_by('-momento')
                 if last_reads.count() == 0:

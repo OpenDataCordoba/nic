@@ -19,7 +19,7 @@ class Command(BaseCommand):
         doms = f.read()
         f.close()
         dlist = doms.split('\n')
-        
+
         c = 0
         skipped = 0
         news = 0
@@ -28,13 +28,13 @@ class Command(BaseCommand):
 
         for dominio in dlist:
             c += 1
-            
+
             pd, created = PreDominio.objects.get_or_create(dominio=dominio)
             # ID=0 si ya existe como dominio
             if not created:
                 skipped += 1
                 continue
-            
+
             if pd.id == 0:
                 already_domain += 1
             else:
@@ -44,7 +44,6 @@ class Command(BaseCommand):
 
             report = f'{c} processed. {news} news, {skipped} skipped, {already_domain} already exists as domain'
             self.stdout.write(self.style.SUCCESS(report))
-        
+
         News.objects.create(title='NEW AR Domains', description=report)
         self.stdout.write(self.style.SUCCESS(f"DONE. {c} processed"))
-        

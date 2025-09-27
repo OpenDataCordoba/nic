@@ -20,7 +20,7 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
 
-        days_ago = options['days_ago']        
+        days_ago = options['days_ago']
         nd = NewDomains()
         nd.data_path = settings.STATIC_ROOT
 
@@ -35,7 +35,7 @@ class Command(BaseCommand):
 
         for dominio in dominios:
             c += 1
-            
+
             pd, created = PreDominio.objects.get_or_create(dominio=dominio)
             # ID=0 si ya existe como dominio
             if not created:
@@ -45,7 +45,7 @@ class Command(BaseCommand):
                     pd.priority = 10
                     pd.save()
                 continue
-            
+
             if pd.id == 0:
                 already_domain += 1
             else:
@@ -55,7 +55,6 @@ class Command(BaseCommand):
 
             report = f'{c} processed. {news} news, {skipped} skipped, {already_domain} already exists as domain'
             self.stdout.write(self.style.SUCCESS(report))
-        
+
         News.objects.create(title='NEW AR Domains', description=report)
         self.stdout.write(self.style.SUCCESS(f"DONE. {c} processed"))
-        

@@ -9,9 +9,9 @@ EMP2_REGEX1 = r'(.*).pipo.emp2.ar$'
 EMP2_REGEX2 = r'n1.(.*).emp2.br$'
 
 class DNSRegexTestCase(TestCase):
-    
+
     def test_regex_detection(self):
-        
+
         emp1 = Empresa.objects.create(nombre='Empresa 01')
         e1r1 = EmpresaRegexDomain.objects.create(empresa=emp1, regex_dns=EMP1_REGEX1)
         logger.info(f'Regex defined {e1r1.regex_dns}')
@@ -24,36 +24,36 @@ class DNSRegexTestCase(TestCase):
         self.assertIsNone(dns2.empresa_regex)
 
     def test_regex_manually_emp(self):
-        
+
         dns1 = DNS.objects.create(dominio='ns2.emp1.net')
         emp1 = Empresa.objects.create(nombre='Empresa 01')
         e1r1 = EmpresaRegexDomain.objects.create(empresa=emp1, regex_dns=EMP1_REGEX1)
         logger.info(f'Regex defined {e1r1.regex_dns}')
         emp1.detect_DNSs()
-        
+
         dns1 = DNS.objects.get(dominio='ns2.emp1.net')
         self.assertEqual(dns1.empresa_regex, e1r1)
 
     def test_regex_manually_regex(self):
-        
+
         dns1 = DNS.objects.create(dominio='ns2.emp1.net')
         emp1 = Empresa.objects.create(nombre='Empresa 01')
         e1r1 = EmpresaRegexDomain.objects.create(empresa=emp1, regex_dns=EMP1_REGEX1)
         logger.info(f'Regex defined {e1r1.regex_dns}')
         e1r1.detect_DNSs()
-        
+
         dns1 = DNS.objects.get(dominio='ns2.emp1.net')
         self.assertEqual(dns1.empresa_regex, e1r1)
 
     def test_regex_multiple(self):
-        
+
         emp1 = Empresa.objects.create(nombre='Empresa 01')
         emp2 = Empresa.objects.create(nombre='Empresa 02')
         e1r1 = EmpresaRegexDomain.objects.create(empresa=emp1, regex_dns=EMP1_REGEX1)
         e1r2 = EmpresaRegexDomain.objects.create(empresa=emp1, regex_dns=EMP1_REGEX2)
         e2r1 = EmpresaRegexDomain.objects.create(empresa=emp2, regex_dns=EMP2_REGEX1)
         e2r2 = EmpresaRegexDomain.objects.create(empresa=emp2, regex_dns=EMP2_REGEX2)
-        
+
         dns1 = DNS.objects.create(dominio='1.emp1.net')
         self.assertEqual(dns1.empresa_regex, e1r1)
         dns2 = DNS.objects.create(dominio='ns2.emp2.net')

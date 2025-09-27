@@ -37,7 +37,7 @@ class Command(BaseCommand):
         # https://support.cloud.engineyard.com/hc/en-us/articles/205408088-Access-Your-Database-Remotely-Through-an-SSH-Tunnel
         # ssh -p XXX -L 3307:REMOTE_HOST:3306 user@REMOTE_HOST
         # self.stdout.write(self.style.SUCCESS(f'Tunneling to {settings.OLD_SSH_HOST}'))
-        
+
         # # https://pypi.org/project/sshtunnel/
         # server = SSHTunnelForwarder(
         #     (settings.OLD_SSH_HOST, settings.OLD_SSH_PORT),
@@ -49,7 +49,7 @@ class Command(BaseCommand):
         # server.start()
 
         # self.stdout.write(self.style.SUCCESS(f'Tunnel OK on port {server.local_bind_port}'))
-        
+
         logger.info('Connecting DB')
         connection = mysql.connector.connect(
             user=settings.OLD_DB_USER,
@@ -62,44 +62,44 @@ class Command(BaseCommand):
         # https://dev.mysql.com/doc/connector-python/en/connector-python-example-cursor-select.html
         cursor = connection.cursor(dictionary=True)  # sin el dictionary=True son tuplas sin nombres de campo
         cursor.execute("SET SESSION MAX_EXECUTION_TIME=100000000;")
-        
+
         c = offset
-        
+
         nuevos_dominios = 0
         nuevos_registrantes = 0
         skipped = 0
-        
+
         for n in range(0, limit, chunks):
             query = f'Select * from dominios order by lastUpdated limit {chunks} offset {offset};'
-            
+
             self.stdout.write(self.style.SUCCESS(f'Query {query}'))
             cursor.execute(query)
 
-            # preparar la pagina que sigue 
-            offset += chunks 
+            # preparar la pagina que sigue
+            offset += chunks
 
-            """ sample data 
+            """ sample data
             "id", "dominio",  "estado",       "lastUpdated",         "desde",               "hasta",              "registrante",        "reg_documento", "DNS1",                 "DNS2","DNS3","DNS4","DNS5", "dominio_changed",     "persona_changed",     "persona_created",     "server_created"
             "187","a.com.ar", "no disponible","2020-02-29 23:24:53", "2014-03-03 00:00:00", "2021-03-03 00:00:00","PINEDA SERGIO RUBEN","20180552449",   "ns2.sedoparking.com",  "ns1.sedoparking.com",,,,,   "2020-02-17 18:28:07", "2020-02-12 17:34:04", "2013-08-20 00:00:00", "2016-07-01 01:16:14"
             "188","e.com.ar", "disponible",   "2017-07-15 13:29:56", "0000-00-00 00:00:00", "0000-00-00 00:00:00",                                                                                            "0000-00-00 00:00:00", "0000-00-00 00:00:00", "0000-00-00 00:00:00", "0000-00-00 00:00:00"
 
             """
-            
+
             for d in cursor:
                 c += 1
-                
+
                 parts = d['dominio'].lower().strip().split('.')
                 base_name = parts[0]
                 zone = '.'.join(parts[1:])
 
                 if d['lastUpdated'] is None:
                     skipped += 1
-                    continue            
+                    continue
                 reg_name = d['registrante'].lower().strip()
                 reg_uid = d['reg_documento'].lower().strip()
-                
+
                 self.stdout.write(self.style.SUCCESS(f"{c} Procesndo dominio {d['lastUpdated']} {base_name} {zone} {d['estado']} {reg_name}"))
-                
+
                 zona, created = Zona.objects.get_or_create(nombre=zone)
 
                 dominio, created = Dominio.objects.get_or_create(zona=zona, nombre=base_name)
@@ -113,13 +113,13 @@ class Command(BaseCommand):
 
                 if d['estado'] == "no disponible":
                     dominio.estado = STATUS_NO_DISPONIBLE
-                
+
                     if d["desde"] is not None:
                         dominio.registered = tz.localize(d["desde"], is_dst=True)
-                    
+
                     if d["hasta"] is not None:
                         dominio.expire = tz.localize(d["hasta"], is_dst=True)
-                
+
                     registrante, created = Registrante.objects.get_or_create(legal_uid=reg_uid)
                     if created:
                         nuevos_registrantes += 1
@@ -128,14 +128,14 @@ class Command(BaseCommand):
                         registrante.created = tz.localize(d["persona_changed"], is_dst=True)
                     if d['persona_created'] is not None:
                         registrante.changed = tz.localize(d["persona_created"], is_dst=True)
-                    
+
                     registrante.name = reg_name  # necesito laultima version de su nombre, por eso debo ordenar bien
                     registrante.save()
 
                     dominio.registrante = registrante
                 else:
                     dominio.estado = STATUS_DISPONIBLE
-                    
+
                     if reg_name is not None and reg_name != '':
                         raise Exception('Registrante pero dominio en estado no esperado')
                     if d["desde"] is not None:

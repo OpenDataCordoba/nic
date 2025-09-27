@@ -8,7 +8,7 @@ import logging
 logger = logging.getLogger(__name__)
 
 class CambioDominioTestCase(TestCase):
-    
+
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
@@ -25,7 +25,7 @@ class CambioDominioTestCase(TestCase):
             else:
                 nombre = f'R{delta_expire.days}U{delta_updated.days}R{delta_readed.days}'
 
-        # logger.info(f'Creating {nombre}')        
+        # logger.info(f'Creating {nombre}')
         dom = Dominio.objects.create(
             nombre=nombre,
             zona=self.zona,
@@ -33,18 +33,18 @@ class CambioDominioTestCase(TestCase):
             expire=timezone.now() + delta_expire if status==STATUS_NO_DISPONIBLE else None,
             data_updated=timezone.now() - delta_updated,
             data_readed=timezone.now() - delta_readed)
-        
+
         # calcupar la prioridad a estos dominios
         dom.calculate_priority()
         self.all.append(dom)
         return dom
-        
+
     def test_priority_order(self):
 
         for u in range(0, 101, 10):
             for r in range(0, 101, 10):
                 self.create_domain(status=STATUS_DISPONIBLE, delta_updated=timedelta(days=u), delta_readed=timedelta(days=r))
-        
+
         for e in range(-30, 31, 10):
             for u in range(0, 101, 10):
                 for r in range(0, r+1, 10):
@@ -83,7 +83,7 @@ class CambioDominioTestCase(TestCase):
         self.assertGreater(results['FU30R30'], results['FU20R30'])
         self.assertGreater(results['FU20R30'], results['FU10R30'])
         self.assertGreater(results['FU10R30'], results['FU0R30'])
-        
+
         # expired 30 days ago
         self.assertGreater(results['E30U30R30'], results['E30U30R20'])
         self.assertGreater(results['E30U30R20'], results['E30U30R10'])
@@ -92,7 +92,7 @@ class CambioDominioTestCase(TestCase):
         self.assertGreater(results['E30U30R30'], results['E30U20R30'])
         self.assertGreater(results['E30U20R30'], results['E30U10R30'])
         self.assertGreater(results['E30U10R30'], results['E30U0R30'])
-        
+
         # registered, expire in 30 days ago
         self.assertGreater(results['R30U30R30'], results['R30U30R20'])
         self.assertGreater(results['R30U30R20'], results['R30U30R10'])
@@ -101,7 +101,7 @@ class CambioDominioTestCase(TestCase):
         self.assertGreater(results['R30U30R30'], results['R30U20R30'])
         self.assertGreater(results['R30U20R30'], results['R30U10R30'])
         self.assertGreater(results['R30U10R30'], results['R30U0R30'])
-        
+
         # expired > registered
         self.assertGreater(results['E30U70R10'], results['R30U70R10'])
         self.assertGreater(results['E30U30R10'], results['R30U30R10'])
@@ -118,7 +118,6 @@ class CambioDominioTestCase(TestCase):
         self.assertGreater(results['R30U70R10'], results['R1500U300R300'])
         self.assertGreater(results['R30U70R10'], results['E1500U300R300'])
         self.assertGreater(results['R30U70R20'], results['FU300R300'])
-        
+
         # Important
         self.assertGreater(results['E60U300R10'], results['R5U300R380'])
-        

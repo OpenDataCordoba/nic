@@ -125,7 +125,7 @@ CREATE EXTENSION postgis;
 """
 
 DATABASES = {
-    'default': {        
+    'default': {
         'ENGINE': 'django.db.backends.sqlite3',
         'NAME': 'nic_dev_db',
     },

@@ -1,6 +1,6 @@
 from django.urls import path, include
 from rest_framework import routers
-from .views import (DominioViewSet, NextPriorityDomainViewSet, 
+from .views import (DominioViewSet, NextPriorityDomainViewSet,
                     UltimosCaidosViewSet, UltimosRenovadosViewSet,
                     UltimosTranspasadosViewSet, UltimosCambioDNSViewSet,
                     PreDominioViewSet)

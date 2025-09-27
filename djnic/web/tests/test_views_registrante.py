@@ -77,7 +77,7 @@ class RubroViewTest(TestCase):
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, 'web/bootstrap-base/registrantes/rubro.html')
-        
+
     def test_rubro_context_data(self):
         response = self.client.get(self.url)
         self.assertIn('ultimos_registrados', response.context)

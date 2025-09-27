@@ -11,6 +11,5 @@ class RegistrantSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Registrante
-        
+
         fields = ['id', 'name', 'zone', 'legal_uid', 'created', 'changed', 'dominios_registrados']
-  

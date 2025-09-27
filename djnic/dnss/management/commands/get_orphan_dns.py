@@ -15,7 +15,7 @@ class Command(BaseCommand):
         self.stdout.write(self.style.SUCCESS("Buscando DNSs"))
         orphans = DNS.objects.filter(empresa_regex__isnull=True)
         pending = orphans.annotate(total_dominios=Count('dominios', filter=Q(dominios__orden=1))).order_by('-total_dominios')
-        
+
         process = pending[:options['show']]
 
         for p in reversed(process):
@@ -25,5 +25,5 @@ class Command(BaseCommand):
                         .filter(dnss__dns=p)[:options['show_domains']]
                 for d in dominios:
                     self.stdout.write(self.style.WARNING(f' - {d}'))
-            
+
         self.stdout.write(self.style.SUCCESS(f"FIN {pending.count()} pending"))

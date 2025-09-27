@@ -20,12 +20,12 @@ class Command(BaseCommand):
         parser.add_argument('--offset', nargs='?', type=int, default=0)
         parser.add_argument('--chunks', nargs='?', type=int, default=5000)
         parser.add_argument('--limit', nargs='?', type=int, default=5000000)
-        
+
 
     def handle(self, *args, **options):
 
         tz = pytz.timezone('America/Argentina/Cordoba')
-        
+
         logger.info('Connecting DB')
         connection = mysql.connector.connect(
             user=settings.OLD_DB_USER,
@@ -37,7 +37,7 @@ class Command(BaseCommand):
 
         cursor = connection.cursor(dictionary=True)  # sin el dictionary=True son tuplas sin nombres de campo
         cursor.execute("SET SESSION MAX_EXECUTION_TIME=100000000;")
-        
+
         # tables = ['cambios_2011', 'cambios_2012', 'cambios_2013', 'cambios_2014',
         #           'cambios_2015', 'cambios_2016', 'cambios_2017', 'cambios_2018',
         #           'cambios_2019', 'cambios']
@@ -46,7 +46,7 @@ class Command(BaseCommand):
         offset = options['offset']
         chunks = options['chunks']
         limit = options['limit']
-        
+
         if year > 2010 and year < 2020:
             table = f'cambios_{year}'
         elif year == 2020:
@@ -68,8 +68,8 @@ class Command(BaseCommand):
 
             cursor.execute(query)
 
-            # preparar la pagina que sigue 
-            offset += chunks 
+            # preparar la pagina que sigue
+            offset += chunks
             if offset > limit:
                 break
 
@@ -77,7 +77,7 @@ class Command(BaseCommand):
                 # skipif already migrated
                 if CampoCambio.objects.filter(uid_anterior=cambio['id']).count() > 0:
                     continue
-                
+
                 c += 1
                 if last_id_dominio is None or last_id_dominio != cambio['idDominio']:
                     dominios = Dominio.objects.filter(uid_anterior=cambio['idDominio'])
@@ -87,9 +87,9 @@ class Command(BaseCommand):
                     elif dominios.count() > 1:
                         raise('WHAT!')
                     last_id_dominio = cambio['idDominio']
-                    dominio = dominios[0]    
+                    dominio = dominios[0]
                     main_cambio = None
-                
+
                 self.stdout.write(self.style.SUCCESS(f"[{table}]:{c} Procesndo cambio {cambio['campo']} from {cambio['anterior']} to {cambio['nuevo']}"))
                 momento = tz.localize(cambio['fecha'], is_dst=True)
                 if main_cambio is None:
@@ -104,10 +104,10 @@ class Command(BaseCommand):
                 lg = f'''PreSave {main_cambio.dominio} {main_cambio.momento}
                             campo={cambio['campo']}, {type(cambio['campo'])}
                             anterior={cambio['anterior']}, {type(cambio['anterior'])}
-                            nuevo={cambio['nuevo']}, {type(cambio['nuevo'])} 
+                            nuevo={cambio['nuevo']}, {type(cambio['nuevo'])}
                             uid_anterior={cambio['id']} {type(cambio['id'])}'''
                 # self.stdout.write(self.style.SUCCESS(lg))
-                
+
                 try:
                     CampoCambio.objects.create(
                         cambio=main_cambio,
@@ -118,12 +118,12 @@ class Command(BaseCommand):
                         )
                 except Exception as e:
                     errors.append(f'Error {e} while saving {lg}')
-                
+
                 if len(errors) > 3:
                     raise Exception(f'Too many errors {errors}')
-                
+
             self.stdout.write(self.style.SUCCESS(f'Finished Table {table}'))
-    
+
         cursor.close()
         connection.close()
 

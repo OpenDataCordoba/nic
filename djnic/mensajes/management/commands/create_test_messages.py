@@ -14,7 +14,7 @@ class Command(BaseCommand):
         users = User.objects.all()
         now = timezone.now()
         html = '''
-            <img src="https://www.himgs.com/imagenes/hello/common/hello-logo-solo.svg" 
+            <img src="https://www.himgs.com/imagenes/hello/common/hello-logo-solo.svg"
                  style="max-width:40%; padding:15px; float:left" />
             Internal <b>Text message</b> {now}
             '''
@@ -26,5 +26,5 @@ class Command(BaseCommand):
             md = MensajeDestinado.objects.create(mensaje=msg1, destinatario=user)
             md = MensajeDestinado.objects.create(mensaje=msg2, destinatario=user, estado=MensajeDestinado.READED)
             md = MensajeDestinado.objects.create(mensaje=msg3, destinatario=user, estado=MensajeDestinado.DELETED)
-            
+
             self.stdout.write(self.style.SUCCESS(f"Created {md}"))

@@ -10,7 +10,7 @@ from zonas.models import Zona
 
 
 class APIDominioTestCase(LiveServerTestCase):
-    
+
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
@@ -23,11 +23,11 @@ class APIDominioTestCase(LiveServerTestCase):
         cls.regular_user_token = Token.objects.create(user=cls.user)
         cls.tokened_regular_client = APIClient()
         cls.tokened_regular_client.credentials(HTTP_AUTHORIZATION='Token ' + cls.regular_user_token.key)
-                
+
         cls.admin_user = User.objects.create_user('admin', 'admin@lala.com', 'admin', is_staff=True, is_superuser=True)
         cls.admin_user_client = APIClient()
         cls.admin_user_client.login(username='admin', password='admin')
-        
+
         cls.admin_user_token = Token.objects.create(user=cls.admin_user)
         cls.tokened_admin_client = APIClient()
         cls.tokened_admin_client.credentials(HTTP_AUTHORIZATION='Token ' + cls.admin_user_token.key)
@@ -38,9 +38,9 @@ class APIDominioTestCase(LiveServerTestCase):
             zona=cls.zona,
             estado=STATUS_DISPONIBLE)
 
-            
+
     def test_post_new_domain(self):
-        
+
         ep = f'{self.live_server_url}/api/v1/dominios/dominio/update_from_whoare/'
         test_dict = {
             "domain": {
@@ -60,15 +60,15 @@ class APIDominioTestCase(LiveServerTestCase):
             "dnss": ['ns2.sedoparking.com', 'ns1.sedoparking.com']
         }
         str_data = json.dumps(test_dict)
-        final = {'domain': str_data}    
-        
+        final = {'domain': str_data}
+
         resp = requests.post(ep, data=final)
         self.assertEqual(resp.status_code, 401)
 
         headers = {'Authorization': f'Token {self.regular_user_token.key}'}
         resp = requests.post(ep, data=final, headers=headers)
         self.assertEqual(resp.status_code, 403)
-        
+
         headers = {'Authorization': f'Token {self.admin_user_token.key}'}
         resp = requests.post(ep, data=final, headers=headers)
         # missing whoare version
@@ -76,8 +76,7 @@ class APIDominioTestCase(LiveServerTestCase):
 
         test_dict['whoare_version'] = '0.1.42'
         str_data = json.dumps(test_dict)
-        final = {'domain': str_data}    
+        final = {'domain': str_data}
         resp = requests.post(ep, data=final, headers=headers)
         self.assertEqual(resp.status_code, 200)
 
-        

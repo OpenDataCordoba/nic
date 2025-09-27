@@ -100,17 +100,17 @@ class PriorityView(PermissionRequiredMixin, View):
         ret = {}
         dominios = Dominio.objects.all()
         ret['total_dominios'] = dominios.count()
-        
+
         prioridades = dominios.order_by('-priority_to_update')
         ret['prioridades'] = []
         for c in [1, 5, 10, 50, 100, 1000, 5000, 10000, 20000]:
             if c < prioridades.count():
                 ret['prioridades'].append(
                     {'order': c,
-                        'dominio': prioridades[c].full_domain(), 
-                        'priority_to_update': prioridades[c].priority_to_update, 
-                        'expire': prioridades[c].expire, 
-                        'data_readed': prioridades[c].data_readed, 
+                        'dominio': prioridades[c].full_domain(),
+                        'priority_to_update': prioridades[c].priority_to_update,
+                        'expire': prioridades[c].expire,
+                        'data_readed': prioridades[c].data_readed,
                         'data_updated': prioridades[c].data_updated
                     })
 
@@ -199,7 +199,7 @@ class DominioPorFechaDeRegistroView(PermissionRequiredMixin, View):
             .order_by('year_registered')\
             .values('year_registered')\
             .annotate(total=Count('year_registered'))
-        
+
         ret['dominios']['year'] = list(dominios)
 
         # return also google chart comaptible data
@@ -218,7 +218,7 @@ class DominioPorFechaDeRegistroView(PermissionRequiredMixin, View):
             .order_by('week_registered')\
             .values('week_registered')\
             .annotate(total=Count('week_registered'))
-        
+
         ret['dominios']['week'] = list(dominios)
 
         # return also google chart comaptible data
@@ -237,7 +237,7 @@ class DominioPorFechaDeRegistroView(PermissionRequiredMixin, View):
             .order_by('day_registered')\
             .values('day_registered')\
             .annotate(total=Count('day_registered'))
-        
+
         ret['dominios']['day'] = list(dominios)
 
         # return also google chart comaptible data
@@ -272,7 +272,7 @@ class DominioPorFechaDeVencimientoView(PermissionRequiredMixin, View):
             .order_by('year_expire')\
             .values('year_expire')\
             .annotate(total=Count('year_expire'))
-        
+
         ret['dominios']['year'] = list(dominios)
 
         # return also google chart comaptible data
@@ -290,7 +290,7 @@ class DominioPorFechaDeVencimientoView(PermissionRequiredMixin, View):
             .order_by('week_expire')\
             .values('week_expire')\
             .annotate(total=Count('week_expire'))
-        
+
         ret['dominios']['week'] = list(dominios)
 
         # return also google chart comaptible data
@@ -308,7 +308,7 @@ class DominioPorFechaDeVencimientoView(PermissionRequiredMixin, View):
             .order_by('day_expire')\
             .values('day_expire')\
             .annotate(total=Count('day_expire'))
-        
+
         ret['dominios']['day'] = list(dominios)
 
         # return also google chart comaptible data

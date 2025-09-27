@@ -22,7 +22,7 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         self.stdout.write(self.style.SUCCESS(f"Creating groups"))
-        
+
         grupo_ar, created = GrupoZona.objects.get_or_create(nombre='Argentina', published=True)
         grupo_uy, created = GrupoZona.objects.get_or_create(nombre='Uruguay', published=True)
         grupo_cl, created = GrupoZona.objects.get_or_create(nombre='Chile', published=True)
@@ -50,24 +50,24 @@ class Command(BaseCommand):
 
         for r in range(1, 7):
             TagForRegistrante.objects.get_or_create(nombre=f'RegTag{r}')
-        
+
         for r in range(1, 70):
             reg, created = Registrante.objects.get_or_create(legal_uid=f'R00000{r}', name=f'Registrante {r}')
             for n in range(1, 3):
                 if random.randint(1, 90) > 70:
                     tag = TagForRegistrante.objects.order_by('?').first()
                     RegistranteTag.objects.create(registrante=reg, tag=tag)
-            
+
         hoy = timezone.now()
         for n in range(0, 500):
             for zona in zonas:
-                
+
                 dom, created = Dominio.objects.get_or_create(nombre=f'test-{n}.{zona.nombre}',zona=zona)
                 # clean DNSs
                 DNSDominio.objects.filter(dominio=dom).delete()
                 dom.data_readed = hoy - timedelta(days=random.randint(1, 90))
                 dom.data_updated = hoy - timedelta(days=random.randint(1, 60))
-                
+
 
                 if random.randint(1, 90) > 30:
                     dom.estado = STATUS_NO_DISPONIBLE
@@ -101,7 +101,6 @@ class Command(BaseCommand):
                             CampoCambio.objects.create(cambio=cd, campo='estado', nuevo=STATUS_DISPONIBLE, anterior=STATUS_NO_DISPONIBLE)
                             CampoCambio.objects.create(cambio=cd, campo='registrant_legal_uid', nuevo='', anterior=rlu)
                             CampoCambio.objects.create(cambio=cd, campo='DNS1', nuevo='', anterior=dns1)
-                            CampoCambio.objects.create(cambio=cd, campo='registrant_name', nuevo='', anterior=rnm)                                    
+                            CampoCambio.objects.create(cambio=cd, campo='registrant_name', nuevo='', anterior=rnm)
 
         self.stdout.write(self.style.SUCCESS(f"Finished"))
-        

@@ -6,7 +6,7 @@ from django.utils import timezone
 
 
 class Registrante(models.Model):
-    
+
     name = models.CharField(max_length=240)
     legal_uid = models.CharField(max_length=90, db_index=True)
     uid = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)
@@ -24,7 +24,7 @@ class Registrante(models.Model):
 
     def get_zoned_date(self, field, zona):
         """ put a datetime in the rigth timezone before move to string """
-        
+
         if field == 'created':
             timefield = self.created
         elif field == 'changed':

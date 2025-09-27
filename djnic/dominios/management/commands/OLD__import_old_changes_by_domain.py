@@ -21,7 +21,7 @@ class Command(BaseCommand):
         CambiosDominio.objects.filter(dominio__changes_migrated=1).delete()
 
         tz = pytz.timezone('America/Argentina/Cordoba')
-        
+
         logger.info('Connecting DB')
         connection = mysql.connector.connect(
             user=settings.OLD_DB_USER,
@@ -33,7 +33,7 @@ class Command(BaseCommand):
 
         cursor = connection.cursor(dictionary=True)  # sin el dictionary=True son tuplas sin nombres de campo
         cursor.execute("SET SESSION MAX_EXECUTION_TIME=100000000;")
-        
+
         tables = ['cambios_2011', 'cambios_2012', 'cambios_2013', 'cambios_2014',
                   'cambios_2015', 'cambios_2016', 'cambios_2017', 'cambios_2018',
                   'cambios_2019', 'cambios']
@@ -47,11 +47,11 @@ class Command(BaseCommand):
             for table in tables:
                 main_cambio = None  # solo se crea si hay que ponerle
                 self.stdout.write(self.style.SUCCESS(f'Table {table}'))
-            
+
                 query = f'''SELECT * FROM {table}
-                            where idDominio = {dominio.uid_anterior} 
+                            where idDominio = {dominio.uid_anterior}
                             order by fecha ASC;'''
-        
+
                 cursor.execute(query)
 
                 c = 0
@@ -75,12 +75,12 @@ class Command(BaseCommand):
                         nuevo=cambio['nuevo']
                         )
 
-                    
+
                 self.stdout.write(self.style.SUCCESS(f'Finished Table {table}'))
 
             dominio.changes_migrated = 2
             dominio.save()
-            
+
         cursor.close()
         connection.close()
 

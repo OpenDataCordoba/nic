@@ -17,11 +17,11 @@ class Command(BaseCommand):
         parser.add_argument('--force', nargs='?', type=bool, default=False)
 
     def handle(self, *args, **options):
-        
+
         dominios = Dominio.objects.filter(next_update_priority__lt=timezone.now())
         if dominios.count() < 250000:
             dominios = Dominio.objects.order_by('next_update_priority')[:250000]
-        
+
         c = 0
         for dominio in dominios:
             c += 1
@@ -32,4 +32,3 @@ class Command(BaseCommand):
         report = f"{c} processed"
         self.stdout.write(self.style.SUCCESS(report))
         News.objects.create(title='Update priority', description=report)
-        

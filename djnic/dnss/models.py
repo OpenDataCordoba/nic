@@ -47,12 +47,12 @@ class EmpresaRegexDomain(models.Model):
         logger.info(f'Previous {qs.count()} domains to Empresa found')
         updated = qs.update(empresa_regex=None)
         logger.info(f'previous {updated} domains to Empresa updated')
-        
+
         qs = DNS.objects.filter(dominio__regex=self.regex_dns)
         logger.info(f'{qs.count()} domains to Empresa found')
         updated = qs.update(empresa_regex=self)
         logger.info(f'{updated} domains to Empresa updated')
-        
+
     def __str__(self):
         return f'{self.empresa} {self.regex_dns}'
 
@@ -64,9 +64,9 @@ class EmpresaRegexDomain(models.Model):
 class DNS(models.Model):
     uid = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)
     empresa_regex = models.ForeignKey(
-        EmpresaRegexDomain, 
-        null=True, blank=True, 
-        on_delete=models.SET_NULL, 
+        EmpresaRegexDomain,
+        null=True, blank=True,
+        on_delete=models.SET_NULL,
         related_name='nameservers')
     dominio = models.CharField(max_length=240, unique=True)
     object_created = models.DateTimeField(auto_now_add=True)
@@ -86,12 +86,12 @@ class DNS(models.Model):
                 self.empresa_regex = rgs
                 return
         logger.error(f'No regex found for {self.dominio}')
-    
+
     def get_empresa(self):
         if self.empresa_regex is None:
             return None
         return self.empresa_regex.empresa
-        
+
     def save(self, **kwargs):
         if self.empresa_regex is None:
             logger.info('Adding empresa_regex')

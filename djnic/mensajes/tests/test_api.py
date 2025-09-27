@@ -66,7 +66,7 @@ class APIDominioTestCase(TestCase):
             self.assertIn(self.user.username, message['mensaje']['titulo'])
             self.assertEqual(self.user.id, message['destinatario'])
             self.assertNotIn('Deleted', message['mensaje']['titulo'])
-        
+
         # User 2 ==========
         resp = self.regular_user_client2.get(ep)
         self.assertEqual(resp.status_code, 200)

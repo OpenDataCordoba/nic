@@ -58,7 +58,7 @@ def get_renovaciones(limit=50, solo_fallados=False, solo_hacia_atras=False):
         cambios = cambios.filter(
             Q(nuevo__lt=F('anterior'))
         )
-    
+
     cambios = cambios.order_by('-cambio__momento')
 
     return cambios[:limit]

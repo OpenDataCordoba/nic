@@ -30,9 +30,9 @@ class CambiosDominio(models.Model):
 
 
 class CampoCambio(models.Model):
-    """ Cada uno de los campos que cambio 
-        Todos string por mas que haya fechas. 
-        Problemas con el DNS porque el sistema anterior tenia 5 
+    """ Cada uno de los campos que cambio
+        Todos string por mas que haya fechas.
+        Problemas con el DNS porque el sistema anterior tenia 5
             campos separads y ahora esta bien hecho.
         """
     cambio = models.ForeignKey(CambiosDominio, on_delete=models.CASCADE, related_name='campos')

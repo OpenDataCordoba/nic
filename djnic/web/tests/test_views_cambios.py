@@ -111,6 +111,6 @@ class RenovacionesHaciaAtrasViewTestCase(TestCase):
         self.assertTemplateUsed(response, 'web/bootstrap-base/dominios/renovaciones.html')
         self.assertEqual(response.context['site_title'], 'Renovaciones de dominio hacia atras')
         self.assertEqual(
-            response.context['site_description'], 
+            response.context['site_description'],
             'Lista de últimos dominios renovados con fecha de vencimiento que cambia hacia el pasado'
         )

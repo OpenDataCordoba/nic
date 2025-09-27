@@ -9,9 +9,9 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
 
         self.stdout.write(self.style.SUCCESS("Buscando Empresas"))
-        
+
         for empresa in Empresa.objects.all():
             self.stdout.write(self.style.SUCCESS(f'{empresa}'))
             empresa.detect_DNSs()
-            
+
         self.stdout.write(self.style.SUCCESS("FIN"))

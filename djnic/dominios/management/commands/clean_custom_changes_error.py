@@ -64,9 +64,9 @@ class Command(BaseCommand):
                             rch.delete()
                         else:
                             self.stdout.write(self.style.ERROR(f" ERROR 3 found (not changed) {change}\n\t{rcr}\n\t{rch}"))
-                    
+
         report = f"{c} processed. Fixes: {fix1}, {fix2}, {fix3}"
         self.stdout.write(self.style.SUCCESS(report))
         News.objects.create(title='Clean failed changes', description=report)
-        
-        
+
+

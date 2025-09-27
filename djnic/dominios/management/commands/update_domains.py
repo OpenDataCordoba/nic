@@ -52,11 +52,10 @@ class Command(BaseCommand):
                             caidos += 1
             elif 'dominio_expire' in [c['campo'] for c in cambios]:
                 renovados += 1
-            
+
 
             sleep(options['sleep'])
 
             self.stdout.write(self.style.SUCCESS(f" - {dominio.priority_to_update} {dominio.next_update_priority}"))
 
         self.stdout.write(self.style.SUCCESS(f"{c} processed"))
-        

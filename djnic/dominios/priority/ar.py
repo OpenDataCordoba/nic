@@ -5,9 +5,9 @@ def calculate_priority(expire_days, readed_days, updated_days, estado):
         expire_days: days since the domain is expired. e.g. -5=will expire in 5 days
         readed_days: days since this domain was readed agains whois
         updated_days: days since this domain eas updated (readed and having changes)
-        
+
         Priority for Argentina """
-    
+
     from dominios.models import STATUS_DISPONIBLE, STATUS_NO_DISPONIBLE
 
     priority = 0
@@ -28,5 +28,5 @@ def calculate_priority(expire_days, readed_days, updated_days, estado):
     else:
         if updated_days < 45:
             priority = readed_days + updated_days
-        
+
     return priority
