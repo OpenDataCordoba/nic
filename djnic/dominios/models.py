@@ -20,9 +20,13 @@ logger = logging.getLogger(__name__)
 
 class Dominio(models.Model):
     nombre = models.CharField(max_length=240, db_index=True, help_text='Nombre solo sin la zona')
-    zona = models.ForeignKey('zonas.Zona', on_delete=models.CASCADE, related_name='dominios', help_text="Lo que va al final y no es parte del dominio")
+    zona = models.ForeignKey(
+        'zonas.Zona', on_delete=models.CASCADE, related_name='dominios', help_text="Lo que va al final y no es parte del dominio"
+    )
     uid = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)
-    registrante = models.ForeignKey('registrantes.Registrante', null=True, blank=True, on_delete=models.SET_NULL, related_name='dominios')
+    registrante = models.ForeignKey(
+        'registrantes.Registrante', null=True, blank=True, on_delete=models.SET_NULL, related_name='dominios'
+    )
 
     data_updated = models.DateTimeField(null=True, blank=True, help_text='When this record was updated')
     data_readed = models.DateTimeField(null=True, blank=True, help_text='When this record was readad (having changes or not)')
@@ -266,7 +270,7 @@ class Dominio(models.Model):
                     nuevo=cambio['nuevo'])
 
             self.data_updated = timezone.now()
-            self.next_update_priority = timezone.now() + timedelta(days=15)
+            self.next_update_priority = timezone.now() + timedelta(days=45)
 
         else:
             logger.info(f' - SIN CAMBIOS {self}')
@@ -294,7 +298,7 @@ class Dominio(models.Model):
             raise Exception('Unknown domain')
 
         self.priority_to_update = priority
-        self.next_update_priority = timezone.now() + timedelta(days=2)
+        self.next_update_priority = timezone.now() + timedelta(days=3)
         self.save()
         return self
 

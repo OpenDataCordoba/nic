@@ -1,9 +1,6 @@
-from datetime import datetime, timedelta
 import logging
 from time import sleep
-from django.core.management.base import BaseCommand, CommandError
-from django.db.models import Q
-from django.utils import timezone
+from django.core.management.base import BaseCommand
 from dominios.models import Dominio, STATUS_NO_DISPONIBLE, STATUS_DISPONIBLE
 from whoare.exceptions import TooManyQueriesError
 
@@ -16,7 +13,7 @@ class Command(BaseCommand):
 
     def add_arguments(self, parser):
         parser.add_argument('--limit', nargs='?', type=int, default=10000)
-        parser.add_argument('--sleep', nargs='?', type=int, default=41)
+        parser.add_argument('--sleep', nargs='?', type=int, default=21)
 
     def handle(self, *args, **options):
         limit = options['limit']
@@ -33,11 +30,13 @@ class Command(BaseCommand):
         for dominio in dominios:
             c += 1
             log_cambios = f'sin_cambios {sin_cambios} caidos {caidos} nuevos {nuevos} renovados {renovados}'
-            self.stdout.write(self.style.SUCCESS(f"{c} {errors} {log_cambios} {dominio} expire:{dominio.expire} readed: {dominio.data_readed}"))
+            self.stdout.write(
+                self.style.SUCCESS(f"{c} {errors} {log_cambios} {dominio} expire:{dominio.expire} readed: {dominio.data_readed}")
+            )
             try:
                 cambios = Dominio.add_from_whois(domain=dominio.full_domain())
             except TooManyQueriesError:
-                self.stdout.write(self.style.SUCCESS(f"WHOIS TooManyQueriesError"))
+                self.stdout.write(self.style.SUCCESS("WHOIS TooManyQueriesError"))
                 errors += 1
                 sleep(15)
 
@@ -52,7 +51,6 @@ class Command(BaseCommand):
                             caidos += 1
             elif 'dominio_expire' in [c['campo'] for c in cambios]:
                 renovados += 1
-
 
             sleep(options['sleep'])
 

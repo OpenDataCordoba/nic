@@ -1,7 +1,5 @@
-from datetime import datetime, timedelta
 import logging
-from django.core.management.base import BaseCommand, CommandError
-from django.db.models import Q
+from django.core.management.base import BaseCommand
 from django.utils import timezone
 from dominios.models import Dominio
 from core.models import News
@@ -19,15 +17,19 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
 
         dominios = Dominio.objects.filter(next_update_priority__lt=timezone.now())
-        if dominios.count() < 250000:
-            dominios = Dominio.objects.order_by('next_update_priority')[:250000]
+        # order to process older first
+        dominios = dominios.order_by('next_update_priority')
+        if dominios.count() > 25000:
+            dominios = Dominio.objects.order_by('next_update_priority')[:25000]
 
         c = 0
         for dominio in dominios:
             c += 1
             old_up = dominio.next_update_priority
             dominio.calculate_priority()
-            self.stdout.write(self.style.SUCCESS(f"{c} {dominio.priority_to_update} {old_up} => {dominio.next_update_priority} {dominio}"))
+            self.stdout.write(self.style.SUCCESS(
+                f"{c} {dominio.priority_to_update} {old_up} => {dominio.next_update_priority} {dominio}")
+            )
 
         report = f"{c} processed"
         self.stdout.write(self.style.SUCCESS(report))
