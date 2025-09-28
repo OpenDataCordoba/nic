@@ -29,8 +29,12 @@ class Command(BaseCommand):
             old_up = dominio.next_update_priority
             old_npu = dominio.priority_to_update
             dominio.calculate_priority()
-            self.stdout.write(self.style.SUCCESS(
-                f"{c} - {dominio} \n\t({old_npu} {old_up}) => ({dominio.next_update_priority} {dominio.priority_to_update})")
+            self.stdout.write(
+                self.style.SUCCESS(
+                    f"{c} - {dominio} \n\t"
+                    f"Expire: {dominio.expire}\n\t"
+                    f"({old_npu} {old_up}) => ({dominio.next_update_priority} {dominio.priority_to_update})"
+                )
             )
 
         report = f"{c} processed"
