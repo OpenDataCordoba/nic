@@ -45,6 +45,6 @@ class Command(BaseCommand):
             if c and c % 1000 == 0:
                 time.sleep(4)
 
-        report = f"{c} processed, {from_0_to_any} from 0 to any. Latest NPU: {dominio.next_update_priority}"
+        report = f"{c} processed, {from_0_to_any} from 0 to any. Latest NPU: {old_nup}"
         self.stdout.write(self.style.SUCCESS(report))
         News.objects.create(title='Update priority', description=report)
