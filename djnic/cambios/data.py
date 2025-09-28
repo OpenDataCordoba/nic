@@ -84,15 +84,18 @@ def get_perdidas_dns(limit=0, days_ago=30):
     """ cambios de DNS """
     logger.info('Get perdidas')
     starts = timezone.now() - timedelta(days=days_ago)
-    cambios = CampoCambio.objects\
-        .filter(cambio__momento__gt=starts)\
-        .filter(campo='DNS1')\
-        .exclude(anterior__exact="").distinct()
+    cambios = CampoCambio.objects.filter(
+        cambio__momento__gt=starts
+    ).filter(
+        campo='DNS1'
+    ).exclude(
+        anterior__exact=""
+    ).distinct()
 
     if limit > 0:
         cambios = cambios[:limit]
 
-    logger.info(f' - Cambios: {cambios.count()}')
+    logger.info(' - Analizando cambios')
     # detectar empresa anterior y empresa nueva
     final = {}
     c = 0
