@@ -1,4 +1,5 @@
 from datetime import timedelta
+from random import randint
 import logging
 import pytz
 import uuid
@@ -299,11 +300,10 @@ class Dominio(models.Model):
 
         self.priority_to_update = priority
         if priority == 0:
-            self.next_update_priority = timezone.now() + timedelta(days=180)
-        elif priority < 9000:
-            self.next_update_priority = timezone.now() + timedelta(days=120)
-        elif priority < 100000:
-            self.next_update_priority = timezone.now() + timedelta(days=15)
+            self.next_update_priority = timezone.now() + timedelta(days=180 + randint(0, 30))
+        elif priority < 2_000_000:
+            days = 40 - int(priority / 100_000)
+            self.next_update_priority = timezone.now() + timedelta(days=days)
         else:
             self.next_update_priority = timezone.now() + timedelta(days=3)
         self.save()
