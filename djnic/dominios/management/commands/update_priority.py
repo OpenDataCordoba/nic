@@ -33,7 +33,8 @@ class Command(BaseCommand):
                 self.style.SUCCESS(
                     f"{c} - {dominio} \n\t"
                     f"Expire: {dominio.expire}\n\t"
-                    f"({old_npu} {old_up}) => ({dominio.next_update_priority} {dominio.priority_to_update})"
+                    f"{old_npu} => ({dominio.next_update_priority}\n\t"
+                    f"{old_up}) => {dominio.priority_to_update}"
                 )
             )
 
