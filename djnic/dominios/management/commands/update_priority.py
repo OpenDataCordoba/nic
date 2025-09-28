@@ -38,9 +38,9 @@ class Command(BaseCommand):
                     f"{old_ptu} => {dominio.priority_to_update}"
                 )
             )
-        # sleep every 1000
-        if c and c % 1000 == 0:
-            time.sleep(4)
+            # sleep every 1000
+            if c and c % 1000 == 0:
+                time.sleep(4)
 
         report = f"{c} processed"
         self.stdout.write(self.style.SUCCESS(report))
