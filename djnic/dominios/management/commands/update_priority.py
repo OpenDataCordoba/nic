@@ -12,23 +12,25 @@ class Command(BaseCommand):
     help = 'Actualizar prioridad en los dominios'
 
     def add_arguments(self, parser):
-        parser.add_argument('--force', nargs='?', type=bool, default=False)
+        parser.add_argument('--limit', nargs='?', type=int, default=25000)
 
     def handle(self, *args, **options):
 
         dominios = Dominio.objects.filter(next_update_priority__lt=timezone.now())
         # order to process older first
         dominios = dominios.order_by('next_update_priority')
-        if dominios.count() > 25000:
-            dominios = Dominio.objects.order_by('next_update_priority')[:25000]
+        limit = options['limit']
+        if limit:
+            dominios = dominios[:limit]
 
         c = 0
         for dominio in dominios:
             c += 1
             old_up = dominio.next_update_priority
+            old_npu = dominio.priority_to_update
             dominio.calculate_priority()
             self.stdout.write(self.style.SUCCESS(
-                f"{c} {dominio.priority_to_update} {old_up} => {dominio.next_update_priority} {dominio}")
+                f"{c} - {dominio} \n\t({old_npu} {old_up}) => ({dominio.next_update_priority} {dominio.priority_to_update})")
             )
 
         report = f"{c} processed"
