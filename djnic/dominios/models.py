@@ -334,23 +334,42 @@ class PreDominio(models.Model):
     def __str__(self):
         return self.dominio
 
+    @staticmethod
+    def get_domain(dominio):
+        """ Check if this raw domain is valid and exists as domain object
+            Returns: Domain obj | None (valid but not exists) | False (bad domain)
+            We need to return:
+             - A valid domain object if exist -> Dominio object
+             - An OK response if is valid and not exists -> None
+             - Some error if is not valid raw domain -> False
+        """
+
+        wa = WhoAre()
+        try:
+            domain_name, zone_str = wa.detect_zone(dominio)
+        except Exception as e:
+            logger.error(f'Bad domain {dominio}: {e}')
+            return False
+
+        # Avoid empty values
+        if not domain_name or not zone_str:
+            return False
+
+        try:
+            zone = Zona.objects.get(nombre=zone_str)
+        except Zona.DoesNotExist:
+            return False
+
+        dominio = Dominio.objects.filter(nombre=domain_name, zona=zone).first()
+        return dominio
+
     def save(self, **kwargs):
         # si ya existe como dominio, omitir
-        wa = WhoAre()
-        domain_name, zone = wa.detect_zone(self.dominio)
-        try:
-            zona = Zona.objects.get(nombre=zone)
-        except Exception as e:
-            logger.error(f'Bad zone {zone}: {e}')
-            self.id = 0
-            return
+        dominio_obj = PreDominio.get_domain(self.dominio)
+        if dominio_obj is False:
+            raise Exception('Bad domain')
+        if dominio_obj is not None:
+            raise Exception('Domain already exists in main table')
 
-        dominios = Dominio.objects.filter(nombre=domain_name, zona=zona)
-        if dominios.count() > 0:
-            # TODO, este injerto no parece bueno
-            self.id = 0
-            # TODO si trate de agregarlo como predominio y existe pero esta disponible
-            # es posible que se haya vuelto a registrar. Debería aqui darle mas prioridad
-            # a su actualizacion
-        else:
-            return super().save(**kwargs)
+        # valid and not exists, save
+        return super().save(**kwargs)

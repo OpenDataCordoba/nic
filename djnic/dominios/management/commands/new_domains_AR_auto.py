@@ -1,10 +1,10 @@
 from datetime import date, timedelta
 import logging
 from django.conf import settings
-from django.core.management.base import BaseCommand, CommandError
-
+from django.core.management.base import BaseCommand
+from django.utils import timezone
 from core.models import News
-from dominios.models import PreDominio
+from dominios.models import PreDominio, STATUS_DISPONIBLE
 
 from whoare.zone_parsers.ar.news_from_blockchain import NewDomains
 
@@ -36,22 +36,38 @@ class Command(BaseCommand):
         for dominio in dominios:
             c += 1
 
+            # Ver si existe como dominio
+            dominio_obj = PreDominio.get_domain(dominio)
+            if dominio_obj is False:
+                # bad domain
+                skipped += 1
+                continue
+
+            if dominio_obj:
+                # ya existe como dominio
+                already_domain += 1
+                # If is an "available" domain, we suspect it could be re-registered
+                # so we give it some priority
+                if dominio_obj.estado == STATUS_DISPONIBLE:
+                    dominio_obj.priority_to_update += 100000
+                    # podriamos perder esto cuando se actualice la prioridad, la pateamos
+                    dominio_obj.next_update_priority = timezone.now() + timedelta(days=10)
+                    dominio_obj.save()
+                    logger.info(f'Available domain {dominio} found as domain, priority updated')
+                continue
+
+            # dominio_obj is None -> valid but not exists
             pd, created = PreDominio.objects.get_or_create(dominio=dominio)
-            # ID=0 si ya existe como dominio
             if not created:
                 skipped += 1
                 # le damos otra oportunidad
-                if pd.priority == 0:
-                    pd.priority = 10
-                    pd.save()
+                pd.priority += 5
+                pd.save()
                 continue
 
-            if pd.id == 0:
-                already_domain += 1
-            else:
-                pd.priority = 80
-                pd.save()
-                news += 1
+            pd.priority = 80
+            pd.save()
+            news += 1
 
             report = f'{c} processed. {news} news, {skipped} skipped, {already_domain} already exists as domain'
             self.stdout.write(self.style.SUCCESS(report))

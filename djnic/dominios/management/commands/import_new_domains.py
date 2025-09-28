@@ -1,12 +1,6 @@
-from datetime import datetime, timedelta
 import logging
-from time import sleep
-from django.core.management.base import BaseCommand, CommandError
-from django.db.models import Q
-from django.utils import timezone
-from whoare.whoare import WhoAre
-from dominios.models import Dominio, PreDominio
-from zonas.models import Zona
+from django.core.management.base import BaseCommand
+from dominios.models import PreDominio
 
 
 logger = logging.getLogger(__name__)
@@ -31,12 +25,25 @@ class Command(BaseCommand):
             c += 1
             self.stdout.write(self.style.SUCCESS(f"{c} [{skipped}] {dominio}"))
 
-            pd, created = PreDominio.objects.get_or_create(dominio=dominio)
-            # ID=0 si ya existe como dominio
-            if not created or pd.id == 0:
+            # Ver si existe como dominio
+            dominio_obj = PreDominio.get_domain(dominio)
+            if dominio_obj is False:
+                # bad domain
                 skipped += 1
+                continue
 
-            pd.priority=options['priority']
+            if dominio_obj:
+                # ya existe como dominio
+                skipped += 1
+                continue
+
+            # dominio_obj is None -> valid but not exists
+            pd, created = PreDominio.objects.get_or_create(dominio=dominio)
+            if not created:
+                skipped += 1
+                continue
+
+            pd.priority = options['priority']
             pd.save()
 
         self.stdout.write(self.style.SUCCESS(f"DONE. {c} processed {skipped} skipped"))
