@@ -26,15 +26,15 @@ class Command(BaseCommand):
         c = 0
         for dominio in dominios:
             c += 1
-            old_up = dominio.next_update_priority
-            old_npu = dominio.priority_to_update
+            old_nup = dominio.next_update_priority
+            old_ptu = dominio.priority_to_update
             dominio.calculate_priority()
             self.stdout.write(
                 self.style.SUCCESS(
                     f"{c} - {dominio} \n\t"
                     f"Expire: {dominio.expire}\n\t"
-                    f"{old_npu} => {dominio.next_update_priority}\n\t"
-                    f"{old_up}) => {dominio.priority_to_update}"
+                    f"{old_nup} => {dominio.next_update_priority}\n\t"
+                    f"{old_ptu} => {dominio.priority_to_update}"
                 )
             )
 
