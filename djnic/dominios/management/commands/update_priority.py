@@ -25,6 +25,7 @@ class Command(BaseCommand):
             dominios = dominios[:limit]
 
         c = 0
+        from_0_to_any = 0
         for dominio in dominios:
             c += 1
             old_nup = dominio.next_update_priority
@@ -38,10 +39,12 @@ class Command(BaseCommand):
                     f"{old_ptu} => {dominio.priority_to_update}"
                 )
             )
+            if old_ptu == 0 and dominio.priority_to_update > 0:
+                from_0_to_any += 1
             # sleep every 1000
             if c and c % 1000 == 0:
                 time.sleep(4)
 
-        report = f"{c} processed"
+        report = f"{c} processed, {from_0_to_any} from 0 to any"
         self.stdout.write(self.style.SUCCESS(report))
         News.objects.create(title='Update priority', description=report)
