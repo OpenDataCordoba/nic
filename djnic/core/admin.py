@@ -6,10 +6,8 @@ from core.models import News
 class NewsAdmin(admin.ModelAdmin):
     list_display = ['title', 'priority', 'object_created', 'description']
 
-    def changelist_view(self, request, extra_context=None):
-        page_size = request.GET.get('page_size')
-        if page_size and page_size.isdigit():
+    def get_changelist_instance(self, request):
+        page_size = request.GET.get('page-size', 20)
+        if page_size:
             self.list_per_page = int(page_size)
-        else:
-            self.list_per_page = 20
-        return super().changelist_view(request, extra_context)
+        return super().get_changelist_instance(request)
