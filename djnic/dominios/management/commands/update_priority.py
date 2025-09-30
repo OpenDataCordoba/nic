@@ -26,6 +26,7 @@ class Command(BaseCommand):
 
         c = 0
         from_0_to_any = 0
+        old_nup = None
         for dominio in dominios:
             c += 1
             old_nup = dominio.next_update_priority
