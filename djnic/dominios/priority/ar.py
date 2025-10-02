@@ -25,7 +25,7 @@ def calculate_priority(expire_days, readed_days, updated_days, estado):
                 priority = 5_000_000 + (expire_days*2) + (readed_days*5) + updated_days
             elif expire_days > 1529:
                 # probablemente judicializados y cosas sin sentido
-                priority = (expire_days*2) + (readed_days*5) + updated_days
+                priority = 3_000_000 + (expire_days*2) + (readed_days*5) + updated_days
             elif expire_days > -26 and expire_days < 46:
                 priority = 1_000_000 + (expire_days*2) + (readed_days*5) + updated_days
             elif expire_days < -25:
