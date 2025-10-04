@@ -16,10 +16,13 @@ class Command(BaseCommand):
         parser.add_argument('--limit', nargs='?', type=int, default=25000)
         # --all to review ALL domains
         parser.add_argument('--all', action='store_true', help='Review ALL domains')
+        parser.add_argument('--chunk-size', nargs='?', type=int, default=1000, help='Chunk size for pagination')
 
     def handle(self, *args, **options):
 
         all = options['all']
+        chunk_size = options['chunk_size']
+
         if all:
             dominios = Dominio.objects.all()
         else:
@@ -33,7 +36,9 @@ class Command(BaseCommand):
         c = 0
         from_0_to_any = 0
         old_nup = None
-        for dominio in dominios:
+
+        # Use iterator with chunking to avoid loading all records into memory
+        for dominio in dominios.iterator(chunk_size=chunk_size):
             c += 1
             old_nup = dominio.next_update_priority
             old_ptu = dominio.priority_to_update
