@@ -278,7 +278,7 @@ class Dominio(models.Model):
 
         return cambios
 
-    def calculate_priority(self):
+    def calculate_priority(self, save=True):
         """ We need a way to know how to use resources
             We can't update all domains every day.
 
@@ -306,7 +306,9 @@ class Dominio(models.Model):
             self.next_update_priority = timezone.now() + timedelta(days=days)
         else:
             self.next_update_priority = timezone.now() + timedelta(days=3)
-        self.save()
+
+        if save:
+            self.save()
         return self
 
 

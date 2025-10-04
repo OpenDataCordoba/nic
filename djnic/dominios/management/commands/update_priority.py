@@ -16,12 +16,18 @@ class Command(BaseCommand):
         parser.add_argument('--limit', nargs='?', type=int, default=25000)
         # --all to review ALL domains
         parser.add_argument('--all', action='store_true', help='Review ALL domains')
-        parser.add_argument('--chunk-size', nargs='?', type=int, default=1000, help='Chunk size for pagination')
+        parser.add_argument('--chunk-size', nargs='?', type=int, default=500, help='Chunk size for pagination')
+        parser.add_argument('--sleep-interval', nargs='?', type=int, default=2300, help='Sleep every N records')
+        parser.add_argument('--sleep-time', nargs='?', type=float, default=1.0, help='Sleep duration in seconds')
+        parser.add_argument('--bulk-size', nargs='?', type=int, default=500, help='Bulk update size')
 
     def handle(self, *args, **options):
 
         all = options['all']
         chunk_size = options['chunk_size']
+        sleep_interval = options['sleep_interval']
+        sleep_time = options['sleep_time']
+        bulk_size = options['bulk_size']
 
         if all:
             dominios = Dominio.objects.all()
@@ -36,13 +42,20 @@ class Command(BaseCommand):
         c = 0
         from_0_to_any = 0
         old_nup = None
+        bulk_updates = []
 
         # Use iterator with chunking to avoid loading all records into memory
         for dominio in dominios.iterator(chunk_size=chunk_size):
             c += 1
             old_nup = dominio.next_update_priority
             old_ptu = dominio.priority_to_update
-            dominio.calculate_priority()
+
+            # Calculate priority without saving
+            dominio.calculate_priority(save=False)
+
+            # Add to bulk update list
+            bulk_updates.append(dominio)
+
             self.stdout.write(
                 self.style.SUCCESS(
                     f"{c} - {dominio} \n\t"
@@ -53,9 +66,29 @@ class Command(BaseCommand):
             )
             if old_ptu == 0 and dominio.priority_to_update > 0:
                 from_0_to_any += 1
-            # sleep every 3000
-            if c and c % 3000 == 0:
-                time.sleep(4)
+
+            # Bulk update when we reach bulk_size
+            if len(bulk_updates) >= bulk_size:
+                Dominio.objects.bulk_update(
+                    bulk_updates, 
+                    ['priority_to_update', 'next_update_priority']
+                )
+                self.stdout.write(f"Bulk updated {len(bulk_updates)} records")
+                bulk_updates = []
+                time.sleep(sleep_time)
+
+            # More frequent sleep to reduce DB load
+            if c % sleep_interval == 0:
+                time.sleep(sleep_time)
+                self.stdout.write(f"Processed {c} records, sleeping {sleep_time}s...")
+
+        # Final bulk update for remaining records
+        if bulk_updates:
+            Dominio.objects.bulk_update(
+                bulk_updates, 
+                ['priority_to_update', 'next_update_priority']
+            )
+            self.stdout.write(f"Final bulk updated {len(bulk_updates)} records")
 
         report = f"{c} processed, {from_0_to_any} from 0 to any. Latest NPU: {old_nup}"
         self.stdout.write(self.style.SUCCESS(report))
