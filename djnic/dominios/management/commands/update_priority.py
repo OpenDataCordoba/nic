@@ -14,10 +14,16 @@ class Command(BaseCommand):
 
     def add_arguments(self, parser):
         parser.add_argument('--limit', nargs='?', type=int, default=25000)
+        # --all to review ALL domains
+        parser.add_argument('--all', action='store_true', help='Review ALL domains')
 
     def handle(self, *args, **options):
 
-        dominios = Dominio.objects.filter(next_update_priority__lt=timezone.now())
+        all = options['all']
+        if all:
+            dominios = Dominio.objects.all()
+        else:
+            dominios = Dominio.objects.filter(next_update_priority__lt=timezone.now())
         # order to process older first
         dominios = dominios.order_by('next_update_priority')
         limit = options['limit']
@@ -42,8 +48,8 @@ class Command(BaseCommand):
             )
             if old_ptu == 0 and dominio.priority_to_update > 0:
                 from_0_to_any += 1
-            # sleep every 1000
-            if c and c % 1000 == 0:
+            # sleep every 3000
+            if c and c % 3000 == 0:
                 time.sleep(4)
 
         report = f"{c} processed, {from_0_to_any} from 0 to any. Latest NPU: {old_nup}"
