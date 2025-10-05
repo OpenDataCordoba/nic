@@ -113,10 +113,18 @@ class NextPriorityDomainViewSet(viewsets.ModelViewSet):
             return res
 
     def get_from_domain(self):
-        prioritarios = Dominio.objects.all().order_by('-priority_to_update')[:100]
+        prioritarios = Dominio.objects.all().order_by('-priority_to_update')[:200]
         random_item = random.choice(prioritarios)
 
         # remove priority
+        data = {
+            'picked_for_update': {
+                'now': timezone.now().strftime("%Y-%m-%d %H:%M:%S"),
+                'old_priority': random_item.priority_to_update,
+                'old_new_next_update': random_item.next_update_priority.strftime("%Y-%m-%d %H:%M:%S"),
+            }
+        }
+        random_item.update_extras(data, save=False)
         random_item.priority_to_update = 0
         random_item.next_update_priority = timezone.now() + timedelta(days=5)
         random_item.save()
