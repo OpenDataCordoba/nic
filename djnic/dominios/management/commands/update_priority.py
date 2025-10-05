@@ -4,6 +4,7 @@ from django.core.management.base import BaseCommand
 from django.utils import timezone
 from dominios.models import Dominio
 from core.models import News
+from dominios.models import STATUS_NO_DISPONIBLE
 
 
 logger = logging.getLogger(__name__)
@@ -21,6 +22,8 @@ class Command(BaseCommand):
         parser.add_argument('--sleep-time', nargs='?', type=float, default=1.0, help='Sleep duration in seconds')
         parser.add_argument('--bulk-size', nargs='?', type=int, default=500, help='Bulk update size')
         parser.add_argument('--order-by', nargs='?', type=str, default='next_update_priority', help='Field to order by')
+        # only non available flag
+        parser.add_argument('--non-available', action='store_true', help='Only process non-available domains')
 
     def handle(self, *args, **options):
 
@@ -30,11 +33,15 @@ class Command(BaseCommand):
         sleep_time = options['sleep_time']
         bulk_size = options['bulk_size']
         order_by = options['order_by']  
+        non_available = options['non_available']
 
         if all:
             dominios = Dominio.objects.all()
         else:
             dominios = Dominio.objects.filter(next_update_priority__lt=timezone.now())
+
+        if non_available:
+            dominios = dominios.filter(estado=STATUS_NO_DISPONIBLE)
         # order to process older first
         dominios = dominios.order_by(order_by)
         limit = options['limit']
