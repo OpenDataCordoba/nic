@@ -133,8 +133,9 @@ class NextPriorityDomainViewSet(viewsets.ModelViewSet):
             }
         }
         random_item.update_extras(data, save=False)
-        random_item.priority_to_update = 0
-        random_item.next_update_priority = timezone.now() + timedelta(days=5)
+        # Vemos casos que van a cero y despues no se leen realmente
+        # random_item.priority_to_update = 0
+        # random_item.next_update_priority = timezone.now() + timedelta(days=5)
         random_item.save()
         self.serializer_class = FlatDominioSerializer
         res = Dominio.objects.filter(pk=random_item.id)

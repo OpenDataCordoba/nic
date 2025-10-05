@@ -135,6 +135,8 @@ class Dominio(models.Model):
             To use from external users and from local generation """
 
         self.data_readed = timezone.now()
+        self.priority_to_update = 0  # will be recalculated later
+        self.next_update_priority = timezone.now() + timedelta(days=15)
 
         cambios = []
         # is already exist analyze and register changes
