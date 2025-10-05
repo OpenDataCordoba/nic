@@ -30,6 +30,9 @@ def calculate_priority(expire_days, readed_days, updated_days, estado):
                 priority = 1_000_000 + (expire_days*2) + (readed_days*5) + updated_days
             elif expire_days < -25:
                 priority = 10_000 + expire_days + readed_days + updated_days
+            else:
+                # non expected, a gap in the selecion
+                priority = -2
         else:
             priority = readed_days * 3
     else:
