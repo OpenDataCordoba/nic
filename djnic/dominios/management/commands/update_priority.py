@@ -80,7 +80,7 @@ class Command(BaseCommand):
             if len(bulk_updates) >= bulk_size:
                 Dominio.objects.bulk_update(
                     bulk_updates,
-                    ['priority_to_update', 'next_update_priority']
+                    ['priority_to_update', 'next_update_priority', 'extras']
                 )
                 self.stdout.write(f"Bulk updated {len(bulk_updates)} records")
                 bulk_updates = []
@@ -95,7 +95,7 @@ class Command(BaseCommand):
         if bulk_updates:
             Dominio.objects.bulk_update(
                 bulk_updates,
-                ['priority_to_update', 'next_update_priority']
+                ['priority_to_update', 'next_update_priority', 'extras']
             )
             self.stdout.write(f"Final bulk updated {len(bulk_updates)} records")
 

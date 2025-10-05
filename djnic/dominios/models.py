@@ -49,6 +49,13 @@ class Dominio(models.Model):
     class Meta:
         unique_together = (('nombre', 'zona'), )
 
+    def update_extras(self, new_data, save=False):
+        if self.extras is None:
+            self.extras = {}
+        self.extras.update(new_data)
+        if save:
+            self.save()
+
     def get_absolute_url(self):
         return reverse('dominio', kwargs={'uid': self.uid})
 
@@ -307,6 +314,15 @@ class Dominio(models.Model):
         else:
             self.next_update_priority = timezone.now() + timedelta(days=3)
 
+        data = {
+            'last_priority_calc': {
+                'update_since': updated_since,
+                'readed_since': readed_since,
+                'expired_since': expired_since,
+                'calculated_priority': priority,
+            }
+        }
+        self.update_extras(data, save=False)
         if save:
             self.save()
         return self
