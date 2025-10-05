@@ -20,6 +20,7 @@ class Command(BaseCommand):
         parser.add_argument('--sleep-interval', nargs='?', type=int, default=2300, help='Sleep every N records')
         parser.add_argument('--sleep-time', nargs='?', type=float, default=1.0, help='Sleep duration in seconds')
         parser.add_argument('--bulk-size', nargs='?', type=int, default=500, help='Bulk update size')
+        parser.add_argument('--order-by', nargs='?', type=str, default='next_update_priority', help='Field to order by')
 
     def handle(self, *args, **options):
 
@@ -28,13 +29,14 @@ class Command(BaseCommand):
         sleep_interval = options['sleep_interval']
         sleep_time = options['sleep_time']
         bulk_size = options['bulk_size']
+        order_by = options['order_by']  
 
         if all:
             dominios = Dominio.objects.all()
         else:
             dominios = Dominio.objects.filter(next_update_priority__lt=timezone.now())
         # order to process older first
-        dominios = dominios.order_by('next_update_priority')
+        dominios = dominios.order_by(order_by)
         limit = options['limit']
         if limit:
             dominios = dominios[:limit]
@@ -70,7 +72,7 @@ class Command(BaseCommand):
             # Bulk update when we reach bulk_size
             if len(bulk_updates) >= bulk_size:
                 Dominio.objects.bulk_update(
-                    bulk_updates, 
+                    bulk_updates,
                     ['priority_to_update', 'next_update_priority']
                 )
                 self.stdout.write(f"Bulk updated {len(bulk_updates)} records")
@@ -85,7 +87,7 @@ class Command(BaseCommand):
         # Final bulk update for remaining records
         if bulk_updates:
             Dominio.objects.bulk_update(
-                bulk_updates, 
+                bulk_updates,
                 ['priority_to_update', 'next_update_priority']
             )
             self.stdout.write(f"Final bulk updated {len(bulk_updates)} records")
