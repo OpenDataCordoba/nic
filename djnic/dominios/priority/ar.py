@@ -15,7 +15,7 @@ def calculate_priority(expire_days, readed_days, updated_days, estado):
     if estado == STATUS_NO_DISPONIBLE:
         if readed_days > 6:
             # en Argentina los dominios caen 45 dias despues de vencidos
-            if expire_days > 45 and expire_days < 95:
+            if expire_days >= 45 and expire_days < 95:
                 priority = 10_000_000 + (expire_days*10) + (readed_days*5) + updated_days
             elif expire_days > 94 and expire_days < 365:
                 # Demoras nuestras probablemente
@@ -26,7 +26,7 @@ def calculate_priority(expire_days, readed_days, updated_days, estado):
             elif expire_days > 1529:
                 # probablemente judicializados y cosas sin sentido
                 priority = 3_000_000 + (expire_days*2) + (readed_days*5) + updated_days
-            elif expire_days > -26 and expire_days < 46:
+            elif expire_days >= -25 and expire_days < 46:
                 priority = 1_000_000 + (expire_days*2) + (readed_days*5) + updated_days
             elif expire_days < -25:
                 priority = 10_000 + expire_days + readed_days + updated_days
