@@ -76,6 +76,14 @@ class DominioViewSet(viewsets.ModelViewSet):
             zona=zona
             )
 
+        data = {
+            'update_from_whoare': {
+                'now': timezone.now().strftime("%Y-%m-%d %H:%M:%S"),
+            }
+        }
+        dominio.update_extras(data, save=False)
+        dominio.save()
+
         cambios = dominio.update_from_wa_object(wa, just_created=dominio_created)
         res = {
             'ok': True,
