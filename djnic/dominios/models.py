@@ -316,6 +316,7 @@ class Dominio(models.Model):
 
         data = {
             'last_priority_calc': {
+                'now': timezone.now().strftime("%Y-%m-%d %H:%M:%S"),
                 'update_since': updated_since,
                 'readed_since': readed_since,
                 'expired_since': expired_since,
