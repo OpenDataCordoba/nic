@@ -1,4 +1,3 @@
-from datetime import timedelta
 import json
 import logging
 import random
@@ -121,8 +120,30 @@ class NextPriorityDomainViewSet(viewsets.ModelViewSet):
             return res
 
     def get_from_domain(self):
-        prioritarios = Dominio.objects.all().order_by('-priority_to_update')[:200]
-        random_item = random.choice(prioritarios)
+        # This is a really heavy query with Django because we have 1.5 million
+        # records in the domains table
+
+        from django.db import connection
+        with connection.cursor() as cursor:
+            # Get a random ID from top 200 priority domains
+            cursor.execute("""
+                SELECT id FROM (
+                    SELECT id FROM dominios_dominio
+                    ORDER BY priority_to_update DESC
+                    LIMIT 200
+                ) AS top_domains
+                ORDER BY RANDOM()
+                LIMIT 1
+            """)
+            result = cursor.fetchone()
+            if result:
+                random_id = result[0]
+            else:
+                # Fallback if no domains found
+                cursor.execute("SELECT id FROM dominios_dominio ORDER BY RANDOM() LIMIT 1")
+                random_id = cursor.fetchone()[0]
+
+        random_item = Dominio.objects.get(id=random_id)
 
         # remove priority
         data = {
