@@ -144,14 +144,14 @@ class NextPriorityDomainViewSet(viewsets.ModelViewSet):
     def get_from_predomain(self):
 
         nuevos = PreDominio.objects.filter(priority__gt=0)
-        nuevos = nuevos.order_by('-priority', 'object_created')[:100]
-        random_item = random.choice(nuevos)
-        if random_item.priority == 0:
+        nuevos = nuevos.order_by('-priority', 'object_created')
+        if nuevos.count() == 0:
             # se acabaron
             return self.get_from_domain()
-
-        random_item.priority = 0
-        random_item.save()
+        # only from the first 100
+        if nuevos.count() > 200:
+            nuevos = nuevos[:200]
+        random_item = random.choice(nuevos)
 
         # si ya existe en dominios, omitir
         wa = WhoAre()
@@ -160,6 +160,8 @@ class NextPriorityDomainViewSet(viewsets.ModelViewSet):
 
         dominios = Dominio.objects.filter(nombre=domain_name, zona=zona)
         if dominios.count() > 0:
+            random_item.priority = 0
+            random_item.save()
             return self.get_from_domain()
 
         self.serializer_class = FlatPreDominioSerializer
