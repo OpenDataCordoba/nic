@@ -6,15 +6,20 @@ from .models import Dominio, PreDominio
 class DominioAdmin(admin.ModelAdmin):
 
     def nameservers(self, obj):
-        return ' '.join([f'{dns.orden}: {dns.dns.dominio}' for dns in obj.dnss.order_by('orden')])
+        ret = ' '.join([f'{dns.orden}: {dns.dns.dominio}' for dns in obj.dnss.order_by('orden')])
+        # limit width in admin
+        if len(ret) > 20:
+            ret = ret[:17] + '...'
+        return ret
 
-    def changelist_view(self, request, extra_context=None):
-        page_size = request.GET.get('page_size')
-        if page_size and page_size.isdigit():
-            self.list_per_page = int(page_size)
-        else:
-            self.list_per_page = 20
-        return super().changelist_view(request, extra_context)
+    # truncate the registrante width in admin
+    def registrante(self, obj):
+        if obj.registrante:
+            ret = str(obj.registrante)
+            if len(ret) > 20:
+                ret = ret[:17] + '...'
+            return ret
+        return '-'
 
     list_display = [
         'nombre', 'zona', 'estado', 'priority_to_update', 'next_update_priority', 'data_updated', 'data_readed',
@@ -25,19 +30,14 @@ class DominioAdmin(admin.ModelAdmin):
     list_filter = ['estado', 'zona']
     # remove huge selectors for the change view (like registrante)
     readonly_fields = ['registrante']
-
+    # 25 records per page
+    list_per_page = 25
 
 @admin.register(PreDominio)
 class PreDominioAdmin(admin.ModelAdmin):
 
-    def changelist_view(self, request, extra_context=None):
-        page_size = request.GET.get('page_size')
-        if page_size and page_size.isdigit():
-            self.list_per_page = int(page_size)
-        else:
-            self.list_per_page = 20
-        return super().changelist_view(request, extra_context)
-
     list_display = ['dominio', 'priority', 'object_created']
     search_fields = ['dominio']
     list_filter = ['priority']
+    # 25 records per page
+    list_per_page = 25
