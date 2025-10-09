@@ -13,7 +13,7 @@ class DominioAdmin(admin.ModelAdmin):
         return ret
 
     # truncate the registrante width in admin
-    def registrante(self, obj):
+    def registrantet(self, obj):
         if obj.registrante:
             ret = str(obj.registrante)
             if len(ret) > 20:
@@ -23,7 +23,7 @@ class DominioAdmin(admin.ModelAdmin):
 
     list_display = [
         'nombre', 'zona', 'estado', 'priority_to_update', 'next_update_priority', 'data_updated', 'data_readed',
-        'registrante', 'registered', 'changed', 'expire', 'nameservers'
+        'registrantet', 'registered', 'changed', 'expire', 'nameservers'
     ]
     list_select_related = ('zona', 'registrante')
     search_fields = ['nombre']
