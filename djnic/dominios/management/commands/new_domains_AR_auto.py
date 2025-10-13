@@ -49,11 +49,15 @@ class Command(BaseCommand):
                 # If is an "available" domain, we suspect it could be re-registered
                 # so we give it some priority
                 if dominio_obj.estado == STATUS_DISPONIBLE:
-                    dominio_obj.priority_to_update += 100000
-                    # podriamos perder esto cuando se actualice la prioridad, la pateamos
-                    dominio_obj.next_update_priority = timezone.now() + timedelta(days=10)
-                    dominio_obj.save()
+                    dominio_obj.priority_to_update = 11_500_0000
                     logger.info(f'Available domain {dominio} found as domain, priority updated')
+                else:
+                    dominio_obj.priority_to_update = 11_000_0000
+                    logger.info(f'Existing domain {dominio} found as domain, priority updated')
+                # podriamos perder esto cuando se actualice la prioridad, la pateamos
+                dominio_obj.next_update_priority = timezone.now() + timedelta(days=20)
+                dominio_obj.save()
+
                 continue
 
             # dominio_obj is None -> valid but not exists

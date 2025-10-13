@@ -303,15 +303,12 @@ class Dominio(models.Model):
 
         if self.zona.nombre == 'ar' or self.zona.nombre.endswith('.ar'):
             from dominios.priority.ar import calculate_priority
-            priority = calculate_priority(expired_since, readed_since, updated_since, self.estado)
+            priority, next_update_priority = calculate_priority(expired_since, readed_since, updated_since, self.estado)
         else:
             raise Exception('Unknown domain')
 
         self.priority_to_update = priority
-        if priority > 5_000_000:
-            self.next_update_priority = timezone.now() + timedelta(days=5)
-        else:
-            self.next_update_priority = timezone.now() + timedelta(days=15)
+        self.next_update_priority = next_update_priority
 
         data = {
             'last_priority_calc': {
