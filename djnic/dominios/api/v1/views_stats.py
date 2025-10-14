@@ -1,23 +1,23 @@
 from datetime import timedelta
-import json
 import logging
 from django.conf import settings
-from django.db.models import Count, F, Value, fields, ExpressionWrapper
+from django.db.models import Count, F
 from django.db.models.functions import Trunc
 from django.utils import timezone
 from django.views import View
 from django.http import JsonResponse
 from django.utils.decorators import method_decorator
 from django.contrib.auth.mixins import PermissionRequiredMixin
-from django.views.decorators.cache import cache_page, never_cache, cache_control
+from django.views.decorators.cache import cache_page, cache_control
 from dominios.models import Dominio, STATUS_NO_DISPONIBLE
 
 
 logger = logging.getLogger(__name__)
+API_STATS_GENERAL_CACHE_SECONDS = 60 * 60 * 2
 
 
-@method_decorator(cache_control(max_age=settings.GENERAL_CACHE_SECONDS), name='dispatch')
-@method_decorator(cache_page(settings.GENERAL_CACHE_SECONDS), name='dispatch')
+@method_decorator(cache_control(max_age=API_STATS_GENERAL_CACHE_SECONDS), name='dispatch')
+@method_decorator(cache_page(API_STATS_GENERAL_CACHE_SECONDS), name='dispatch')
 class GeneralStatsView(PermissionRequiredMixin, View):
 
     permission_required = []
@@ -106,13 +106,15 @@ class PriorityView(PermissionRequiredMixin, View):
         for c in [1, 5, 10, 50, 100, 1000, 5000, 10000, 20000]:
             if c < prioridades.count():
                 ret['prioridades'].append(
-                    {'order': c,
+                    {
+                        'order': c,
                         'dominio': prioridades[c].full_domain(),
                         'priority_to_update': prioridades[c].priority_to_update,
                         'expire': prioridades[c].expire,
                         'data_readed': prioridades[c].data_readed,
                         'data_updated': prioridades[c].data_updated
-                    })
+                    }
+                )
 
         # return JsonResponse({'ok': False, 'error': 'Missing WhoAre version'}, status=400)
         return JsonResponse({'ok': True, 'data': ret}, status=200)
