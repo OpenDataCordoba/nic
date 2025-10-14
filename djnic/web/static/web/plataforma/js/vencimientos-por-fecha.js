@@ -13,7 +13,7 @@ function drawChart1() {
     var chartDiv3 = document.getElementById('chart_div3');
 
     var jsonData = $.ajax({
-        url: "/api/v1/dominios/stats/vencimientos-por-fecha?p=1",
+        url: "/api/v1/dominios/stats/vencimientos-por-fecha",
         dataType: "json",
         async: false
         });
