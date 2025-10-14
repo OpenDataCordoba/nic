@@ -1,5 +1,4 @@
-from django.urls import path, include
-from rest_framework import routers
+from django.urls import path
 from .views_stats import (GeneralStatsView, PriorityView, ReadingStatsView,
                           DominioPorFechaDeRegistroView,
                           DominioPorFechaDeVencimientoView)
