@@ -17,6 +17,8 @@ class Command(BaseCommand):
 
     def add_arguments(self, parser):
         parser.add_argument('--days_ago', nargs='?', type=int, default=3)
+        # allow skipping existing and unavailable domains
+        parser.add_argument('--skip-no-disponible', action='store_true', help='Skip registered domains')
 
     def handle(self, *args, **options):
 
@@ -36,6 +38,7 @@ class Command(BaseCommand):
         for dominio in dominios:
             c += 1
 
+            skip_no_disponible = options['skip_no_disponible']
             # Ver si existe como dominio
             dominio_obj = PreDominio.get_domain(dominio)
             if dominio_obj is False:
@@ -52,6 +55,9 @@ class Command(BaseCommand):
                     dominio_obj.priority_to_update = 11_500_0000
                     logger.info(f'Available domain {dominio} found as domain, priority updated')
                 else:
+                    if skip_no_disponible:
+                        skipped += 1
+                        continue
                     dominio_obj.priority_to_update = 11_000_0000
                     logger.info(f'Existing domain {dominio} found as domain, priority updated')
                 # podriamos perder esto cuando se actualice la prioridad, la pateamos
