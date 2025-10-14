@@ -60,8 +60,8 @@ class Command(BaseCommand):
                         continue
                     dominio_obj.priority_to_update = 11_000_0000
                     logger.info(f'Existing domain {dominio} found as domain, priority updated')
-                # podriamos perder esto cuando se actualice la prioridad, la pateamos
-                dominio_obj.next_update_priority = timezone.now() + timedelta(days=20)
+                # podriamos perder esto cuando se actualice la prioridad, la pateamos un rato largo
+                dominio_obj.next_update_priority = timezone.now() + timedelta(days=90)
                 dominio_obj.save()
 
                 continue
