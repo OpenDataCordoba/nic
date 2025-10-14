@@ -116,6 +116,9 @@ class NextPriorityDomainViewSet(viewsets.ModelViewSet):
             res = self.get_from_domain()
             return res
         else:
+            # TODO cuando queda solo un predominio, todos los doferentes nodos
+            # pegan en el mismo si se ejecutan mismo tiempo
+            # Inventar algo.
             res = self.get_from_predomain()
             return res
 
