@@ -1,7 +1,7 @@
 @reboot /usr/local/bin/whoare-serve --token xxx > /PATH/nic/whoare.log
 
-38 10,23 * * * cd /PATH/nic/djnic/ && . /PATH/env/bin/activate && /PATH/env/bin/python manage.py new_domains_AR_auto --days_ago 3 > /PATH/nic/new_domains.log
+38 10,22 * * * cd /PATH/nic/djnic/ && . /PATH/env/bin/activate && /PATH/env/bin/python manage.py new_domains_AR_auto --days_ago 3 > /PATH/nic/new_domains.log
 0 4 * * * cd /PATH/nic/djnic/ && . /PATH/env/bin/activate && /PATH/env/bin/python manage.py clean_custom_changes_error --delete True > /PATH/nic/change_error.log
-30 4 * * * cd /PATH/nic/djnic/ && . /PATH/env/bin/activate && /PATH/env/bin/python manage.py update_priority > /PATH/nic/up_priority.log
+30 1,4,7,23 * * * cd /PATH/nic/djnic/ && . /PATH/env/bin/activate && /PATH/env/bin/python manage.py update_priority --limit 60000 > /PATH/nic/up_priority.log
+30 11,14,17,20 * * * cd /PATH/nic/djnic/ && . /PATH/env/bin/activate && /PATH/env/bin/python manage.py update_priority --limit 1000 > /PATH/nic/up_priority.log
 0 3 * * * cd /PATH/nic/djnic/ && . /PATH/env/bin/activate && /PATH/env/bin/python manage.py cache_hosting_stats > /PATH/nic/cache_hosting.log
-

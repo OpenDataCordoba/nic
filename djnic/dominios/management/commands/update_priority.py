@@ -19,7 +19,7 @@ class Command(BaseCommand):
         parser.add_argument('--all', action='store_true', help='Review ALL domains')
         parser.add_argument('--chunk-size', nargs='?', type=int, default=500, help='Chunk size for pagination')
         parser.add_argument('--sleep-interval', nargs='?', type=int, default=2300, help='Sleep every N records')
-        parser.add_argument('--sleep-time', nargs='?', type=float, default=1.0, help='Sleep duration in seconds')
+        parser.add_argument('--sleep-time', nargs='?', type=float, default=4.0, help='Sleep duration in seconds')
         parser.add_argument('--bulk-size', nargs='?', type=int, default=500, help='Bulk update size')
         parser.add_argument('--order-by', nargs='?', type=str, default='next_update_priority', help='Field to order by')
         # only non available flag
