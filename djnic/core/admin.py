@@ -1,4 +1,6 @@
 from django.contrib import admin
+from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
+from django.contrib.auth.models import User
 from core.models import News
 
 
@@ -11,3 +13,12 @@ class NewsAdmin(admin.ModelAdmin):
         if page_size:
             self.list_per_page = int(page_size)
         return super().get_changelist_instance(request)
+
+
+# Unregister the default User admin
+admin.site.unregister(User)
+
+
+@admin.register(User)
+class UserAdmin(BaseUserAdmin):
+    list_display = BaseUserAdmin.list_display + ('last_login', 'date_joined')
