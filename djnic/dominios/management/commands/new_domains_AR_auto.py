@@ -33,6 +33,7 @@ class Command(BaseCommand):
         skipped = 0
         news = 0
         already_domain = 0
+        re_live = 0  # domains that were registered again
         report = '-'
 
         for dominio in dominios:
@@ -53,6 +54,7 @@ class Command(BaseCommand):
                 # so we give it some priority
                 if dominio_obj.estado == STATUS_DISPONIBLE:
                     dominio_obj.priority_to_update = 11_500_000
+                    re_live += 1
                     logger.info(f'Available domain {dominio} found as domain, priority updated')
                 else:
                     if skip_no_disponible:
@@ -80,7 +82,11 @@ class Command(BaseCommand):
             pd.save()
             news += 1
 
-        report = f'{c} processed. {news} news, {skipped} skipped, {already_domain} already exists as domain'
+        report = (
+            f'{c} processed.'
+            f'{news} news, {skipped} skipped, {already_domain} already exists as domain'
+            f', {re_live} re-registered.'
+        )
         self.stdout.write(self.style.SUCCESS(report))
 
         News.objects.create(title='NEW AR Domains', description=report)
