@@ -53,6 +53,9 @@ class Command(BaseCommand):
         from_low_to_5M = 0
         from_low_to_7M = 0
         from_low_to_10M = 0
+        from_5_to_7M = 0
+        from_7_to_10M = 0
+        from_5_to_10M = 0
 
         old_nup = None
         bulk_updates = []
@@ -86,6 +89,14 @@ class Command(BaseCommand):
                     from_low_to_7M += 1
                 elif dominio.priority_to_update >= 5_000_000:
                     from_low_to_5M += 1
+            elif old_ptu < 7_000_000:
+                if dominio.priority_to_update >= 10_000_000:
+                    from_5_to_10M += 1
+                elif dominio.priority_to_update >= 7_000_000:
+                    from_5_to_7M += 1
+            elif old_ptu < 10_000_000:
+                if dominio.priority_to_update >= 10_000_000:
+                    from_7_to_10M += 1
 
             # Bulk update when we reach bulk_size
             if len(bulk_updates) >= bulk_size:
@@ -110,12 +121,19 @@ class Command(BaseCommand):
             )
             self.stdout.write(f"Final bulk updated {len(bulk_updates)} records")
 
+        # move old_nup tofull datetime to YYY-MM-DD HH:MM:SS
+        if old_nup:
+            old_nup = old_nup.strftime('%Y-%m-%d %H:%M:%S')
+
         report = (
-            f"{c} processed,"
-            f"{from_0_to_any} from 0 to any. Latest NPU: {old_nup}"
-            f"{from_low_to_5M} from low to >=5M, "
-            f"{from_low_to_7M} from low to >=7M, "
-            f"{from_low_to_10M} from low to >=10M."
+            f"{c} processed, "
+            f"{from_0_to_any} from 0 to any. Latest NPU: {old_nup}\n"
+            f"0->5:{from_low_to_5M} "
+            f"0->7:{from_low_to_7M} "
+            f"0->10:{from_low_to_10M} "
+            f"5->7:{from_5_to_7M} "
+            f"5->10:{from_5_to_10M} "
+            f"7->10:{from_7_to_10M}"
         )
         self.stdout.write(self.style.SUCCESS(report))
         News.objects.create(title='Update priority', description=report)
