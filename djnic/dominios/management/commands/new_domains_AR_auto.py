@@ -22,6 +22,9 @@ class Command(BaseCommand):
         # allow multiple zones to be exclusive (like bet.ar, com.ar, etc)
         parser.add_argument('--exclusive-zones', nargs='+', help='List of exclusive zones')
 
+        # re test 2 years of new zone domains
+        # python manage.py new_domains_AR_auto --days_ago 750 --exclusive-zones mutual.ar coop.ar senasa.ar seg.ar bet.ar
+
     def handle(self, *args, **options):
 
         days_ago = options['days_ago']
