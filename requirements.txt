@@ -78,5 +78,5 @@ sqlparse==0.4.2
     # via django
 urllib3==1.26.7
     # via requests
-whoare==0.2.1
+whoare==0.2.3
     # via -r requirements.in
