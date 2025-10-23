@@ -19,6 +19,8 @@ class Command(BaseCommand):
         parser.add_argument('--days_ago', nargs='?', type=int, default=3)
         # allow skipping existing and unavailable domains
         parser.add_argument('--skip-no-disponible', action='store_true', help='Skip registered domains')
+        # allow multiple zones to be exclusive (like bet.ar, com.ar, etc)
+        parser.add_argument('--exclusive-zones', nargs='+', help='List of exclusive zones')
 
     def handle(self, *args, **options):
 
@@ -35,9 +37,18 @@ class Command(BaseCommand):
         already_domain = 0
         re_live = 0  # domains that were registered again
         report = '-'
+        exclusive_zones = options['exclusive_zones']
+        if exclusive_zones:
+            exclusive_zones = [zone.lower() for zone in exclusive_zones]
 
         for dominio in dominios:
             c += 1
+            dominio = dominio.lower()
+            if exclusive_zones:
+                if not any(dominio.endswith(f'.{zone}') for zone in exclusive_zones):
+                    logger.info(f'Skipping {dominio} as not in exclusive zones {exclusive_zones}')
+                    skipped += 1
+                    continue
 
             skip_no_disponible = options['skip_no_disponible']
             # Ver si existe como dominio
