@@ -19,19 +19,19 @@ def calculate_priority(expire_days, readed_days, updated_days, estado):
 
         # en Argentina los dominios caen 45 dias despues de vencidos
         if expire_days >= 46 and expire_days < 95:
-            readed_days_pond = (readed_days - 3) * 3_000_000 if readed_days <= 3 else readed_days * 5
+            readed_days_pond = (readed_days - 6) * 2_000_000 if readed_days <= 6 else readed_days * 5
             priority = 11_500_000 + (expire_days*10) + readed_days_pond + updated_days
-            next_update_priority = timezone.now() + timezone.timedelta(days=1)
+            next_update_priority = timezone.now() + timezone.timedelta(days=3)
         elif expire_days >= -25 and expire_days < 0:
             # Este es el momento de renovacion, es importante tambien
             readed_days_pond = (readed_days - 10) * 500_000 if readed_days <= 10 else readed_days * 5
             priority = 4_000_000 + (expire_days*2) + readed_days_pond + updated_days
-            next_update_priority = timezone.now() + timezone.timedelta(days=2)
+            next_update_priority = timezone.now() + timezone.timedelta(days=4)
         elif expire_days >= 0 and expire_days < 46:
             # Este es el momento de renovacion, es importante tambien
-            readed_days_pond = (readed_days - 10) * 500_000 if readed_days <= 10 else readed_days * 5
+            readed_days_pond = (readed_days - 10) * 400_000 if readed_days <= 10 else readed_days * 5
             priority = 5_000_000 + (expire_days*2) + readed_days_pond + updated_days
-            next_update_priority = timezone.now() + timezone.timedelta(days=2)
+            next_update_priority = timezone.now() + timezone.timedelta(days=3)
         elif expire_days > 94 and expire_days < 365:
             # Demoras nuestras probablemente
             readed_days_pond = (readed_days - 30) * 200_000 if readed_days <= 30 else readed_days * 5
@@ -46,7 +46,7 @@ def calculate_priority(expire_days, readed_days, updated_days, estado):
             # probablemente judicializados y cosas sin sentido
             readed_days_pond = (readed_days - 300) * 50_000 if readed_days <= 300 else readed_days * 5
             priority = 3_000_000 + (expire_days*2) + readed_days_pond + updated_days
-            next_update_priority = timezone.now() + timezone.timedelta(days=50)
+            next_update_priority = timezone.now() + timezone.timedelta(days=25)
         elif expire_days < -25:
             priority = 10_000 + expire_days + readed_days + updated_days
             next_update_priority = timezone.now() + timezone.timedelta(days=25)
