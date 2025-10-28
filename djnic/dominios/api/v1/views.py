@@ -7,6 +7,7 @@ from django.utils import timezone
 from rest_framework import viewsets
 from rest_framework.permissions import DjangoModelPermissions
 from rest_framework.authentication import TokenAuthentication, SessionAuthentication
+from rest_framework.throttling import BaseThrottle
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import filters
 from django.http import JsonResponse
@@ -22,6 +23,12 @@ from .serializer import (DominioSerializer, CambiosDominioSerializer,
                          PreDominioSerializer)
 
 logger = logging.getLogger(__name__)
+
+
+class NoThrottle(BaseThrottle):
+    """Throttle class that allows all requests"""
+    def allow_request(self, request, view):
+        return True
 
 
 class DominioViewSet(viewsets.ModelViewSet):
@@ -107,6 +114,7 @@ class NextPriorityDomainViewSet(viewsets.ModelViewSet):
 
     permission_classes = [DjangoModelPermissions]
     authentication_classes = [TokenAuthentication, SessionAuthentication]
+    throttle_classes = [NoThrottle]
 
     def get_queryset(self):
         # definir si mando uno de los posibles nuevos o de la base comun
