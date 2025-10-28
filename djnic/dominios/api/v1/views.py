@@ -36,6 +36,7 @@ class DominioViewSet(viewsets.ModelViewSet):
     serializer_class = DominioSerializer
     permission_classes = [DjangoModelPermissions]
     authentication_classes = [TokenAuthentication, SessionAuthentication]
+    throttle_classes = [NoThrottle]
     filter_backends = [DjangoFilterBackend, filters.OrderingFilter]
     filterset_fields = ['estado', 'nombre', 'expire', 'registrante__legal_uid']
     search_fields = ['nombre', 'registrante__legal_uid']
