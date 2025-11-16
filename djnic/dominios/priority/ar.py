@@ -64,7 +64,19 @@ def calculate_priority(expire_days, readed_days, updated_days, estado):
             priority = -2
 
     else:
-        priority = (readed_days*10) + updated_days
-        next_update_priority = timezone.now() + timezone.timedelta(days=30)
+        # Si el dominio cayo hace poco, darle algunas oportunidades
+        # Pasa mucho que los dominios caen y se levantan en pocos dias
+        # Podemos usar "data_updated" como referencia del dia de caida
+        # Ver los registros de cambios sería pesado
+        if updated_days < 33:
+            updated_days_pond = (updated_days - 10) * 50_000
+            priority = 3_000_000 + updated_days_pond
+            next_update_priority = timezone.now() + timezone.timedelta(days=8)
+        elif updated_days < 100:
+            priority = 1_000_000 + updated_days_pond
+            next_update_priority = timezone.now() + timezone.timedelta(days=20)
+        else:
+            priority = (readed_days * 1000) + updated_days
+            next_update_priority = timezone.now() + timezone.timedelta(days=90)
 
     return priority, next_update_priority
