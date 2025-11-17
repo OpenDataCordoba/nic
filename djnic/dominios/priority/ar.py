@@ -73,6 +73,7 @@ def calculate_priority(expire_days, readed_days, updated_days, estado):
             priority = 3_000_000 + updated_days_pond
             next_update_priority = timezone.now() + timezone.timedelta(days=8)
         elif updated_days < 100:
+            updated_days_pond = (updated_days - 10) * 50_000
             priority = 1_000_000 + updated_days_pond
             next_update_priority = timezone.now() + timezone.timedelta(days=20)
         else:
