@@ -1,6 +1,3 @@
-from django.conf import settings
-from django.utils.decorators import method_decorator
-from django.views.decorators.cache import cache_page, cache_control
 from django.views.generic.base import TemplateView
 from django.views.generic.detail import DetailView
 
@@ -91,8 +88,8 @@ class UltimosRegistrados(AnalyticsViewMixin, TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['site_title'] = 'Ultimos dominios caidos'
-        context['site_description'] = 'Lista de los últimos dominios caidos'
+        context['site_title'] = 'Ultimos dominios registrados'
+        context['site_description'] = 'Lista de los últimos dominios registrados'
 
         context['ultimos_registrados'] = get_ultimos_registrados(limit=500)
 
