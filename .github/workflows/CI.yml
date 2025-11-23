@@ -55,6 +55,5 @@ jobs:
         cd djnic
         python manage.py test --settings=djnic.test_settings
       env:
-        DJANGO: 3.2.25
         DB: postgres
         DATABASE_URL: postgres://postgres:postgres@localhost:5432/test_db
