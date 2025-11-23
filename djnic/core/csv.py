@@ -60,4 +60,4 @@ def queryset_as_csv_view(request, filename, queryset, fields, override_fields={}
                 final_row = {fixed_fields[k]: getattr(row, k) for k in fields}
             writer.writerow(final_row)
 
-    return FileResponse(open(full_path, 'rb'))
+    return FileResponse(open(full_path, 'rb'), as_attachment=True, filename=filename)
