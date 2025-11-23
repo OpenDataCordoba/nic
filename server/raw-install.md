@@ -6,7 +6,7 @@ sudo apt update -y
 sudo apt upgrade -y
 sudo add-apt-repository ppa:deadsnakes/ppa
 sudo add-apt-repository ppa:certbot/certbot
-sudo apt install git python3.8 python3.8-venv \
+sudo apt install git python3.10 python3.10-venv \
     supervisor nginx postgresql postgresql-contrib \
     postgresql-10-postgis-2.4 python-certbot-nginx \
     python-memcache
@@ -32,7 +32,7 @@ sudo su - postgres
 # create postgis extension, user and database
 # migrate DB from previous server
 
-python3.8 -m venv ~/env
+python3.10 -m venv ~/env
 source ~/env/bin/activate
 pip install -U pip
 git clone https://github.com/OpenDataCordoba/nic.git

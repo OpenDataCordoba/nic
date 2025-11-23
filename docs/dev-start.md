@@ -1,6 +1,6 @@
 # Local environment
 
-Create a Python 3.8 local environment and run
+Create a Python 3.10 local environment and run
 
 ```
 pip install -r requirements.txt
