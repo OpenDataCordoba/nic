@@ -11,16 +11,15 @@ class APIStatsTestCase(TestCase):
     def setUp(self):
         self.client = APIClient()
         self.user = User.objects.create_user('testuser', 'test@example.com', 'password')
-        self.token = Token.objects.create(user=self.user)
-        self.client.credentials(HTTP_AUTHORIZATION='Token ' + self.token.key)
         permission = Permission.objects.get(
             codename='view_dominio',
             content_type__app_label='dominios',
             content_type__model='dominio'
         )
         self.user.user_permissions.add(permission)
-        self.user_logged_client = APIClient()
-        self.user_logged_client.login(username='testuser', password='password')
+        self.token = Token.objects.create(user=self.user)
+        self.client.credentials(HTTP_AUTHORIZATION='Token ' + self.token.key)
+        self.client.force_login(self.user)
 
         self.zona = Zona.objects.create(nombre='ar')
         self.dominio = Dominio.objects.create(
@@ -30,6 +29,7 @@ class APIStatsTestCase(TestCase):
             registered=timezone.now(),
             expire=timezone.now()
         )
+        self.anon_client = APIClient()
 
     def test_general_stats(self):
         url = '/api/v1/dominios/stats/general'
@@ -38,12 +38,12 @@ class APIStatsTestCase(TestCase):
 
     def test_priority_stats_anon(self):
         url = '/api/v1/dominios/stats/priority'
-        response = self.client.get(url)
+        response = self.anon_client.get(url)
         self.assertEqual(response.status_code, 302)
 
-    def test_priority_stats_looged_in(self):
+    def test_priority_stats_logged_in(self):
         url = '/api/v1/dominios/stats/priority'
-        response = self.user_logged_client.get(url)
+        response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
 
     def test_registrados_por_fecha_stats(self):
