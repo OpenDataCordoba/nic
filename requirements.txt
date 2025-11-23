@@ -92,7 +92,7 @@ six==1.16.0
     # via
     #   python-memcached
     #   pywebpush
-sqlparse==0.4.2
+sqlparse==0.5.0
     # via django
 typing-extensions==4.15.0
     # via
