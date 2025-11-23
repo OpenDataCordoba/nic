@@ -53,7 +53,7 @@ jobs:
     - name: Run tests
       run: |
         cd djnic
-        python manage.py test
+        python manage.py test --settings=djnic.test_settings
       env:
         DJANGO: 3.2.25
         DB: postgres
