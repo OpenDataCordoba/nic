@@ -107,7 +107,8 @@ class APIDominioTestCase(TestCase):
             '/api/v1/dominios/next-priority/',
             '/api/v1/dominios/ultimos-renovados/',
             '/api/v1/dominios/ultimos-transpasados/',
-            '/api/v1/dominios/ultimos-cambio-dns/'
+            '/api/v1/dominios/ultimos-cambio-dns/',
+            '/api/v1/dominios/predominio/'
         ]
 
         for ep in endpoints:

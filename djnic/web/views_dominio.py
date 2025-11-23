@@ -73,11 +73,9 @@ class UltimosCaidos(AnalyticsViewMixin, TemplateView):
         context['site_title'] = 'Ultimos dominios caidos'
         context['site_description'] = 'Lista de los últimos dominios caidos'
 
-        context['ultimos_caidos'] = get_ultimos_caidos(limit=500)
-
-        # limit for non logged users
-        if not self.request.user.is_authenticated:
-            context['ultimos_caidos'] = context['ultimos_caidos'][:5]
+        # Authenticated users see 10, anonymous users see 5
+        limit = 10 if self.request.user.is_authenticated else 5
+        context['ultimos_caidos'] = get_ultimos_caidos(limit=limit)
 
         return context
 

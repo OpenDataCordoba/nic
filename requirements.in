@@ -1,11 +1,11 @@
-django==3.2.25
+django==4.2.*
 whoare>=0.2.4
 psycopg2-binary>=2.9.10
-django-filter==2.4.0
-djangorestframework==3.13.1
+django-filter>=23.1
+djangorestframework>=3.14.0
 Markdown==3.3.6
 requests>=2.26.0
-django-webpush>=0.3.3
-django-allauth>=0.47.0
+django-webpush>=0.3.6
+django-allauth[socialaccount]>=0.54.0
 django-cache-memoize>=0.1.10
 python_memcached==1.59

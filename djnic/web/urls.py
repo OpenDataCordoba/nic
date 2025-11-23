@@ -57,7 +57,7 @@ urlpatterns = [
     path('stats-read-general', StatsReadGeneralView.as_view(), name='stats-read-general'),
     path('stats-read-vto', StatsReadVtoView.as_view(), name='stats-read-vto'),
     path('registrados-por-fecha', StatsRegistradosPorFechaView.as_view(), name='registrados-por-fecha'),
-    path('vencimientos-por-fecha', StatsVencimientosPorFechaView.as_view(), name='registrados-por-fecha'),
+    path('vencimientos-por-fecha', StatsVencimientosPorFechaView.as_view(), name='vencimientos-por-fecha'),
 
     # Usuarios
     path('login/', LoginView.as_view(), name='clogin'),

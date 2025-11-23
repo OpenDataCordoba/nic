@@ -9,7 +9,7 @@ jobs:
     
     strategy:
       matrix:
-        python-version: ["3.10", "3.11"]
+        python-version: ["3.10", "3.11", "3.12"]
 
     services:
       postgres:
@@ -53,8 +53,7 @@ jobs:
     - name: Run tests
       run: |
         cd djnic
-        python manage.py test
+        python manage.py test --settings=djnic.test_settings
       env:
-        DJANGO: 3.2.25
         DB: postgres
         DATABASE_URL: postgres://postgres:postgres@localhost:5432/test_db
