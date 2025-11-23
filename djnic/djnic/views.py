@@ -8,7 +8,7 @@ class DominioSitemap(Sitemap):
     changefreq = "yearly"
     priority = 0.5
     protocol = 'https'
-    limit = 10000
+    limit = 3000
 
     def items(self):
         return Dominio.objects.all()
@@ -21,7 +21,7 @@ class RegistranteSitemap(Sitemap):
     changefreq = "yearly"
     priority = 0.6
     protocol = 'https'
-    limit = 10000
+    limit = 3000
 
     def items(self):
         return Registrante.objects.all()
@@ -34,7 +34,7 @@ class RubroSitemap(Sitemap):
     changefreq = "never"
     priority = 0.7
     protocol = 'https'
-    limit = 10000
+    limit = 3000
 
     def items(self):
         return TagForRegistrante.objects.all()
@@ -47,7 +47,7 @@ class HostingSitemap(Sitemap):
     changefreq = "yearly"
     priority = 0.8
     protocol = 'https'
-    limit = 10000
+    limit = 3000
 
     def items(self):
         return Empresa.objects.all()
@@ -60,7 +60,7 @@ class DNSSitemap(Sitemap):
     changefreq = "yearly"
     priority = 0.4
     protocol = 'https'
-    limit = 10000
+    limit = 3000
 
     def items(self):
         return DNS.objects.all()
