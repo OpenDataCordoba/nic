@@ -94,7 +94,7 @@ class GeneralStatsView(PermissionRequiredMixin, View):
 @method_decorator(cache_page(settings.GENERAL_CACHE_SECONDS), name='dispatch')
 class PriorityView(PermissionRequiredMixin, View):
 
-    permission_required = ['dominios.can_view']
+    permission_required = ['dominios.view_dominio']
 
     def get(self, request):
         ret = {}
