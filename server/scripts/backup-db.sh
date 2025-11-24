@@ -12,6 +12,7 @@ sudo supervisorctl stop nic
 # Default values
 BACKUP_DIR="$HOME/nic_backups"
 DB_HOST="localhost"
+DB_PORT="5432"
 DB_USER="nicuser"
 DB_PASS=""
 DB_NAME="nicdb"
@@ -39,6 +40,10 @@ while [[ $# -gt 0 ]]; do
             DB_NAME="$2"
             shift 2
             ;;
+        --db-port)
+            DB_PORT="$2"
+            shift 2
+            ;;
         *)
             echo "Unknown option: $1" >&2
             exit 1
@@ -55,11 +60,11 @@ mkdir -p "$BACKUP_DIR"
 # Dump the database
 if [[ -n "$DB_PASS" ]]; then
     PGPASSWORD="$DB_PASS" pg_dump --format=p --no-acl --no-owner \
-        "$DB_NAME" -h "$DB_HOST" \
+        "$DB_NAME" -h "$DB_HOST" -p "$DB_PORT" \
         -U "$DB_USER" > "$DUMP_FILE"
 else
     pg_dump --format=p --no-acl --no-owner \
-        "$DB_NAME" -h "$DB_HOST" \
+        "$DB_NAME" -h "$DB_HOST" -p "$DB_PORT" \
         -U "$DB_USER" > "$DUMP_FILE"
 fi
 
