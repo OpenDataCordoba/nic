@@ -8,14 +8,29 @@ set -e
 sudo supervisorctl stop nic
 
 
-# Default backup directory
+# Default values
 BACKUP_DIR="$HOME/nic_backups"
+DB_HOST="localhost"
+DB_USER="nicuser"
+DB_PASS=""
 
 # Parse arguments
 while [[ $# -gt 0 ]]; do
     case $1 in
         --backup-dir)
             BACKUP_DIR="$2"
+            shift 2
+            ;;
+        --db-host)
+            DB_HOST="$2"
+            shift 2
+            ;;
+        --db-user)
+            DB_USER="$2"
+            shift 2
+            ;;
+        --db-pass)
+            DB_PASS="$2"
             shift 2
             ;;
         *)
@@ -26,7 +41,6 @@ while [[ $# -gt 0 ]]; do
 done
 
 DB_NAME="nicdb"
-DB_USER="nicuser"
 DATE=$(date +"%Y-%m-%d")
 DUMP_FILE="$BACKUP_DIR/nicdb_$DATE.sql"
 
@@ -34,9 +48,15 @@ DUMP_FILE="$BACKUP_DIR/nicdb_$DATE.sql"
 mkdir -p "$BACKUP_DIR"
 
 # Dump the database
-pg_dump --format=p --no-acl --no-owner \
-    "$DB_NAME" -h localhost \
-    -U "$DB_USER" > "$DUMP_FILE"
+if [[ -n "$DB_PASS" ]]; then
+    PGPASSWORD="$DB_PASS" pg_dump --format=p --no-acl --no-owner \
+        "$DB_NAME" -h "$DB_HOST" \
+        -U "$DB_USER" > "$DUMP_FILE"
+else
+    pg_dump --format=p --no-acl --no-owner \
+        "$DB_NAME" -h "$DB_HOST" \
+        -U "$DB_USER" > "$DUMP_FILE"
+fi
 
 # Restart the nic app
 sudo supervisorctl start nic
