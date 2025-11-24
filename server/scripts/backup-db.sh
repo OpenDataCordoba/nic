@@ -8,11 +8,13 @@ set -e
 sudo supervisorctl stop nic
 
 
+
 # Default values
 BACKUP_DIR="$HOME/nic_backups"
 DB_HOST="localhost"
 DB_USER="nicuser"
 DB_PASS=""
+DB_NAME="nicdb"
 
 # Parse arguments
 while [[ $# -gt 0 ]]; do
@@ -33,6 +35,10 @@ while [[ $# -gt 0 ]]; do
             DB_PASS="$2"
             shift 2
             ;;
+        --db-name)
+            DB_NAME="$2"
+            shift 2
+            ;;
         *)
             echo "Unknown option: $1" >&2
             exit 1
@@ -40,9 +46,8 @@ while [[ $# -gt 0 ]]; do
     esac
 done
 
-DB_NAME="nicdb"
 DATE=$(date +"%Y-%m-%d")
-DUMP_FILE="$BACKUP_DIR/nicdb_$DATE.sql"
+DUMP_FILE="$BACKUP_DIR/${DB_NAME}_$DATE.sql"
 
 # Create backup directory if it doesn't exist
 mkdir -p "$BACKUP_DIR"
