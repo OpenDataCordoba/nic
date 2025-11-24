@@ -57,25 +57,20 @@ def calculate_priority(expire_days, readed_days, updated_days, estado):
             priority = 3_000_000 + (expire_days*2) + readed_days_pond + updated_days
             next_update_priority = timezone.now() + timezone.timedelta(days=25)
         elif expire_days < -31:
-            priority = 10_000 + expire_days + readed_days + updated_days
+            priority = 1_000_000 + expire_days + readed_days + updated_days
             next_update_priority = timezone.now() + timezone.timedelta(days=25)
         else:
             # non expected, a gap in the selecion
             priority = -2
 
     else:
-        # Si el dominio cayo hace poco, darle algunas oportunidades
-        # Pasa mucho que los dominios caen y se levantan en pocos dias
-        # Podemos usar "data_updated" como referencia del dia de caida
-        # Ver los registros de cambios sería pesado
-        if updated_days < 33:
+        # Si el dominio cayo hace poco, darle alguna oportunidad
+        # En generar los capturamos con los registros de todos los dias
+        # Esto es poco importante
+        if updated_days < 90:
             updated_days_pond = (updated_days - 10) * 50_000
-            priority = 3_000_000 + updated_days_pond + readed_days
-            next_update_priority = timezone.now() + timezone.timedelta(days=8)
-        elif updated_days < 100:
-            updated_days_pond = (updated_days - 10) * 50_000
-            priority = 1_000_000 + updated_days_pond + readed_days
-            next_update_priority = timezone.now() + timezone.timedelta(days=20)
+            priority = 100_000 + updated_days_pond + readed_days
+            next_update_priority = timezone.now() + timezone.timedelta(days=40)
         else:
             priority = (readed_days * 1000) + updated_days
             next_update_priority = timezone.now() + timezone.timedelta(days=90)
