@@ -56,8 +56,12 @@ def calculate_priority(expire_days, readed_days, updated_days, estado):
             readed_days_pond = (readed_days - 300) * 50_000 if readed_days <= 300 else readed_days * 5
             priority = 3_000_000 + (expire_days*2) + readed_days_pond + updated_days
             next_update_priority = timezone.now() + timezone.timedelta(days=25)
-        elif expire_days < -31:
-            priority = 1_000_000 + expire_days + readed_days + updated_days
+        elif expire_days < -31 and expire_days >= -90:
+            priority = 100_000 + expire_days + readed_days + updated_days
+            next_update_priority = timezone.now() + timezone.timedelta(days=25)
+        elif expire_days < -90:
+            # evitar los que expiran en 100 años, no usar (o limitar expire_days) aqui
+            priority = 50_000 + readed_days + updated_days
             next_update_priority = timezone.now() + timezone.timedelta(days=25)
         else:
             # non expected, a gap in the selecion
