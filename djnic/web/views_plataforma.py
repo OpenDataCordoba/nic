@@ -10,7 +10,7 @@ class StatsReadVtoView(AnalyticsViewMixin, TemplateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['site_title'] = 'Estadisticas de lecturas por vencimiento'
-        context['site_description'] = 'Dias desde la ultima lectura de domimios según fecha de vencimieeto del mismo'
+        context['site_description'] = 'Dias desde la ultima lectura de domimios según fecha de vencimiento del mismo'
 
         return context
 
