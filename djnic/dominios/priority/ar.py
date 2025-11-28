@@ -11,15 +11,6 @@ def calculate_priority(expire_days, readed_days, updated_days, estado):
 
     from dominios.models import STATUS_NO_DISPONIBLE
 
-    """
-    Start runing from priority
-    Error GET status 429: {"detail":"Request was throttled. Expected available in 11 seconds."}
-    - Got wondercraft.com.ar no disponible readed 2021-09-23T12:02:49.981450-03:00 expire 2022-09-22T00:00:00-03:00
-    Domain wondercraft.com.ar tor:False
-    REG [43]: None
-    [1]0 REN0 DOWN1 NOCH0 NEW0 OTR0
-    Error GET status 429: {"detail":"Request was throttled. Expected available in 12 seconds."}
-    """
     priority = 0
     next_update_priority = timezone.now() + timezone.timedelta(days=15)
 

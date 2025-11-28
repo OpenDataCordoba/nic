@@ -6,6 +6,13 @@
     <div class="row">
         <div class="col-lg-4 col-md-4 col-sm-4 col-xs-4">
             <h2>Dominio {{ dominio.full_domain }}</h2>
+
+            {% if dominio.registrante %}
+
+            <h3>Registrante</h3>
+            <p><b><a href='{% url "registrante" uid=dominio.registrante.uid %}'>{{ dominio.registrante.name }}</a></b></p>
+
+            {% endif %}
             
             <p>Registrado: <b>{{ dominio.registered|date:"Y-m-d H:i:s" }}</b></p>
             <p>Cambio en NIC: <b>{{ dominio.changed|date:"Y-m-d H:i:s" }}</b></p>
@@ -21,15 +28,8 @@
             {% endfor %}
             </ul>
         </div>
-
-    {% if dominio.registrante %}
-        <div class="col-lg-4 col-md-4 col-sm-4 col-xs-4">
-            <h3>Registrante</h3>
-            <p><b><a href='{% url "registrante" uid=dominio.registrante.uid %}'>{{ dominio.registrante.name }}</a></b></p>
-        </div>
-    {% endif %}
     
-        <div class="col-lg-4 col-md-4 col-sm-4 col-xs-4">
+        <div class="col-lg-8 col-md-8 col-sm-8 col-xs-8">
             <h3>Historial de lecturas</h3>
             {% for cambio in cambios %}
                 <p><b>{{ cambio.momento }}</b> Hay cambios: <b>{{ cambio.have_changes|yesno:"si,no" }}</b></p>
