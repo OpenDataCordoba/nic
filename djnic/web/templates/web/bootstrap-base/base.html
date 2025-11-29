@@ -29,15 +29,14 @@
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-giJF6kkoqNQ00vy+HMDP7azOuL0xtbfIcaT9wjKHr8RbDVddVHyTfAAsrekwKmP1" crossorigin="anonymous">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-social@5.1.1/bootstrap-social.min.css" rel="stylesheet">
+    <link href="{% static 'web/dark-mode.css' %}" rel="stylesheet">
+    <link href="{% static 'web/dark-mode-toggle.css' %}" rel="stylesheet">
+    <script src="{% static 'web/dark-mode.js' %}"></script>
   </head>
   <body>
-
     {% include "web/bootstrap-base/navbar.html" %}
-    
     {% block main %}{% endblock main %}
-
     {% block footer %}{% endblock footer %}
-    
     {% csrf_token %}
     <script>
     const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;

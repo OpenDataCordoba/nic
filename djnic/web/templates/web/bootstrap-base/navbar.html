@@ -37,7 +37,7 @@
 
         <li class="nav-item dropdown">
           <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-            Descargas {% if not user.is_authenticated %}(requiere registro){% endif %}
+            Descargas
           </a>
           <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
             <li><a class="dropdown-item" href="/descargas/dominios.csv">Todos los dominios</a></li>
@@ -133,7 +133,12 @@
       <form class="d-flex" action="{% url 'search' %}" method="get">
         <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search" name="query">
         <button class="btn btn-outline-success" type="submit">Search</button>
+        
+        <button id="darkModeToggle" class="dark-mode-toggle-btn btn btn-outline-secondary">
+          <i class="fa fa-moon-o"></i>
+        </button>
       </form>
+
     </div>
   </div>
 </nav>

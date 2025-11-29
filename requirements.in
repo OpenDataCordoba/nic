@@ -9,3 +9,4 @@ django-webpush>=0.3.6
 django-allauth[socialaccount]>=0.54.0
 django-cache-memoize>=0.1.10
 python_memcached==1.59
+# pymemcache
