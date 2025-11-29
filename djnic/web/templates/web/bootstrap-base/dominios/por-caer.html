@@ -19,13 +19,18 @@
                     <table id="data-table-basic" class="table table-striped">
                         <thead>
                             <tr>
-<th>Dominio</th><th>Registrante</th><th>Venció</th>
+<th>Dominio</th><th>Desde</th><th>Registrante</th><th>Venció</th>
                                 </tr>
                             </thead>
                             <tbody>
 {% for dominio in por_caer %}
 <tr>
-<td>{{ dominio.nombre }}.{{ dominio.zona.nombre }}</td>
+<td>
+    <a href='{% url "dominio" uid=dominio.uid %}'>
+    {{ dominio.nombre }}.{{ dominio.zona.nombre }}
+    </a>
+</td>
+<td>{{ dominio.registered|date:"Y-m-d" }}</td>
 <td>
     {% if dominio.registrante %}
     <a href='{% url "registrante" uid=dominio.registrante.uid %}'>{{ dominio.registrante.name }}</a>
