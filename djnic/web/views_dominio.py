@@ -1,3 +1,6 @@
+from django.utils.decorators import method_decorator
+from django.views.decorators.cache import cache_page, cache_control
+
 from django.views.generic.base import TemplateView
 from django.views.generic.detail import DetailView
 
@@ -64,6 +67,8 @@ class DominioView(AnalyticsViewMixin, DetailView):
         return context
 
 
+@method_decorator(cache_control(max_age=60 * 60 * 12), name='dispatch')
+@method_decorator(cache_page(60 * 60 * 12), name='dispatch')
 class UltimosCaidos(AnalyticsViewMixin, TemplateView):
 
     template_name = "web/bootstrap-base/dominios/ultimos-caidos.html"
@@ -80,6 +85,8 @@ class UltimosCaidos(AnalyticsViewMixin, TemplateView):
         return context
 
 
+@method_decorator(cache_control(max_age=60 * 60 * 12), name='dispatch')
+@method_decorator(cache_page(60 * 60 * 12), name='dispatch')
 class UltimosRegistrados(AnalyticsViewMixin, TemplateView):
 
     template_name = "web/bootstrap-base/dominios/ultimos-registrados.html"
@@ -98,6 +105,8 @@ class UltimosRegistrados(AnalyticsViewMixin, TemplateView):
         return context
 
 
+@method_decorator(cache_control(max_age=60 * 60 * 12), name='dispatch')
+@method_decorator(cache_page(60 * 60 * 12), name='dispatch')
 class DominiosAntiguosView(AnalyticsViewMixin, TemplateView):
 
     template_name = "web/bootstrap-base/dominios/antiguos.html"
@@ -116,6 +125,8 @@ class DominiosAntiguosView(AnalyticsViewMixin, TemplateView):
         return context
 
 
+@method_decorator(cache_control(max_age=60 * 60 * 12), name='dispatch')
+@method_decorator(cache_page(60 * 60 * 12), name='dispatch')
 class Judicializados(AnalyticsViewMixin, TemplateView):
 
     template_name = "web/bootstrap-base/dominios/judicializados.html"
@@ -134,6 +145,8 @@ class Judicializados(AnalyticsViewMixin, TemplateView):
         return context
 
 
+@method_decorator(cache_control(max_age=60 * 60 * 12), name='dispatch')
+@method_decorator(cache_page(60 * 60 * 12), name='dispatch')
 class DominiosVencimientoLargoView(AnalyticsViewMixin, TemplateView):
     """ Dominios que vencen más en el futuro """
 
@@ -153,6 +166,8 @@ class DominiosVencimientoLargoView(AnalyticsViewMixin, TemplateView):
         return context
 
 
+@method_decorator(cache_control(max_age=60 * 60 * 12), name='dispatch')
+@method_decorator(cache_page(60 * 60 * 12), name='dispatch')
 class PorCaerView(AnalyticsViewMixin, TemplateView):
 
     template_name = "web/bootstrap-base/dominios/por-caer.html"

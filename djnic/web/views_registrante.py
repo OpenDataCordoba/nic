@@ -1,4 +1,3 @@
-from django.conf import settings
 from django.utils.decorators import method_decorator
 from django.views.decorators.cache import cache_page, cache_control
 from django.views.generic.detail import DetailView
@@ -27,6 +26,8 @@ class RegistranteView(AnalyticsViewMixin, DetailView):
         return context
 
 
+@method_decorator(cache_control(max_age=60 * 60 * 12), name='dispatch')
+@method_decorator(cache_page(60 * 60 * 12), name='dispatch')
 class RegistrantesAntiguosView(AnalyticsViewMixin, ListView):
 
     model = Registrante
@@ -42,6 +43,8 @@ class RegistrantesAntiguosView(AnalyticsViewMixin, ListView):
         return context
 
 
+@method_decorator(cache_control(max_age=60 * 60 * 12), name='dispatch')
+@method_decorator(cache_page(60 * 60 * 12), name='dispatch')
 class MayoresRegistrantesView(AnalyticsViewMixin, ListView):
 
     model = Registrante
@@ -57,6 +60,8 @@ class MayoresRegistrantesView(AnalyticsViewMixin, ListView):
         return context
 
 
+@method_decorator(cache_control(max_age=60 * 60 * 12), name='dispatch')
+@method_decorator(cache_page(60 * 60 * 12), name='dispatch')
 class RubrosView(AnalyticsViewMixin, ListView):
 
     model = TagForRegistrante
@@ -71,6 +76,8 @@ class RubrosView(AnalyticsViewMixin, ListView):
         return context
 
 
+@method_decorator(cache_control(max_age=60 * 60 * 12), name='dispatch')
+@method_decorator(cache_page(60 * 60 * 12), name='dispatch')
 class RubroView(AnalyticsViewMixin, DetailView):
 
     model = TagForRegistrante
