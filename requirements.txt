@@ -52,7 +52,7 @@ frozenlist==1.8.0
     #   aiosignal
 http-ece==1.1.0
     # via pywebpush
-idna==3.3
+idna==3.7
     # via
     #   requests
     #   yarl
