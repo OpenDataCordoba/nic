@@ -82,7 +82,7 @@ pytz==2021.3
     # via whoare
 pywebpush==2.1.2
     # via django-webpush
-requests==2.26.0
+requests==2.32.4
     # via
     #   -r requirements.in
     #   django-allauth
