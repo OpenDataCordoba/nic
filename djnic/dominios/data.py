@@ -76,7 +76,7 @@ def get_por_caer(limit=5, de_registrantes_etiquetados=False, etiqueta=None):
         estado=STATUS_NO_DISPONIBLE,
         expire__lt=starts,
         expire__gt=ends
-    ).order_by('registered')
+    )
 
     if de_registrantes_etiquetados:
         dominios = dominios.annotate(tags=Count('registrante__tags')).filter(tags__gt=0)
@@ -84,7 +84,7 @@ def get_por_caer(limit=5, de_registrantes_etiquetados=False, etiqueta=None):
     if etiqueta is not None:
         dominios = dominios.filter(registrante__tags__tag=etiqueta)
 
-    dominios = dominios.order_by('expire')
+    dominios = dominios.order_by('registered')
     if limit > 0:
         dominios = dominios[:limit]
 
