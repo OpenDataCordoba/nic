@@ -134,3 +134,16 @@ body.dark-mode ::-webkit-scrollbar {
 body.dark-mode ::-webkit-scrollbar-thumb {
   background: #343a40;
 }
+
+/* Global */
+body {
+    font-size: 0.8rem !important;
+}
+.container {
+    margin-top: 35px;
+}
+
+/* Reduce h2 size globally */
+.h2, h2 {
+  font-size: 1.1rem !important;
+}
