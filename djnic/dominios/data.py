@@ -75,7 +75,8 @@ def get_por_caer(limit=5, de_registrantes_etiquetados=False, etiqueta=None):
     dominios = Dominio.objects.filter(
         estado=STATUS_NO_DISPONIBLE,
         expire__lt=starts,
-        expire__gt=ends)
+        expire__gt=ends
+    ).order_by('registered')
 
     if de_registrantes_etiquetados:
         dominios = dominios.annotate(tags=Count('registrante__tags')).filter(tags__gt=0)
