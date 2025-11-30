@@ -1,11 +1,11 @@
 from django.test import TestCase, Client
 from django.urls import reverse
-from django.contrib.auth.models import User
 from dominios.models import Dominio, STATUS_DISPONIBLE, STATUS_NO_DISPONIBLE
 from cambios.models import CambiosDominio, CampoCambio
 from zonas.models import Zona
 from django.utils import timezone
 from datetime import timedelta
+
 
 class DominioViewTest(TestCase):
     def setUp(self):
@@ -24,6 +24,7 @@ class DominioViewTest(TestCase):
         self.assertTemplateUsed(response, 'web/bootstrap-base/dominio.html')
         self.assertEqual(response.context['dominio'], self.dominio)
         self.assertEqual(response.context['estado'], 'Disponible')
+
 
 class UltimosCaidosViewTest(TestCase):
     def setUp(self):
@@ -61,12 +62,12 @@ class UltimosCaidosViewTest(TestCase):
         self.assertLessEqual(len(response.context['ultimos_caidos']), 5)
 
     def test_ultimos_caidos_view_authenticated(self):
-        user = User.objects.create_user(username='testuser', password='password')
         self.client.login(username='testuser', password='password')
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, 200)
-        # Authenticated user sees 10 results
-        self.assertEqual(len(response.context['ultimos_caidos']), 10)
+        # Authenticated user sees all results
+        self.assertEqual(len(response.context['ultimos_caidos']), 12)
+
 
 class UltimosRegistradosViewTest(TestCase):
     def setUp(self):
@@ -90,6 +91,7 @@ class UltimosRegistradosViewTest(TestCase):
         # Unauthenticated user sees limited results
         self.assertLessEqual(len(response.context['ultimos_registrados']), 5)
 
+
 class JudicializadosViewTest(TestCase):
     def setUp(self):
         self.client = Client()
@@ -110,6 +112,7 @@ class JudicializadosViewTest(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, 'web/bootstrap-base/dominios/judicializados.html')
         self.assertIn('dominios', response.context)
+
 
 class DominiosAntiguosViewTest(TestCase):
     def setUp(self):
