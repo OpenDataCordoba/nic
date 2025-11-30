@@ -2,8 +2,8 @@ from cache_memoize import cache_memoize
 from django.conf import settings
 from datetime import timedelta
 import logging
-from django.db.models import Count, Q, DurationField, F, ExpressionWrapper, DateTimeField, IntegerField
-from django.db.models.functions import Trunc, Cast
+from django.db.models import Q, DurationField, F, ExpressionWrapper, DateTimeField
+from django.db.models.functions import Cast
 from django.utils import timezone
 from dominios.models import STATUS_NO_DISPONIBLE, STATUS_DISPONIBLE
 from cambios.models import CampoCambio

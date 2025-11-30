@@ -241,7 +241,7 @@ OLD_DB_USER = ''
 OLD_DB_PASS = ''
 OLD_DB_NAME = ''
 
-GENERAL_CACHE_SECONDS = 60 * 60 * 22
+GENERAL_CACHE_SECONDS = 60 * 60 * 12
 
 # Login buttons goes directly to Google
 # If False, a new step is required to login

@@ -4,8 +4,11 @@ from django.db.models import Count, Q
 from django.utils import timezone
 from dnss.models import Empresa, DNS
 from dominios.models import Dominio
+from cache_memoize import cache_memoize
+from django.conf import settings
 
 
+@cache_memoize(settings.GENERAL_CACHE_SECONDS)
 def get_hosting_usados(days_ago=0, limit=5, use_cache=True):
     # Generate cache key based on parameters
     cache_key = f'hostings_{days_ago}_{limit}'
@@ -34,6 +37,7 @@ def get_hosting_usados(days_ago=0, limit=5, use_cache=True):
     return hostings
 
 
+@cache_memoize(settings.GENERAL_CACHE_SECONDS)
 def get_dominios_from_hosting(hosting, limit=5, use_cache=True):
     cache_key = f'hosting_dominios_{hosting.uid}_{limit}'
 
@@ -55,6 +59,7 @@ def get_dominios_from_hosting(hosting, limit=5, use_cache=True):
     return dominios
 
 
+@cache_memoize(settings.GENERAL_CACHE_SECONDS)
 def get_orphan_dns(limit=5, use_cache=True):
     cache_key = f'orphan_dns_{limit}'
 
@@ -77,6 +82,7 @@ def get_orphan_dns(limit=5, use_cache=True):
     return result
 
 
+@cache_memoize(settings.GENERAL_CACHE_SECONDS)
 def get_dominios_sin_dns_count(use_cache=True):
     cache_key = 'dominios_sin_dns_count'
 

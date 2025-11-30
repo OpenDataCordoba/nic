@@ -1,7 +1,4 @@
-from datetime import timedelta
-from django.db.models import Count, Q
-from django.db.models.functions import Trunc
-from django.utils import timezone
+from django.db.models import Count
 from registrantes.models import Registrante
 from cache_memoize import cache_memoize
 from django.conf import settings
