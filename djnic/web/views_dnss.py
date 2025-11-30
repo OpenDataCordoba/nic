@@ -1,8 +1,5 @@
-from django.utils.decorators import method_decorator
-from django.views.decorators.cache import cache_page, cache_control
 from django.views.generic.detail import DetailView
 from django.views.generic.list import ListView
-from django.core.cache import cache
 
 from core.views import AnalyticsViewMixin
 from cambios.models import CampoCambio
@@ -31,8 +28,6 @@ class HostingView(AnalyticsViewMixin, DetailView):
         return context
 
 
-@method_decorator(cache_control(max_age=60 * 15), name='dispatch')  # Cachear por 15 minutos
-@method_decorator(cache_page(60 * 15), name='dispatch')
 class HostingsView(AnalyticsViewMixin, ListView):
 
     model = Empresa
@@ -51,8 +46,6 @@ class HostingsView(AnalyticsViewMixin, ListView):
         return context
 
 
-@method_decorator(cache_control(max_age=60 * 15), name='dispatch')  # Cachear por 15 minutos
-@method_decorator(cache_page(60 * 15), name='dispatch')
 class Hostings30View(AnalyticsViewMixin, ListView):
 
     model = Empresa
@@ -87,8 +80,6 @@ class DNSView(AnalyticsViewMixin, DetailView):
         return context
 
 
-@method_decorator(cache_control(max_age=60 * 15), name='dispatch')  # Cachear por 15 minutos
-@method_decorator(cache_page(60 * 15), name='dispatch')
 class PerdidasView(AnalyticsViewMixin, ListView):
 
     model = CampoCambio
@@ -100,11 +91,6 @@ class PerdidasView(AnalyticsViewMixin, ListView):
         context['site_title'] = 'Perdidas de clientes'
         context['site_description'] = 'Perdidas de clientes por empresas de hosting'
 
-        # Use cached data
-        cached_perdidas = cache.get('perdidas_dns_30')
-        if cached_perdidas:
-            context['perdidas'] = cached_perdidas
-        else:
-            context['perdidas'] = get_perdidas_dns(days_ago=30)
+        context['perdidas'] = get_perdidas_dns(days_ago=30)
 
         return context
