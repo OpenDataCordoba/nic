@@ -63,7 +63,7 @@ class UltimosCaidosViewTest(TestCase):
         self.assertLessEqual(len(response.context['ultimos_caidos']), 5)
 
     def test_ultimos_caidos_view_authenticated(self):
-        user = User.objects.create_user(username='testuser', password='password')
+        User.objects.create_user(username='testuser', password='password')
         self.client.login(username='testuser', password='password')
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, 200)
@@ -105,7 +105,7 @@ class JudicializadosViewTest(TestCase):
                 nombre=f"test{i}",
                 zona=self.zona,
                 estado=STATUS_NO_DISPONIBLE,
-                expire=timezone.now() - timedelta(days=10), # Expired
+                expire=timezone.now() - timedelta(days=10),  # Expired
                 data_updated=timezone.now()
             )
 
@@ -156,6 +156,7 @@ class DominiosVencimientoLargoViewTest(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, 'web/bootstrap-base/dominios/futuros.html')
         self.assertIn('dominios', response.context)
+
 
 class PorCaerViewTest(TestCase):
     def setUp(self):
