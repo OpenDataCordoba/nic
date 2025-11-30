@@ -1,6 +1,7 @@
 import json
 import logging
 import random
+from cache_memoize import cache_memoize
 from django.conf import settings
 from whoare.whoare import WhoAre
 from django.utils import timezone
@@ -13,7 +14,7 @@ from rest_framework import filters
 from django.http import JsonResponse
 from django.db.models import F, Q
 from django.utils.decorators import method_decorator
-from django.views.decorators.cache import never_cache, cache_page
+from django.views.decorators.cache import never_cache
 from rest_framework.decorators import action
 from dominios.models import Dominio, STATUS_DISPONIBLE, STATUS_NO_DISPONIBLE, PreDominio
 from zonas.models import Zona
@@ -100,7 +101,6 @@ class DominioViewSet(viewsets.ModelViewSet):
         return JsonResponse(res)
 
 
-@method_decorator(cache_page(settings.GENERAL_CACHE_SECONDS), name='dispatch')
 class PreDominioViewSet(viewsets.ModelViewSet):
     queryset = PreDominio.objects.all()
     serializer_class = PreDominioSerializer
@@ -108,6 +108,17 @@ class PreDominioViewSet(viewsets.ModelViewSet):
     authentication_classes = [TokenAuthentication, SessionAuthentication]
     filter_backends = [DjangoFilterBackend, filters.OrderingFilter]
     ordering = ['dominio']
+
+    MAX_QUERYSET_SIZE = 1000
+
+    @staticmethod
+    @cache_memoize(settings.GENERAL_CACHE_SECONDS)
+    def get_queryset_cached(limit):
+        return PreDominio.objects.all()[:limit]
+
+    def get_queryset(self):
+        # Use cached queryset, ignoring user/token
+        return self.get_queryset_cached(self.MAX_QUERYSET_SIZE)
 
 
 @method_decorator(never_cache, name='dispatch')
@@ -202,19 +213,26 @@ class NextPriorityDomainViewSet(viewsets.ModelViewSet):
         return res
 
 
-@method_decorator(cache_page(settings.GENERAL_CACHE_SECONDS), name='dispatch')
 class UltimosCaidosViewSet(viewsets.ModelViewSet):
     """ ultimo dominios que pasaron a estar disponibles """
 
-    def get_queryset(self):
+    MAX_QUERYSET_SIZE = 500
+
+    @staticmethod
+    @cache_memoize(settings.GENERAL_CACHE_SECONDS)
+    def get_queryset_cached(limit):
         campo_caidos = CampoCambio.objects.filter(
             campo='estado',
             anterior=STATUS_NO_DISPONIBLE,
             nuevo=STATUS_DISPONIBLE)\
                 .order_by('-cambio__momento')[:100]
         ids = [cc.cambio.dominio.id for cc in campo_caidos]
-        queryset = Dominio.objects.filter(id__in=ids)
+        queryset = Dominio.objects.filter(id__in=ids)[:limit]
         return queryset
+
+    def get_queryset(self):
+        # Use cached queryset, ignoring user/token
+        return self.get_queryset_cached(self.MAX_QUERYSET_SIZE)
 
     serializer_class = CambiosDominioSerializer
     permission_classes = [DjangoModelPermissions]
@@ -226,18 +244,25 @@ class UltimosCaidosViewSet(viewsets.ModelViewSet):
     ordering = ['nombre']
 
 
-@method_decorator(cache_page(settings.GENERAL_CACHE_SECONDS), name='dispatch')
 class UltimosRenovadosViewSet(viewsets.ModelViewSet):
     """ ultimo dominios que se renovaron """
 
-    def get_queryset(self):
+    MAX_QUERYSET_SIZE = 500
+
+    @staticmethod
+    @cache_memoize(settings.GENERAL_CACHE_SECONDS)
+    def get_queryset_cached(limit):
         campos = CampoCambio.objects.filter(
             campo='dominio_expire',
             nuevo__gt=F('anterior'))\
                 .order_by('-cambio__momento')[:100]
         ids = [cc.cambio.dominio.id for cc in campos]
-        queryset = Dominio.objects.filter(id__in=ids)
+        queryset = Dominio.objects.filter(id__in=ids)[:limit]
         return queryset
+
+    def get_queryset(self):
+        # Use cached queryset, ignoring user/token
+        return self.get_queryset_cached(self.MAX_QUERYSET_SIZE)
 
     serializer_class = CambiosDominioSerializer
     permission_classes = [DjangoModelPermissions]
@@ -249,11 +274,14 @@ class UltimosRenovadosViewSet(viewsets.ModelViewSet):
     ordering = ['nombre']
 
 
-@method_decorator(cache_page(settings.GENERAL_CACHE_SECONDS), name='dispatch')
 class UltimosTranspasadosViewSet(viewsets.ModelViewSet):
     """ ultimo dominios que pasaron a nuevos dueños """
 
-    def get_queryset(self):
+    MAX_QUERYSET_SIZE = 500
+
+    @staticmethod
+    @cache_memoize(settings.GENERAL_CACHE_SECONDS)
+    def get_queryset_cached(limit):
         campos = CampoCambio.objects.filter(
             campo='registrant_legal_uid',
             nuevo__isnull=False,
@@ -263,8 +291,12 @@ class UltimosTranspasadosViewSet(viewsets.ModelViewSet):
             .order_by('-cambio__momento')[:100]
 
         ids = [cc.cambio.dominio.id for cc in campos]
-        queryset = Dominio.objects.filter(id__in=ids)
+        queryset = Dominio.objects.filter(id__in=ids)[:limit]
         return queryset
+
+    def get_queryset(self):
+        # Use cached queryset, ignoring user/token
+        return self.get_queryset_cached(self.MAX_QUERYSET_SIZE)
 
     serializer_class = CambiosDominioSerializer
     permission_classes = [DjangoModelPermissions]
@@ -276,11 +308,14 @@ class UltimosTranspasadosViewSet(viewsets.ModelViewSet):
     ordering = ['nombre']
 
 
-@method_decorator(cache_page(settings.GENERAL_CACHE_SECONDS), name='dispatch')
 class UltimosCambioDNSViewSet(viewsets.ModelViewSet):
     """ ultimo dominios que pasaron a nuevos dueños """
 
-    def get_queryset(self):
+    MAX_QUERYSET_SIZE = 500
+
+    @staticmethod
+    @cache_memoize(settings.GENERAL_CACHE_SECONDS)
+    def get_queryset_cached(limit):
         campos = CampoCambio.objects.filter(
             campo='DNS1',
             nuevo__isnull=False,
@@ -290,8 +325,12 @@ class UltimosCambioDNSViewSet(viewsets.ModelViewSet):
             .order_by('-cambio__momento')[:100]
 
         ids = [cc.cambio.dominio.id for cc in campos]
-        queryset = Dominio.objects.filter(id__in=ids)
+        queryset = Dominio.objects.filter(id__in=ids)[:limit]
         return queryset
+
+    def get_queryset(self):
+        # Use cached queryset, ignoring user/token
+        return self.get_queryset_cached(self.MAX_QUERYSET_SIZE)
 
     serializer_class = CambiosDominioSerializer
     permission_classes = [DjangoModelPermissions]
