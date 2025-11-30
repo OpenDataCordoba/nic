@@ -136,6 +136,7 @@ class DominiosAntiguosViewTest(TestCase):
         self.assertTemplateUsed(response, 'web/bootstrap-base/dominios/antiguos.html')
         self.assertIn('dominios', response.context)
 
+
 class DominiosVencimientoLargoViewTest(TestCase):
     def setUp(self):
         self.client = Client()
