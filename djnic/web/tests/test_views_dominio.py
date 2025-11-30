@@ -1,5 +1,6 @@
 from django.test import TestCase, Client
 from django.urls import reverse
+from django.contrib.auth.models import User
 from dominios.models import Dominio, STATUS_DISPONIBLE, STATUS_NO_DISPONIBLE
 from cambios.models import CambiosDominio, CampoCambio
 from zonas.models import Zona
@@ -62,6 +63,7 @@ class UltimosCaidosViewTest(TestCase):
         self.assertLessEqual(len(response.context['ultimos_caidos']), 5)
 
     def test_ultimos_caidos_view_authenticated(self):
+        user = User.objects.create_user(username='testuser', password='password')
         self.client.login(username='testuser', password='password')
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, 200)
