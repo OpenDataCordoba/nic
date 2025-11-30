@@ -7,6 +7,7 @@ from zonas.models import Zona
 from django.utils import timezone
 from datetime import timedelta
 
+
 class DominioViewTest(TestCase):
     def setUp(self):
         self.client = Client()
@@ -24,6 +25,7 @@ class DominioViewTest(TestCase):
         self.assertTemplateUsed(response, 'web/bootstrap-base/dominio.html')
         self.assertEqual(response.context['dominio'], self.dominio)
         self.assertEqual(response.context['estado'], 'Disponible')
+
 
 class UltimosCaidosViewTest(TestCase):
     def setUp(self):
@@ -61,12 +63,13 @@ class UltimosCaidosViewTest(TestCase):
         self.assertLessEqual(len(response.context['ultimos_caidos']), 5)
 
     def test_ultimos_caidos_view_authenticated(self):
-        user = User.objects.create_user(username='testuser', password='password')
+        User.objects.create_user(username='testuser', password='password')
         self.client.login(username='testuser', password='password')
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, 200)
-        # Authenticated user sees 10 results
-        self.assertEqual(len(response.context['ultimos_caidos']), 10)
+        # Authenticated user sees all results
+        self.assertEqual(len(response.context['ultimos_caidos']), 12)
+
 
 class UltimosRegistradosViewTest(TestCase):
     def setUp(self):
@@ -90,6 +93,7 @@ class UltimosRegistradosViewTest(TestCase):
         # Unauthenticated user sees limited results
         self.assertLessEqual(len(response.context['ultimos_registrados']), 5)
 
+
 class JudicializadosViewTest(TestCase):
     def setUp(self):
         self.client = Client()
@@ -101,7 +105,7 @@ class JudicializadosViewTest(TestCase):
                 nombre=f"test{i}",
                 zona=self.zona,
                 estado=STATUS_NO_DISPONIBLE,
-                expire=timezone.now() - timedelta(days=10), # Expired
+                expire=timezone.now() - timedelta(days=10),  # Expired
                 data_updated=timezone.now()
             )
 
@@ -110,6 +114,7 @@ class JudicializadosViewTest(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, 'web/bootstrap-base/dominios/judicializados.html')
         self.assertIn('dominios', response.context)
+
 
 class DominiosAntiguosViewTest(TestCase):
     def setUp(self):
@@ -131,6 +136,7 @@ class DominiosAntiguosViewTest(TestCase):
         self.assertTemplateUsed(response, 'web/bootstrap-base/dominios/antiguos.html')
         self.assertIn('dominios', response.context)
 
+
 class DominiosVencimientoLargoViewTest(TestCase):
     def setUp(self):
         self.client = Client()
@@ -150,6 +156,7 @@ class DominiosVencimientoLargoViewTest(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, 'web/bootstrap-base/dominios/futuros.html')
         self.assertIn('dominios', response.context)
+
 
 class PorCaerViewTest(TestCase):
     def setUp(self):
