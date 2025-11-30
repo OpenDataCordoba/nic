@@ -38,11 +38,7 @@ class CampoCambioViewSet(viewsets.ModelViewSet):
 
     MAX_QUERYSET_SIZE = 1000
 
-    @staticmethod
     @cache_memoize(settings.GENERAL_CACHE_SECONDS)
-    def get_queryset_cached(limit):
-        return CampoCambio.objects.all()[:limit]
-
     def get_queryset(self):
         # Use cached queryset, ignoring user/token
-        return self.get_queryset_cached(self.MAX_QUERYSET_SIZE)
+        return CampoCambio.objects.all()[:self.MAX_QUERYSET_SIZE]
