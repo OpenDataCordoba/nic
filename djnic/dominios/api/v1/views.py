@@ -109,16 +109,9 @@ class PreDominioViewSet(viewsets.ModelViewSet):
     filter_backends = [DjangoFilterBackend, filters.OrderingFilter]
     ordering = ['dominio']
 
-    MAX_QUERYSET_SIZE = 1000
-
-    @staticmethod
     @cache_memoize(settings.GENERAL_CACHE_SECONDS)
-    def get_queryset_cached(limit):
-        return PreDominio.objects.all()[:limit]
-
     def get_queryset(self):
-        # Use cached queryset, ignoring user/token
-        return self.get_queryset_cached(self.MAX_QUERYSET_SIZE)
+        return PreDominio.objects.all()
 
 
 @method_decorator(never_cache, name='dispatch')
@@ -216,23 +209,16 @@ class NextPriorityDomainViewSet(viewsets.ModelViewSet):
 class UltimosCaidosViewSet(viewsets.ModelViewSet):
     """ ultimo dominios que pasaron a estar disponibles """
 
-    MAX_QUERYSET_SIZE = 500
-
-    @staticmethod
     @cache_memoize(settings.GENERAL_CACHE_SECONDS)
-    def get_queryset_cached(limit):
+    def get_queryset(self):
         campo_caidos = CampoCambio.objects.filter(
             campo='estado',
             anterior=STATUS_NO_DISPONIBLE,
             nuevo=STATUS_DISPONIBLE)\
                 .order_by('-cambio__momento')[:100]
         ids = [cc.cambio.dominio.id for cc in campo_caidos]
-        queryset = Dominio.objects.filter(id__in=ids)[:limit]
+        queryset = Dominio.objects.filter(id__in=ids)
         return queryset
-
-    def get_queryset(self):
-        # Use cached queryset, ignoring user/token
-        return self.get_queryset_cached(self.MAX_QUERYSET_SIZE)
 
     serializer_class = CambiosDominioSerializer
     permission_classes = [DjangoModelPermissions]
@@ -247,22 +233,15 @@ class UltimosCaidosViewSet(viewsets.ModelViewSet):
 class UltimosRenovadosViewSet(viewsets.ModelViewSet):
     """ ultimo dominios que se renovaron """
 
-    MAX_QUERYSET_SIZE = 500
-
-    @staticmethod
     @cache_memoize(settings.GENERAL_CACHE_SECONDS)
-    def get_queryset_cached(limit):
+    def get_queryset(self):
         campos = CampoCambio.objects.filter(
             campo='dominio_expire',
             nuevo__gt=F('anterior'))\
                 .order_by('-cambio__momento')[:100]
         ids = [cc.cambio.dominio.id for cc in campos]
-        queryset = Dominio.objects.filter(id__in=ids)[:limit]
+        queryset = Dominio.objects.filter(id__in=ids)
         return queryset
-
-    def get_queryset(self):
-        # Use cached queryset, ignoring user/token
-        return self.get_queryset_cached(self.MAX_QUERYSET_SIZE)
 
     serializer_class = CambiosDominioSerializer
     permission_classes = [DjangoModelPermissions]
@@ -277,11 +256,8 @@ class UltimosRenovadosViewSet(viewsets.ModelViewSet):
 class UltimosTranspasadosViewSet(viewsets.ModelViewSet):
     """ ultimo dominios que pasaron a nuevos dueños """
 
-    MAX_QUERYSET_SIZE = 500
-
-    @staticmethod
     @cache_memoize(settings.GENERAL_CACHE_SECONDS)
-    def get_queryset_cached(limit):
+    def get_queryset(self):
         campos = CampoCambio.objects.filter(
             campo='registrant_legal_uid',
             nuevo__isnull=False,
@@ -291,12 +267,8 @@ class UltimosTranspasadosViewSet(viewsets.ModelViewSet):
             .order_by('-cambio__momento')[:100]
 
         ids = [cc.cambio.dominio.id for cc in campos]
-        queryset = Dominio.objects.filter(id__in=ids)[:limit]
+        queryset = Dominio.objects.filter(id__in=ids)
         return queryset
-
-    def get_queryset(self):
-        # Use cached queryset, ignoring user/token
-        return self.get_queryset_cached(self.MAX_QUERYSET_SIZE)
 
     serializer_class = CambiosDominioSerializer
     permission_classes = [DjangoModelPermissions]
@@ -311,11 +283,8 @@ class UltimosTranspasadosViewSet(viewsets.ModelViewSet):
 class UltimosCambioDNSViewSet(viewsets.ModelViewSet):
     """ ultimo dominios que pasaron a nuevos dueños """
 
-    MAX_QUERYSET_SIZE = 500
-
-    @staticmethod
     @cache_memoize(settings.GENERAL_CACHE_SECONDS)
-    def get_queryset_cached(limit):
+    def get_queryset(self):
         campos = CampoCambio.objects.filter(
             campo='DNS1',
             nuevo__isnull=False,
@@ -325,12 +294,8 @@ class UltimosCambioDNSViewSet(viewsets.ModelViewSet):
             .order_by('-cambio__momento')[:100]
 
         ids = [cc.cambio.dominio.id for cc in campos]
-        queryset = Dominio.objects.filter(id__in=ids)[:limit]
+        queryset = Dominio.objects.filter(id__in=ids)
         return queryset
-
-    def get_queryset(self):
-        # Use cached queryset, ignoring user/token
-        return self.get_queryset_cached(self.MAX_QUERYSET_SIZE)
 
     serializer_class = CambiosDominioSerializer
     permission_classes = [DjangoModelPermissions]
