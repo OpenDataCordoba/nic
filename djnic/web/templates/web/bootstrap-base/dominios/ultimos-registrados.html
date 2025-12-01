@@ -18,22 +18,19 @@
                     <table id="data-table-basic" class="table table-striped">
                         <thead>
                             <tr>
-<th>Dominio</th><th>Registrante</th>
-                                </tr>
-                            </thead>
-                            <tbody>
+                                <th width="30%">Dominio</th>
+                                <th width="35%">Registrante</th>
+                                <th width="17%">Registrado</th>
+                                <th width="18%">Detectado</th>
+                            </tr>
+                        </thead>
+                        <tbody>
 {% for dominio in ultimos_registrados %}
 <tr>
 <td>
-    <button onclick="$('#ultimo_registrado_{{ dominio.id }}').toggle();">+</button>
     <a href='{% url "dominio" uid=dominio.uid %}'>
     {{ dominio.nombre }}.{{ dominio.zona.nombre }}
     </a>
-    
-<div style="display: none" id="ultimo_registrado_{{ dominio.id }}">
-    <br />Registrado: {{ dominio.registered|date:"Y-m-d H:i:s" }}
-    <br />Detectado: {{ dominio.data_updated|date:"Y-m-d H:i:s" }}
-</div>
 </td>
 <td>
     {% if dominio.registrante %}
@@ -41,10 +38,12 @@
     {% else %}
     ERROR
     {% endif %}
-    </td>
+</td>
+<td>{{ dominio.registered|date:"Y-m-d H:i:s" }}</td>
+<td>{{ dominio.data_updated|date:"Y-m-d H:i:s" }}</td>
 </tr>
 {% endfor %}                                 
-                            </tbody>
+                        </tbody>
 </table>
               </div>
             </div>
