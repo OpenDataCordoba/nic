@@ -18,7 +18,15 @@
                 </div>
                 <div class="table-responsive">
                     <table id="data-table-basic" class="table table-striped">
-<thead><tr><th>Dominio</th><th>Anterior</th><th>Nuevo</th><th>días</th></tr></thead>
+<thead>
+    <tr>
+        <th>Dominio</th>
+        <th>Anterior</th>
+        <th>Nuevo</th>
+        <th>días</th>
+        <th>leido</th>
+    </tr>
+</thead>
 <tbody>
 {% for campo in campos %}
 <tr>
@@ -32,7 +40,9 @@
 <td>
     {{ campo.tdiff }}
 </td>
-
+<td>
+    {{ campo.cambio.momento|date:"Y-m-d" }}
+</td>
 </tr>
 {% endfor %}                                 
                         </tbody>
