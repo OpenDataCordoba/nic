@@ -13,16 +13,20 @@
                         {% if not user.is_authenticated %}
                         Para ver la lista ampliada debes <a href='{% url "clogin" %}'>acceder</a> al sistema
                         {% endif %}
-                        </p>
+                    </p>
                 </div>
                 <div class="table-responsive">
                     <table id="data-table-basic" class="table table-striped">
                         <thead>
                             <tr>
-<th>Dominio</th><th>Desde</th><th>Registrante</th><th>Venció</th>
-                                </tr>
-                            </thead>
-                            <tbody>
+                                <th width="30%">Dominio</th>
+                                <th width="10%">Desde</th>
+                                <th width="30%">Registrante</th>
+                                <th width="10%">Venció</th>
+                                <th width="20%">Leído</th>
+                            </tr>
+                        </thead>
+                        <tbody>
 {% for dominio in por_caer %}
 <tr>
 <td>
@@ -38,7 +42,8 @@
     ERROR
     {% endif %}
     </td>
-<td>{{ dominio.expire|date:"Y-m-d H:i:s" }}</td>
+<td>{{ dominio.expire|date:"Y-m-d" }}</td>
+<td>{{ dominio.data_readed|date:"Y-m-d H:i:s" }}</td>
 </tr>
 
 {% endfor %}                                 
