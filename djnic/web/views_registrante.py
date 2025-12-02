@@ -20,6 +20,7 @@ class RegistranteView(AnalyticsViewMixin, DetailView):
         context = super().get_context_data(**kwargs)
         context['site_title'] = f'Registrante de dominio {self.object.name}'
         context['site_description'] = f'Datos del registrante {self.object.name}'
+        context['dominios'] = self.object.dominios.all().order_by('expire')
 
         return context
 

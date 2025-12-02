@@ -4,7 +4,7 @@
 
 <div class="container">
     <div class="row">
-        <div class="col-lg-4 col-md-4 col-sm-4 col-xs-4">
+        <div class="col-12">
             <h2>Registrante {{ registrante.name }}</h2>
             
             <p>Dominios: <b>{{ registrante.dominios.count }}</b></p>
@@ -12,20 +12,48 @@
             <p>Cambio en NIC: <b>{{ registrante.changed|date:"Y-m-d H:i:s" }}</b></p>
             
         </div>
-
-        <div class="col-lg-4 col-md-4 col-sm-4 col-xs-4">
-            <h3>Dominios</h3>
-            
-            <ul>
-            {% for dominio in registrante.dominios.all %}
-                <li>
-                    <a href='{% url "dominio" uid=dominio.uid %}'>{{ dominio.full_domain }}</a>
-                </li>
-            {% endfor %}
-            </ul>
-        </div>
-    
     </div>
+    <div class="row">
+        <div class="col-12">
+            <h3>Dominios</h3>
 
+            <div class="data-table-list">
+
+                <div class="table-responsive">
+                    <table id="data-table-basic" class="table table-striped">
+<thead>
+    <tr>
+        <th>Dominio</th>
+        <th>Registrado</th>
+        <th>Expira</th>
+        <th>Leido</th>
+    </tr>
+</thead>
+<tbody>
+{% for dominio in dominios %}
+<tr>
+<td>
+    <a href='{% url "dominio" uid=dominio.uid %}'>{{ dominio.full_domain }}</a>
+</td>
+<td>
+    {{ dominio.registered|date:"Y-m-d" }}
+</td>
+<td>
+    {{ dominio.expire|date:"Y-m-d" }}
+</td>
+<td>
+    {{ dominio.data_readed|date:"Y-m-d H:i:s" }}
+</td>
+
+</tr>
+
+{% endfor %}                                 
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 
 {% endblock main %}
