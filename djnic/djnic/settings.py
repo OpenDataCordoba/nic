@@ -247,6 +247,13 @@ GENERAL_CACHE_SECONDS = 60 * 60 * 12
 # If False, a new step is required to login
 SOCIALACCOUNT_LOGIN_ON_GET = True
 
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+USE_X_FORWARDED_HOST = True
+USE_X_FORWARDED_PORT = True
+
+CSRF_COOKIE_SECURE = True
+SESSION_COOKIE_SECURE = True
+
 try:
     from .local_settings import *
 except:
