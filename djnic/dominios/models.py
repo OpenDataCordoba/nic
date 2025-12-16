@@ -317,6 +317,7 @@ class Dominio(models.Model):
                 'readed_since': readed_since,
                 'expired_since': expired_since,
                 'calculated_priority': priority,
+                'next_update_priority': next_update_priority.strftime("%Y-%m-%d %H:%M:%S"),
             }
         }
         self.update_extras(data, save=False)
