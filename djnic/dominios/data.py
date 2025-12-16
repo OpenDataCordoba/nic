@@ -71,7 +71,7 @@ def get_por_caer(limit=5, de_registrantes_etiquetados=False, etiqueta=None):
 
     # TODO esto es para Argentina. Cada pais deberá tener sus reglas
     starts = timezone.now() - timedelta(days=44)
-    ends = timezone.now() - timedelta(days=50)
+    ends = timezone.now() - timedelta(days=47)
     dominios = Dominio.objects.filter(
         estado=STATUS_NO_DISPONIBLE,
         expire__lt=starts,
