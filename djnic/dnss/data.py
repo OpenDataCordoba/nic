@@ -9,14 +9,7 @@ from django.conf import settings
 
 
 @cache_memoize(settings.GENERAL_CACHE_SECONDS)
-def get_hosting_usados(days_ago=0, limit=5, use_cache=True):
-    # Generate cache key based on parameters
-    cache_key = f'hostings_{days_ago}_{limit}'
-
-    if use_cache:
-        cached_data = cache.get(cache_key)
-        if cached_data is not None:
-            return cached_data
+def get_hosting_usados(days_ago=0, limit=5, zona=None):
 
     # Empresas de hosting más usadas
     hostings = Empresa.objects.all()
@@ -27,24 +20,18 @@ def get_hosting_usados(days_ago=0, limit=5, use_cache=True):
             regexs__nameservers__dominios__dominio__registered__gt=starts
         )
 
+    if zona:
+        hostings = hostings.filter(regexs__nameservers__dominios__dominio__zona=zona)
+
     hostings = hostings.annotate(
         total_dominios=Count('regexs__nameservers__dominios', filter=Q(regexs__nameservers__dominios__orden=1))
     ).order_by('-total_dominios')[:limit]
-
-    # Always cache the result when we calculate it
-    cache.set(cache_key, hostings, timeout=86400)  # 24 hours
 
     return hostings
 
 
 @cache_memoize(settings.GENERAL_CACHE_SECONDS)
-def get_dominios_from_hosting(hosting, limit=5, use_cache=True):
-    cache_key = f'hosting_dominios_{hosting.uid}_{limit}'
-
-    if use_cache:
-        cached_data = cache.get(cache_key)
-        if cached_data is not None:
-            return cached_data
+def get_dominios_from_hosting(hosting, limit=5):
 
     dominios = Dominio.objects.filter(
         dnss__dns__empresa_regex__empresa=hosting
@@ -52,9 +39,6 @@ def get_dominios_from_hosting(hosting, limit=5, use_cache=True):
 
     if limit > 0:
         dominios = dominios[:limit]
-
-    # Always cache the result when we calculate it
-    cache.set(cache_key, dominios, timeout=86400)  # 24 hours
 
     return dominios
 
