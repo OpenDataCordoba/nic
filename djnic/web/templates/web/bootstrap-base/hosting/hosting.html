@@ -5,7 +5,7 @@
 <div class="container">
     <div class="row">
 
-        <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
+        <div class="col-lg-9 col-md-9 col-sm-6 col-xs-6">
             <h2>Hosting: {{hosting.nombre }}</h2>
             <p>
                 Dominios en DNS: <b>{{ total_dominios }}</b>
@@ -32,7 +32,7 @@
                 <td>{{ regxdns.regex_dns }}</td>
             </tr>
             {% endfor %}
-            |</tbody>
+            </tbody>
         </table>
     </div>
 </div>
@@ -40,9 +40,6 @@
 <div class="data-table-list">
     <div class="basic-tb-hd">
         <h2>Dominios</h2>
-        {% if total_dominios >= 99 %}
-            <span class="badge badge-danger">musestra limitada a 100</span>
-        {% endif %}
     </div>
     <div class="table-responsive">
         <table id="data-table-basic" class="table table-striped">
@@ -67,14 +64,14 @@
                 <td>{{ dominio.registered|date:"Y-m-d" }}</td>
             </tr>
             {% endfor %}
-            |</tbody>
+            </tbody>
         </table>
     </div>
 </div>
 
 </div>
 
-<div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
+<div class="col-lg-3 col-md-3 col-sm-6 col-xs-6">
     <div class="data-table-list">
         <div class="basic-tb-hd">
             <h2>DNS encontrados</h2>
