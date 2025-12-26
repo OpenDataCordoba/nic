@@ -7,6 +7,7 @@ from cambios.data import get_ultimos_caidos
 from dominios.data import (get_ultimos_registrados, get_judicializados,
                            get_primeros_registrados, get_futuros,
                            get_por_caer)
+from zonas.models import Zona
 
 
 class DominioView(AnalyticsViewMixin, DetailView):
@@ -89,7 +90,17 @@ class UltimosRegistrados(AnalyticsViewMixin, TemplateView):
         context['site_title'] = 'Ultimos dominios registrados'
         context['site_description'] = 'Lista de los últimos dominios registrados'
 
-        context['ultimos_registrados'] = get_ultimos_registrados(limit=500)
+        zona_id = self.request.GET.get('zona')
+        zona = None
+        if zona_id:
+            try:
+                zona = Zona.objects.get(id=zona_id)
+            except Zona.DoesNotExist:
+                zona = None
+        context['zona_seleccionada'] = zona
+        context['zonas'] = Zona.objects.all()
+
+        context['ultimos_registrados'] = get_ultimos_registrados(limit=500, zona=zona)
 
         # limit for non logged users
         if not self.request.user.is_authenticated:
