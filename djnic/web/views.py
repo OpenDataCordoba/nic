@@ -34,8 +34,8 @@ class HomeView(AnalyticsViewMixin, TemplateView):
 
         context['ultimos_caidos'] = get_ultimos_caidos(limit=5, zona=zona)
         context['ultimos_registrados'] = get_ultimos_registrados(limit=5, zona=zona)
-        context['hostings'] = get_hosting_usados(days_ago=0, limit=5, zona=zona)
-        context['hostings_last_30_days'] = get_hosting_usados(days_ago=30, limit=5, zona=zona)
+        # context['hostings'] = get_hosting_usados(days_ago=0, limit=5, zona=zona)
+        # context['hostings_last_30_days'] = get_hosting_usados(days_ago=30, limit=5, zona=zona)
         context['news_from_tags'] = get_ultimos_registrados(limit=5, de_registrantes_etiquetados=True, zona=zona)
         context['transferencias'] = get_ultimas_transferencias(limit=5, zona=zona)
         return context

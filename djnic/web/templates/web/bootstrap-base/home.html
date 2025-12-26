@@ -18,7 +18,7 @@
 
 <div class="container">
     <div class="row">
-        <div class="col-lg-4 col-md-4 col-sm-4 col-xs-4">
+        <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
             <div class="data-table-list">
                 <div class="basic-tb-hd"><h2>Últimos caidos</h2>
                 <small><a href="{% url 'ultimos-caidos' %}">(ver más)</a></small></div>
@@ -51,7 +51,7 @@
             </div>
         </div>
 
-        <div class="col-lg-4 col-md-4 col-sm-4 col-xs-4">
+        <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
             <div class="data-table-list">
                 <div class="basic-tb-hd"><h2>Últimos registrados</h2>
                 <small><a href="{% url 'ultimos-registrados' %}">(ver más)</a></small></div>
@@ -83,65 +83,14 @@
                             </tbody>
 </table></div></div></div>
 
-        <div class="col-lg-4 col-md-4 col-sm-4 col-xs-4">
-            <div class="data-table-list">
-                <div class="basic-tb-hd">
-                <h2>Hosting más usados</h2>
-                <small><a href="{% url 'hostings' %}">(ver más)</a></small>
-                </div>
-                <div class="table-responsive">
-                    <table id="data-table-basic" class="table table-striped">
-                        <thead>
-                            <tr>
-<th>Hosting</th><th>Dominios apuntados</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-{% for host in hostings %}
-<tr>
-<td>{{ host.nombre }}</td>
-<td>{{ host.total_dominios }}</td>
-</tr>
-{% endfor %}                                 
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
         </div>
     </div>
 <!-- Data Table area End-->
 
-<!-- Hostings 30 dias Data Table area Start-->
     <div class="container">
         <div class="row">
-            <div class="col-lg-4 col-md-4 col-sm-4 col-xs-4">
-                <div class="data-table-list">
-                    <div class="basic-tb-hd">
-                    <h2>Hosting más usados</h2><p>dominios creados en los últimos 30 días</p>
-                    <small><a href="{% url 'hostings-30' %}">(ver más)</a></small>
-                    </div>
-                    <div class="table-responsive">
-                        <table id="data-table-basic" class="table table-striped">
-                            <thead>
-                                <tr>
-<th>Hosting</th><th>Dominios apuntados</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-{% for host in hostings_last_30_days %}
-<tr>
-<td>{{ host.nombre }}</td>
-<td>{{ host.total_dominios }}</td>
-</tr>
-{% endfor %}                                 
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
 
-            <div class="col-lg-4 col-md-4 col-sm-4 col-xs-4">
+            <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
                 <div class="data-table-list">
                     <div class="basic-tb-hd">
                         <h2>Nuevos dominios de registrantes etiquetados</h2>
@@ -182,7 +131,7 @@
                 </div>
             </div>
         
-            <div class="col-lg-4 col-md-4 col-sm-4 col-xs-4">
+            <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
                 <div class="data-table-list">
                     <div class="basic-tb-hd">
                         <h2>Transferencias de dominios</h2>
