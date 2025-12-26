@@ -74,9 +74,19 @@ class UltimosCaidos(AnalyticsViewMixin, TemplateView):
         context['site_title'] = 'Ultimos dominios caidos'
         context['site_description'] = 'Lista de los últimos dominios caidos'
 
-        # Authenticated users see 10, anonymous users see 5
+        zona_id = self.request.GET.get('zona')
+        zona = None
+        if zona_id:
+            try:
+                zona = Zona.objects.get(id=zona_id)
+            except Zona.DoesNotExist:
+                zona = None
+        context['zona_seleccionada'] = zona
+        context['zonas'] = Zona.objects.all()
+
+        # Authenticated users see 500, anonymous users see 5
         limit = 500 if self.request.user.is_authenticated else 5
-        context['ultimos_caidos'] = get_ultimos_caidos(limit=limit)
+        context['ultimos_caidos'] = get_ultimos_caidos(limit=limit, zona=zona)
 
         return context
 
