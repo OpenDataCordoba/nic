@@ -10,6 +10,7 @@ from dominios.data import get_ultimos_registrados
 from dnss.data import get_hosting_usados
 from core.data import get_search_results
 from core.views import AnalyticsViewMixin
+from zonas.models import Zona
 
 
 class HomeView(AnalyticsViewMixin, TemplateView):
@@ -21,13 +22,22 @@ class HomeView(AnalyticsViewMixin, TemplateView):
         context['site_title'] = 'NIC Data'
         context['site_description'] = 'Sitio con información de registros de dominios argentinos'
 
-        context['ultimos_caidos'] = get_ultimos_caidos(limit=5)
-        context['ultimos_registrados'] = get_ultimos_registrados(limit=5)
-        context['hostings'] = get_hosting_usados(days_ago=0, limit=5)
-        context['hostings_last_30_days'] = get_hosting_usados(days_ago=30, limit=5)
-        context['news_from_tags'] = get_ultimos_registrados(limit=5, de_registrantes_etiquetados=True)
-        context['transferencias'] = get_ultimas_transferencias(limit=5)
+        zona_id = self.request.GET.get('zona')
+        zona = None
+        if zona_id:
+            try:
+                zona = Zona.objects.get(id=zona_id)
+            except Zona.DoesNotExist:
+                zona = None
+        context['zona_seleccionada'] = zona
+        context['zonas'] = Zona.objects.all()
 
+        context['ultimos_caidos'] = get_ultimos_caidos(limit=5, zona=zona)
+        context['ultimos_registrados'] = get_ultimos_registrados(limit=5, zona=zona)
+        context['hostings'] = get_hosting_usados(days_ago=0, limit=5, zona=zona)
+        context['hostings_last_30_days'] = get_hosting_usados(days_ago=30, limit=5, zona=zona)
+        context['news_from_tags'] = get_ultimos_registrados(limit=5, de_registrantes_etiquetados=True, zona=zona)
+        context['transferencias'] = get_ultimas_transferencias(limit=5, zona=zona)
         return context
 
 

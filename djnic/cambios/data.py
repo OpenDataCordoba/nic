@@ -14,37 +14,51 @@ logger = logging.getLogger(__name__)
 
 
 @cache_memoize(settings.GENERAL_CACHE_SECONDS)
-def get_ultimos_caidos(limit=5):
-    ultimos_caidos = CampoCambio.objects\
-        .filter(campo='estado', anterior=STATUS_NO_DISPONIBLE, nuevo=STATUS_DISPONIBLE)\
-        .order_by('-cambio__momento')[:limit]
+def get_ultimos_caidos(limit=5, zona=None):
+    ultimos_caidos = CampoCambio.objects.filter(
+        campo='estado', anterior=STATUS_NO_DISPONIBLE, nuevo=STATUS_DISPONIBLE
+    )
+    if zona:
+        ultimos_caidos = ultimos_caidos.filter(cambio__dominio__zona=zona)
+
+    ultimos_caidos = ultimos_caidos.order_by('-cambio__momento')[:limit]
 
     return ultimos_caidos
 
 
 @cache_memoize(settings.GENERAL_CACHE_SECONDS)
-def get_ultimas_transferencias(limit=5):
+def get_ultimas_transferencias(limit=5, zona=None):
     """ Dominios que pasan de un registrante a otros
         Pueden no ser transferencias sino sino solo casos
             donde el dominio esta libre poco tiempo y
             lo registra otra persona. Pasa con dominios valiosos
         """
-    transferencias = CampoCambio.objects\
-        .filter(campo='registrant_legal_uid')\
-        .exclude(anterior__exact="")\
-        .exclude(nuevo__exact="")\
-        .order_by('-cambio__momento')
+    transferencias = CampoCambio.objects.filter(
+        campo='registrant_legal_uid'
+    ).exclude(
+        anterior__exact=""
+    ).exclude(nuevo__exact="")
+
+    if zona:
+        transferencias = transferencias.filter(cambio__dominio__zona=zona)
+
+    transferencias = transferencias.order_by('-cambio__momento')
 
     return transferencias[:limit]
 
 
 @cache_memoize(settings.GENERAL_CACHE_SECONDS)
-def get_renovaciones(limit=50, solo_fallados=False, solo_hacia_atras=False):
+def get_renovaciones(limit=50, solo_fallados=False, solo_hacia_atras=False, zona=None):
     """ Dominios que cambia la fecha en que expira """
     cambios = CampoCambio.objects\
         .filter(campo='dominio_expire')\
         .exclude(anterior__exact="")\
-        .exclude(nuevo__exact="")\
+        .exclude(nuevo__exact="")
+
+    if zona:
+        cambios = cambios.filter(cambio__dominio__zona=zona)
+
+    cambios = cambios\
         .annotate(dnuevo=Cast('nuevo', DateTimeField()))\
         .annotate(danterior=Cast('anterior', DateTimeField()))\
         .annotate(tdiff=ExpressionWrapper(F('dnuevo') - F('danterior'), output_field=DurationField()))

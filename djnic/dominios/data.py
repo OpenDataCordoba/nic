@@ -7,8 +7,11 @@ from django.conf import settings
 
 
 @cache_memoize(settings.GENERAL_CACHE_SECONDS)
-def get_ultimos_registrados(limit=5, de_registrantes_etiquetados=False, etiqueta=None):
+def get_ultimos_registrados(limit=5, de_registrantes_etiquetados=False, etiqueta=None, zona=None):
     ultimos = Dominio.objects.filter(estado=STATUS_NO_DISPONIBLE)
+
+    if zona:
+        ultimos = ultimos.filter(zona=zona)
 
     if de_registrantes_etiquetados:
         ultimos = ultimos.annotate(tags=Count('registrante__tags')).filter(tags__gt=0)

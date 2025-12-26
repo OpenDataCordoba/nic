@@ -3,6 +3,20 @@
 {% block main %}
 
 <div class="container">
+    <form method="get" id="zona-selector-form" class="mb-3">
+        <div class="form-group">
+            <label for="zona-selector"><b>Filtrar por zona:</b></label>
+            <select name="zona" id="zona-selector" class="form-control" style="width:auto;display:inline-block;" onchange="document.getElementById('zona-selector-form').submit();">
+                <option value="">Todas</option>
+                {% for zona in zonas %}
+                    <option value="{{ zona.id }}" {% if zona_seleccionada and zona_seleccionada.id == zona.id %}selected{% endif %}>{{ zona.nombre }}</option>
+                {% endfor %}
+            </select>
+        </div>
+    </form>
+</div>
+
+<div class="container">
     <div class="row">
         <div class="col-lg-4 col-md-4 col-sm-4 col-xs-4">
             <div class="data-table-list">
