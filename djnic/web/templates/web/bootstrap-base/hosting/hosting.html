@@ -4,7 +4,8 @@
 
 <div class="container">
     <div class="row">
-        <div class="col-lg-4 col-md-4 col-sm-4 col-xs-4">
+
+        <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
             <h2>Hosting: {{hosting.nombre }}</h2>
             <p>
                 Dominios en DNS: <b>{{ total_dominios }}</b>
@@ -12,39 +13,68 @@
                     <span class="badge badge-danger">musestra limitada a 100</span>
                 {% endif %}
             </p>
-            
-        </div>
 
-        <div class="col-lg-4 col-md-4 col-sm-4 col-xs-4">
-            <div class="data-table-list">
-                <div class="basic-tb-hd">
-                    <h2>DNS asignados</h2>
-                    <small>Sujeto a revision</small>
-                </div>
-                <div class="table-responsive">
-                    <table id="data-table-basic" class="table table-striped">
-<thead>
-                            <tr>
-<th>DNS</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-{% for regxdns in hosting.regexs.all %}
-<tr>
+<div class="data-table-list">
+    <div class="basic-tb-hd">
+        <h2>DNS asignados</h2>
+        <small>Sujeto a revision</small>
+    </div>
+    <div class="table-responsive">
+        <table id="data-table-basic" class="table table-striped">
+            <thead>
+                <tr>
+                    <th>DNS</th>
+                </tr>
+            </thead>
+            <tbody>
+            {% for regxdns in hosting.regexs.all %}
+            <tr>
+                <td>{{ regxdns.regex_dns }}</td>
+            </tr>
+            {% endfor %}
+            |</tbody>
+        </table>
+    </div>
+</div>
 
-<td>    
-    {{ regxdns.regex_dns }}
-</td>
+<div class="data-table-list">
+    <div class="basic-tb-hd">
+        <h2>Dominios</h2>
+        {% if total_dominios >= 99 %}
+            <span class="badge badge-danger">musestra limitada a 100</span>
+        {% endif %}
+    </div>
+    <div class="table-responsive">
+        <table id="data-table-basic" class="table table-striped">
+            <thead>
+                <tr>
+                    <th>Dominio</th>
+                    <th>Registrante</th>
+                    <th>Fecha de registro</th>
+                </tr>
+            </thead>
+            <tbody>
+            {% for dominio in ultimos_dominios %}
+            <tr>
+                <td>
+                    <a href='{% url "dominio" uid=dominio.uid %}'>
+                    {{ dominio.nombre }}.{{ dominio.zona.nombre }}
+                    </a>
+                </td>
+                <td>
+                    <a href='{% url "registrante" uid=dominio.registrante.uid %}'>{{ dominio.registrante.name }}</a>
+                </td>
+                <td>{{ dominio.registered|date:"Y-m-d" }}</td>
+            </tr>
+            {% endfor %}
+            |</tbody>
+        </table>
+    </div>
+</div>
 
-</tr>
-{% endfor %}                                 
-                            </tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
+</div>
 
-<div class="col-lg-4 col-md-4 col-sm-4 col-xs-4">
+<div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
     <div class="data-table-list">
         <div class="basic-tb-hd">
             <h2>DNS encontrados</h2>
