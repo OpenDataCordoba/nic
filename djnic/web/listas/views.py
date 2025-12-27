@@ -92,6 +92,7 @@ class CiudadesArgentinasView(AnalyticsViewMixin, TemplateView):
             'buenosaires',
             'cordoba',
             'rosario',
+            'carlospaz',
             'mendoza',
             'laplata',
             'sanmiguel',
@@ -115,6 +116,43 @@ class CiudadesArgentinasView(AnalyticsViewMixin, TemplateView):
             'riocuarto',
         ]
         data = sorted(data)
+        dom_data = generate_lista_table(data, zonas_relevantes=['com.ar', 'ar', 'gob.ar'])
+        context['data'] = dom_data
+
+        return context
+
+
+class PorteniosView(AnalyticsViewMixin, TemplateView):
+
+    template_name = "web/bootstrap-base/listas.html"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['site_title'] = 'Lista de Dominios Porteños'
+        context['site_description'] = 'Lista de dominios porteños'
+        # Lista de dominios porteños
+        data = [
+            'tango',
+            'laboca',
+            'palermo',
+            'recoleta',
+            'belgrano',
+            'caballito',
+            'flores',
+            'monserrat',
+            'sanisidro',
+            'villaurquiza',
+            'nuñez',
+            'constitucion',
+            'almagro',
+            'boedo',
+            'parquechacabuco',
+            'villaurquiza',
+            'parquepatricios',
+            'villaurquiza',
+            'bsas',
+            'baires',
+        ]
         dom_data = generate_lista_table(data, zonas_relevantes=['com.ar', 'ar', 'gob.ar'])
         context['data'] = dom_data
 
