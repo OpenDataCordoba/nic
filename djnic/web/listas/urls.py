@@ -1,5 +1,6 @@
 from django.urls import path
 from web.listas.views import (
+    BebidasView,
     ComidasView,
     DominiosUnaCaracterView,
     DominiosDosCaracteresView,
@@ -16,4 +17,5 @@ urlpatterns = [
     path('ciudades-argentinas', CiudadesArgentinasView.as_view(), name='listas-ciudades-argentinas'),
     path('portenios', PorteniosView.as_view(), name='lista-portenios'),
     path('comidas', ComidasView.as_view(), name='lista-comidas'),
+    path('bebidas', BebidasView.as_view(), name='lista-bebidas'),
 ]
