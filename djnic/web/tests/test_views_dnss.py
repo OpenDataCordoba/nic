@@ -32,8 +32,9 @@ class HostingViewTest(TestCase):
         )
 
         zona = Zona.objects.create(nombre="com")
+        # uid like uuid.uuid4
         self.registrante = Registrante.objects.create(
-            uid='test-registrante-uid',
+            uid='123e4567-e89b-12d3-a456-426614174000',
             name="Test Registrante"
         ) 
         # Create a test domain using this DNS
