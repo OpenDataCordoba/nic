@@ -1,7 +1,10 @@
+from django.conf import settings
 from dominios.models import Dominio
 from zonas.models import Zona
+from cache_memoize import cache_memoize
 
 
+@cache_memoize(settings.GENERAL_CACHE_SECONDS)
 def generate_lista_table(lista, zonas_relevantes=['com.ar', 'ar']):
     """ Generar un diccionario/tabla con todos los elementos de la lista como dominios
         para todas las zonas disponibles

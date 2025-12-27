@@ -1,3 +1,4 @@
+import string
 from core.views import AnalyticsViewMixin
 from web.listas.utils import generate_lista_table
 from django.views.generic.base import TemplateView
@@ -38,6 +39,22 @@ class ProvinciasArgentinasListView(AnalyticsViewMixin, TemplateView):
             'tucuman',
         ]
         dom_data = generate_lista_table(data, zonas_relevantes=['com.ar', 'ar', 'gob.ar'])
+        context['data'] = dom_data
+
+        return context
+
+
+class DominiosUnaCaracterView(AnalyticsViewMixin, TemplateView):
+
+    template_name = "web/bootstrap-base/listas.html"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['site_title'] = 'Lista de Dominios de una letra'
+        context['site_description'] = 'Lista de dominios de una sola letra'
+        # Lista de dominios de una letra
+        data = list(string.ascii_lowercase) + list(string.digits)
+        dom_data = generate_lista_table(data, zonas_relevantes=['com.ar', 'ar'])
         context['data'] = dom_data
 
         return context
