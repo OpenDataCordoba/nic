@@ -39,7 +39,6 @@ def get_search_results(query):
             ).first()
             if exact_dom:
                 res['exacto'] = [exact_dom]
-                return res
 
         if len(dominio_nombre) > 3:
             res['parecidos'] = Dominio.objects.filter(nombre__icontains=dominio_nombre).order_by('nombre')[:250]
