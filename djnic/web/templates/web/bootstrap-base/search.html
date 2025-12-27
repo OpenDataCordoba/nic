@@ -13,14 +13,18 @@
 <tbody>
 
 {% for res in exacto %}
-<tr>
-<td><a href='{% url "dominio" uid=res.uid %}'>{{ res.full_domain }}</a></td>
+<tr title="Exacto">
+<td>
+    <b>
+        <a href='{% url "dominio" uid=res.uid %}'>{{ res.full_domain }}</a>
+    </b>
+</td>
 <td>Dominio</td>
 </tr>
 {% endfor %}
 
 {% for res in parecidos %}
-<tr>
+<tr title="Parecido">
 <td><a href='{% url "dominio" uid=res.uid %}'>{{ res.full_domain }}</a></td>
 <td>Dominio</td>
 </tr>

@@ -30,7 +30,7 @@ def get_search_results(query):
         # esto es dominio.nombre + dominio.zona.nombre
         partes = query.split('.')
         dominio_nombre = partes[0]
-        zona_nombre = '.' + '.'.join(partes[1:])
+        zona_nombre = '.'.join(partes[1:])
         zona = Zona.objects.filter(nombre=zona_nombre).first()
         if zona:
             # primero que todo el exacto
