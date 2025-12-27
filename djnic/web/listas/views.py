@@ -54,7 +54,7 @@ class DominiosUnaCaracterView(AnalyticsViewMixin, TemplateView):
         context['site_description'] = 'Lista de dominios de una sola letra'
         # Lista de dominios de una letra
         data = list(string.ascii_lowercase) + list(string.digits)
-        dom_data = generate_lista_table(data, zonas_relevantes=['com.ar', 'ar'])
+        dom_data = generate_lista_table(data, zonas_relevantes=['ar', 'com.ar'])
         context['data'] = dom_data
 
         return context
