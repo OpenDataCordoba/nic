@@ -9,6 +9,7 @@ from rest_framework.authtoken import views
 from .views import DominioSitemap, RegistranteSitemap, RubroSitemap, HostingSitemap, DNSSitemap
 from web.views import robots_txt
 
+
 sitemaps = {
     'dominio': DominioSitemap,
     'registrante': RegistranteSitemap,
@@ -25,7 +26,11 @@ urlpatterns = [
     path('api-token-auth/', views.obtain_auth_token),
     # Sitemap https://docs.djangoproject.com/en/3.1/ref/contrib/sitemaps/#creating-a-sitemap-index
     path('sitemap.xml', cache_page(86400)(sitemap_views.index), {'sitemaps': sitemaps}),
-    path('sitemap-<section>.xml', cache_page(86400)(sitemap_views.sitemap), {'sitemaps': sitemaps}, name='django.contrib.sitemaps.views.sitemap'),
+    path(
+        'sitemap-<section>.xml',
+        cache_page(86400)(sitemap_views.sitemap),
+        {'sitemaps': sitemaps}, name='django.contrib.sitemaps.views.sitemap'
+    ),
 
     # webpush
     path('webpush/', include('webpush.urls')),
