@@ -157,3 +157,39 @@ class PorteniosView(AnalyticsViewMixin, TemplateView):
         context['data'] = dom_data
 
         return context
+
+
+class ComidasView(AnalyticsViewMixin, TemplateView):
+
+    template_name = "web/bootstrap-base/listas.html"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['site_title'] = 'Lista de Comidas Populares'
+        context['site_description'] = 'Lista de comidas populares'
+        # Lista de comidas populares
+        data = [
+            'pizza',
+            'empanadas',
+            'asado',
+            'milanesa',
+            'chori',
+            'choripan',
+            'pan',
+            'locro',
+            'humita',
+            'provoleta',
+            'leche',
+            'queso',
+            'dulcedeleche',
+            'alfajor',
+            'mate',
+            'medialunas',
+            'chocotorta',
+            'pollo',
+            'fainá',
+        ]
+        dom_data = generate_lista_table(data, zonas_relevantes=['com.ar', 'ar'])
+        context['data'] = dom_data
+
+        return context
