@@ -34,7 +34,7 @@
             {% if elem.estado == 'disponible' %}
             Libre
             {% else %}
-            {{ elem.registrante.name|truncatechars:20 }}
+            {{ elem.registrante.name|truncatechars:35 }}
             {% endif %}
         </a>
     {% else %}
