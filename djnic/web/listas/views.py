@@ -258,7 +258,7 @@ class FutbolistasView(AnalyticsViewMixin, TemplateView):
             'huracan',
             'tigre',
         ]
-        dom_data = generate_lista_table(data, zonas_relevantes=['com.ar', 'ar'])
+        dom_data = generate_lista_table(data, zonas_relevantes=['com.ar', 'ar', 'org.ar'])
         context['data'] = dom_data
 
         return context
