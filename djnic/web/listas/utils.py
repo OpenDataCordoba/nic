@@ -18,7 +18,7 @@ def generate_lista_table(lista):
         dominio_str = dominio_str.strip().lower()
         res['dominios'][dominio_str] = {}
         for zona in zonas:
-            dominio = Dominio.objects.filter(dominio=dominio_str, zona=zona).first()
+            dominio = Dominio.objects.filter(nombre=dominio_str, zona=zona).first()
             res['dominios'][dominio_str][zona.nombre] = dominio
 
     return res
