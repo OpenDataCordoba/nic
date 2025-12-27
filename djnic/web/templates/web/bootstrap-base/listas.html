@@ -31,10 +31,14 @@
     <td>
     {% if elem %}
         <a href='{% url "dominio" uid=elem.uid %}'>
-        {{ elem.registrante }}
+            {% if elem.estado == 'disponible' %}
+            Libre
+            {% else %}
+            {{ elem.registrante.name|truncatechars:20 }}
+            {% endif %}
         </a>
     {% else %}
-        Libre
+        No relevado
     {% endif %}
     </td>
 {% endfor %}
