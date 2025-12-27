@@ -21,17 +21,17 @@
 
 <tbody>
 
-{% for nombre, zonas in data.dominios.items %}
+{% for nombre, lista in data.dominios.items %}
 <tr>
     <td>
         <b>{{ nombre }}</b>
     </td>
 
-    {% for zona in data.zonas %}
+    {% for elem in lista %}
     <td>
-    {% if zonas[zona] %}
-        <a href='{% url "dominio" uid=zonas[zona].uid %}'>
-        {{ zonas[zona].registrante }}
+    {% if elem %}
+        <a href='{% url "dominio" uid=elem.uid %}'>
+        {{ elem.registrante }}
         </a>
     {% else %}
         Libre
