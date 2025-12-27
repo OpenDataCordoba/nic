@@ -7,7 +7,7 @@ from django.views.generic import FormView
 from web.forms import SearchForm
 from cambios.data import get_ultimos_caidos, get_ultimas_transferencias
 from dominios.data import get_ultimos_registrados
-from dnss.data import get_hosting_usados
+# from dnss.data import get_hosting_usados
 from core.data import get_search_results
 from core.views import AnalyticsViewMixin
 from zonas.models import Zona
@@ -84,7 +84,7 @@ class SearchResultsView(AnalyticsViewMixin, FormView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['site_title'] = 'Acerca de Dominios Argentinos'
+        context['site_title'] = 'Buscando ...'
         context['site_description'] = 'Dominios Argentinos es un proyecto de OpenDataCordoba'
 
         query = self.request.GET.get('query')

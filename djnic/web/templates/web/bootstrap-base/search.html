@@ -23,6 +23,13 @@
 </tr>
 {% endfor %}
 
+{% for res in casi %}
+<tr title="Casi">
+<td><a href='{% url "dominio" uid=res.uid %}'>{{ res.full_domain }}</a></td>
+<td>Dominio</td>
+</tr>
+{% endfor %}
+
 {% for res in parecidos %}
 <tr title="Parecido">
 <td><a href='{% url "dominio" uid=res.uid %}'>{{ res.full_domain }}</a></td>

@@ -11,6 +11,7 @@ from django.conf import settings
 def get_search_results(query):
     res = {
         'exacto': [],
+        'casi': [],
         'parecidos': [],
         'dominios': [],
         'registrantes': [],
@@ -41,9 +42,11 @@ def get_search_results(query):
                 res['exacto'] = [exact_dom]
 
         if len(dominio_nombre) > 3:
+            res['casi'] = Dominio.objects.filter(nombre=dominio_nombre).order_by('nombre')
             res['parecidos'] = Dominio.objects.filter(nombre__icontains=dominio_nombre).order_by('nombre')[:250]
 
     else:
+        res['casi'] = Dominio.objects.filter(nombre=query).order_by('nombre')
         res['dominios'] = Dominio.objects.filter(nombre__icontains=query).order_by('nombre')[:250]
         res['registrantes'] = Registrante.objects.filter(
             Q(name__icontains=query) | Q(legal_uid__icontains=query)
