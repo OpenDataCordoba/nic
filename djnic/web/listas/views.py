@@ -27,7 +27,7 @@ class ProvinciasArgentinasListView(AnalyticsViewMixin, TemplateView):
             'mendoza',
             'misiones',
             'neuquen',
-            'rio-negro',
+            'rionegro',
             'salta',
             'sanjuan',
             'sanluis',
