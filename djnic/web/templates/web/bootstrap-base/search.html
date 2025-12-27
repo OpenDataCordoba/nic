@@ -12,6 +12,20 @@
 <thead><tr><th>Resultado</th><th>Tipo</th></tr></thead>
 <tbody>
 
+{% for res in exacto %}
+<tr>
+<td><a href='{% url "dominio" uid=res.uid %}'>{{ res.full_domain }}</a></td>
+<td>Dominio</td>
+</tr>
+{% endfor %}
+
+{% for res in parecidos %}
+<tr>
+<td><a href='{% url "dominio" uid=res.uid %}'>{{ res.full_domain }}</a></td>
+<td>Dominio</td>
+</tr>
+{% endfor %}
+
 {% for res in dominios %}
 <tr>
 <td><a href='{% url "dominio" uid=res.uid %}'>{{ res.full_domain }}</a></td>
