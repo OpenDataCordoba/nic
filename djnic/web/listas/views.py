@@ -77,3 +77,45 @@ class DominiosDosCaracteresView(AnalyticsViewMixin, TemplateView):
         context['data'] = dom_data
 
         return context
+
+
+class CiudadesArgentinasView(AnalyticsViewMixin, TemplateView):
+
+    template_name = "web/bootstrap-base/listas.html"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['site_title'] = 'Lista de Ciudades Argentinas'
+        context['site_description'] = 'Lista de ciudades argentinas'
+        # Lista de ciudades argentinas
+        data = [
+            'buenosaires',
+            'cordoba',
+            'rosario',
+            'mendoza',
+            'laplata',
+            'sanmiguel',
+            'mardelplata',
+            'salta',
+            'santafe',
+            'sanjuan',
+            'resistencia',
+            'bahiablanca',
+            'parana',
+            'merlo',
+            'quilmes',
+            'sansalvador',
+            'guaymallen',
+            'posadas',
+            'sanrafael',
+            'laferrere',
+            'lanus',
+            'godoycruz',
+            'banfield',
+            'riocuarto',
+        ]
+        data = sorted(data)
+        dom_data = generate_lista_table(data, zonas_relevantes=['com.ar', 'ar', 'gob.ar'])
+        context['data'] = dom_data
+
+        return context
