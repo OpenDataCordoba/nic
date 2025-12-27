@@ -37,7 +37,7 @@ class ProvinciasArgentinasListView(AnalyticsViewMixin, TemplateView):
             'tierradelfuego',
             'tucuman',
         ]
-        dom_data = generate_lista_table(data)
+        dom_data = generate_lista_table(data, zonas_relevantes=['com.ar', 'ar', 'gob.ar'])
         context['data'] = dom_data
 
         return context

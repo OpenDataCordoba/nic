@@ -2,13 +2,12 @@ from dominios.models import Dominio
 from zonas.models import Zona
 
 
-def generate_lista_table(lista):
+def generate_lista_table(lista, zonas_relevantes=['com.ar', 'ar']):
     """ Generar un diccionario/tabla con todos los elementos de la lista como dominios
         para todas las zonas disponibles
     """
 
     # listar solo las zonas relevantes (quitar las que no se usan mucho)
-    zonas_relevantes = ['com.ar', 'ar', 'net.ar', 'org.ar', 'tur.ar', 'gob.ar']
     zonas = Zona.objects.filter(nombre__in=zonas_relevantes)
     res = {
         'dominios': {},
