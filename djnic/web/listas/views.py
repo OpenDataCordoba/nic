@@ -58,3 +58,22 @@ class DominiosUnaCaracterView(AnalyticsViewMixin, TemplateView):
         context['data'] = dom_data
 
         return context
+
+
+class DominiosDosCaracteresView(AnalyticsViewMixin, TemplateView):
+
+    template_name = "web/bootstrap-base/listas.html"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['site_title'] = 'Lista de Dominios de dos letras en .ar'
+        context['site_description'] = 'Lista de dominios de dos letras en .ar'
+        # Lista de dominios de dos letras
+        data = []
+        for char1 in string.ascii_lowercase + string.digits:
+            for char2 in string.ascii_lowercase + string.digits:
+                data.append(f"{char1}{char2}")
+        dom_data = generate_lista_table(data, zonas_relevantes=['ar'])
+        context['data'] = dom_data
+
+        return context
