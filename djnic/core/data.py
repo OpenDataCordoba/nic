@@ -25,7 +25,6 @@ def get_search_results(query):
         return res
     query = query.lower()
     if query.endswith('.ar'):
-        query = query[:-3]
         # Estamos buscando un dominio con la zona completa
         # esto es dominio.nombre + dominio.zona.nombre
         partes = query.split('.')
