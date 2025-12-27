@@ -1,5 +1,5 @@
 from django.contrib.auth.decorators import login_required
-from django.urls import path
+from django.urls import path, include
 from .views import (HomeView, AboutView, SearchResultsView,
                     PrivaciPolicyView, TermsView, LoginView)
 
@@ -68,4 +68,7 @@ urlpatterns = [
     path('descargas/dnss.csv', csv_dns, name='csv-dnss'),
     path('descargas/dominios.csv', csv_dominios, name='csv-dominios'),
 
+    # Listas predefinidas
+    # listas/* sent to listas/urls.py
+    path('listas/', include('web.listas.urls'))
 ]

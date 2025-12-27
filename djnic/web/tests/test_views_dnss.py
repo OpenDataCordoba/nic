@@ -5,6 +5,7 @@ from django.test import TestCase, Client
 from django.urls import reverse
 from dnss.models import Empresa, DNS, EmpresaRegexDomain
 from dominios.models import Dominio, DNSDominio
+from registrantes.models import Registrante
 from zonas.models import Zona
 
 
@@ -31,10 +32,16 @@ class HostingViewTest(TestCase):
         )
 
         zona = Zona.objects.create(nombre="com")
+        # uid like uuid.uuid4
+        self.registrante = Registrante.objects.create(
+            uid='123e4567-e89b-12d3-a456-426614174000',
+            name="Test Registrante"
+        ) 
         # Create a test domain using this DNS
         self.dominio = Dominio.objects.create(
             nombre="example",
             zona=zona,
+            registrante=self.registrante,
         )
         DNSDominio.objects.create(
             dominio=self.dominio,

@@ -1,0 +1,54 @@
+{% extends "web/bootstrap-base/base.html" %}
+
+{% block main %}
+
+<div class="container">
+    <div class="row">
+        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+            <div class="data-table-list">
+                <div class="basic-tb-hd"><h2>{{ site_title }}</h2></div>
+                <div class="table-responsive">
+                    <table id="data-table-basic" class="table table-striped">
+
+<thead>
+    <tr>
+        <th>Nombre</th>
+        {% for zona in data.zonas %}
+        <th>{{ zona }}</th>
+        {% endfor %}
+    </tr>
+</thead>
+
+<tbody>
+
+{% for nombre, zonas in data.dominios.items %}
+<tr>
+    <td>
+        <b>{{ nombre }}</b>
+    </td>
+
+    {% for zona in data.zonas %}
+    <td>
+    {% if zonas[zona] %}
+        <a href='{% url "dominio" uid=zonas[zona].uid %}'>
+        {{ zonas[zona].registrante }}
+        </a>
+    {% else %}
+        Libre
+    {% endif %}
+    </td>
+{% endfor %}
+</tr>
+{% endfor %}
+
+
+
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>        
+    </div>
+</div>
+
+{% endblock main %}
