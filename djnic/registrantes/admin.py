@@ -19,4 +19,7 @@ class TagForRegistranteAdmin(admin.ModelAdmin):
 class RegistranteTagAdmin(admin.ModelAdmin):
     list_display = ['registrante', 'tag']
     list_per_page = 10
-    search_fields = ['registrante__name', 'registrante__legal_uid']
+    search_fields = ['registrante__name', 'registrante__legal_uid', 'tag__nombre']
+    autocomplete_fields = ['registrante', 'tag']
+    list_select_related = ['registrante', 'tag']
+    list_filter = ['tag']
