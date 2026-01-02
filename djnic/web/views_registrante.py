@@ -1,8 +1,12 @@
 from django.views.generic.detail import DetailView
 from django.views.generic.list import ListView
+from django.views import View
+from django.shortcuts import redirect, get_object_or_404
+from django.contrib import messages
+from django.http import HttpResponseForbidden
 
 from core.views import AnalyticsViewMixin
-from registrantes.models import Registrante, TagForRegistrante
+from registrantes.models import Registrante, TagForRegistrante, RegistranteTag
 from dominios.data import get_ultimos_registrados
 from registrantes.data import get_primeros_reg_creados, get_mayores_registrantes
 
@@ -21,6 +25,11 @@ class RegistranteView(AnalyticsViewMixin, DetailView):
         context['site_title'] = f'Registrante de dominio {self.object.name}'
         context['site_description'] = f'Datos del registrante {self.object.name}'
         context['dominios'] = self.object.dominios.all().order_by('expire')
+
+        # Tags para usuarios staff
+        context['registrante_tags'] = self.object.tags.all()
+        context['all_tags'] = TagForRegistrante.objects.all().order_by('nombre')
+        context['is_staff'] = self.request.user.is_staff
 
         return context
 
@@ -90,3 +99,85 @@ class RubroView(AnalyticsViewMixin, DetailView):
         webpush = {"group": f'rubro-{self.kwargs["uid"]}'}
         context['webpush'] = webpush
         return context
+
+
+class AddTagToRegistranteView(View):
+    """Vista para agregar un tag existente a un registrante - Solo staff"""
+
+    def post(self, request, uid):
+        # Verificar que el usuario es staff
+        if not request.user.is_staff:
+            return HttpResponseForbidden("Solo usuarios staff pueden realizar esta acción")
+
+        registrante = get_object_or_404(Registrante, uid=uid)
+        tag_uid = request.POST.get('tag_uid')
+
+        if tag_uid:
+            tag = get_object_or_404(TagForRegistrante, uid=tag_uid)
+
+            # Verificar si ya existe la relación
+            if not RegistranteTag.objects.filter(registrante=registrante, tag=tag).exists():
+                RegistranteTag.objects.create(registrante=registrante, tag=tag)
+                messages.success(request, f'Tag "{tag.nombre}" agregado exitosamente')
+            else:
+                messages.warning(request, f'El registrante ya tiene el tag "{tag.nombre}"')
+        else:
+            messages.error(request, 'Debe seleccionar un tag')
+
+        return redirect('registrante', uid=uid)
+
+
+class CreateAndAddTagView(View):
+    """Vista para crear un nuevo tag y agregarlo al registrante - Solo staff"""
+
+    def post(self, request, uid):
+        # Verificar que el usuario es staff
+        if not request.user.is_staff:
+            return HttpResponseForbidden("Solo usuarios staff pueden realizar esta acción")
+
+        registrante = get_object_or_404(Registrante, uid=uid)
+        tag_nombre = request.POST.get('tag_nombre', '').strip()
+
+        if tag_nombre:
+            # Buscar o crear el tag
+            tag, created = TagForRegistrante.objects.get_or_create(nombre=tag_nombre)
+
+            # Verificar si ya existe la relación
+            if not RegistranteTag.objects.filter(registrante=registrante, tag=tag).exists():
+                RegistranteTag.objects.create(registrante=registrante, tag=tag)
+                if created:
+                    messages.success(request, f'Tag "{tag_nombre}" creado y agregado exitosamente')
+                else:
+                    messages.success(request, f'Tag "{tag_nombre}" agregado exitosamente')
+            else:
+                messages.warning(request, f'El registrante ya tiene el tag "{tag_nombre}"')
+        else:
+            messages.error(request, 'Debe ingresar un nombre para el tag')
+
+        return redirect('registrante', uid=uid)
+
+
+class RemoveTagFromRegistranteView(View):
+    """Vista para remover un tag de un registrante - Solo staff"""
+
+    def post(self, request, uid):
+        # Verificar que el usuario es staff
+        if not request.user.is_staff:
+            return HttpResponseForbidden("Solo usuarios staff pueden realizar esta acción")
+
+        registrante = get_object_or_404(Registrante, uid=uid)
+        tag_uid = request.POST.get('tag_uid')
+
+        if tag_uid:
+            tag = get_object_or_404(TagForRegistrante, uid=tag_uid)
+            relacion = RegistranteTag.objects.filter(registrante=registrante, tag=tag)
+
+            if relacion.exists():
+                relacion.delete()
+                messages.success(request, f'Tag "{tag.nombre}" removido exitosamente')
+            else:
+                messages.warning(request, f'El registrante no tiene el tag "{tag.nombre}"')
+        else:
+            messages.error(request, 'Tag no especificado')
+
+        return redirect('registrante', uid=uid)

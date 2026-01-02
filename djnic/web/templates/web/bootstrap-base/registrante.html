@@ -10,9 +10,86 @@
             <p>Dominios: <b>{{ registrante.dominios.count }}</b></p>
             <p>Registrado en Nic: <b>{{ registrante.created|date:"Y-m-d H:i:s" }}</b></p>
             <p>Cambio en NIC: <b>{{ registrante.changed|date:"Y-m-d H:i:s" }}</b></p>
-            
+
         </div>
     </div>
+
+    {% if is_staff %}
+    <!-- SECCIÓN STAFF ONLY - Gestión de Tags -->
+    <div class="row mt-4">
+        <div class="col-12">
+            <div class="card border-warning bg-light">
+                <div class="card-header bg-warning text-dark">
+                    <h4 class="mb-0">Panel de Staff - Gestión de Tags</h4>
+                </div>
+                <div class="card-body">
+                    {% if messages %}
+                        {% for message in messages %}
+                        <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                            {{ message }}
+                            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        {% endfor %}
+                    {% endif %}
+
+                    <!-- Tags actuales del registrante -->
+                    <div class="mb-4">
+                        <h5>Tags Asignados:</h5>
+                        {% if registrante_tags %}
+                        <div class="d-flex flex-wrap gap-2">
+                            {% for rel_tag in registrante_tags %}
+                            <div class="badge badge-primary p-2 d-inline-flex align-items-center" style="font-size: 1rem;">
+                                <a href="{% url 'rubro' uid=rel_tag.tag.uid %}" class="text-white text-decoration-none mr-2">
+                                    {{ rel_tag.tag.nombre }}
+                                </a>
+                                <form method="post" action="{% url 'registrante-remove-tag' uid=registrante.uid %}" style="display: inline;" onsubmit="return confirm('¿Seguro que deseas eliminar este tag?');">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="tag_uid" value="{{ rel_tag.tag.uid }}">
+                                    <button type="submit" class="btn btn-sm btn-danger ml-1" style="padding: 0.1rem 0.3rem; line-height: 1;">×</button>
+                                </form>
+                            </div>
+                            {% endfor %}
+                        </div>
+                        {% else %}
+                        <p class="text-muted">Este registrante no tiene tags asignados.</p>
+                        {% endif %}
+                    </div>
+
+                    <hr>
+
+                    <!-- Agregar tag existente -->
+                    <div class="mb-4">
+                        <h5>Agregar Tag Existente:</h5>
+                        <form method="post" action="{% url 'registrante-add-tag' uid=registrante.uid %}" class="form-inline">
+                            {% csrf_token %}
+                            <select name="tag_uid" class="form-control mr-2" style="width: 300px;" required>
+                                <option value="">Seleccionar un tag...</option>
+                                {% for tag in all_tags %}
+                                <option value="{{ tag.uid }}">{{ tag.nombre }}</option>
+                                {% endfor %}
+                            </select>
+                            <button type="submit" class="btn btn-primary">Agregar Tag</button>
+                        </form>
+                    </div>
+
+                    <hr>
+
+                    <!-- Crear nuevo tag -->
+                    <div class="mb-2">
+                        <h5>Crear Nuevo Tag:</h5>
+                        <form method="post" action="{% url 'registrante-create-tag' uid=registrante.uid %}" class="form-inline">
+                            {% csrf_token %}
+                            <input type="text" name="tag_nombre" class="form-control mr-2" placeholder="Nombre del nuevo tag..." style="width: 300px;" required>
+                            <button type="submit" class="btn btn-success">Crear y Agregar Tag</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
     <div class="row">
         <div class="col-12">
             <h3>Dominios</h3>
