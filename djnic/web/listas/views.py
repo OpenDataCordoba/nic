@@ -282,13 +282,13 @@ class CiudadesMundoView(AnalyticsViewMixin, TemplateView):
             'losangeles',
             'madrid',
             'miami',
-            'moscow',
+            'moscu',
             'newyork',
             'paris',
             'roma',
             'sydney',
             'tokyo',
-            'vienna',
+            'viena',
         ]
         dom_data = generate_lista_table(data, zonas_relevantes=['com.ar', 'ar', 'tur.ar'])
         context['data'] = dom_data
