@@ -6,6 +6,7 @@ from web.listas.views import (
     ComidasView,
     DominiosUnaCaracterView,
     DominiosDosCaracteresView,
+    FinanzasView,
     FutbolistasView,
     PorteniosView,
     ProvinciasArgentinasListView,
@@ -22,4 +23,5 @@ urlpatterns = [
     path('comidas', ComidasView.as_view(), name='lista-comidas'),
     path('bebidas', BebidasView.as_view(), name='lista-bebidas'),
     path('futbol', FutbolistasView.as_view(), name='lista-futbol'),
+    path('finanzas', FinanzasView.as_view(), name='lista-finanzas'),
 ]

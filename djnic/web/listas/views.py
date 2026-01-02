@@ -294,3 +294,39 @@ class CiudadesMundoView(AnalyticsViewMixin, TemplateView):
         context['data'] = dom_data
 
         return context
+
+
+class FinanzasView(AnalyticsViewMixin, TemplateView):
+
+    template_name = "web/bootstrap-base/listas.html"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['site_title'] = 'Dominios de Finanzas'
+        context['site_description'] = 'Lista de dominios relacionados con finanzas e inversiones'
+        data = [
+            'ahorro',
+            'banco',
+            'billetera',
+            'bitcoin',
+            'bolsa',
+            'broker',
+            'cripto',
+            'credito',
+            'dinero',
+            'dolar',
+            'finanzas',
+            'litio',
+            'hipoteca',
+            'inversion',
+            'oro',
+            'plata',
+            'prestamo',
+            'seguro',
+            'tarjeta',
+            'trading',
+        ]
+        dom_data = generate_lista_table(data, zonas_relevantes=['com.ar', 'ar'])
+        context['data'] = dom_data
+
+        return context
