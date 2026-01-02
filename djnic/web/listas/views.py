@@ -262,3 +262,35 @@ class FutbolistasView(AnalyticsViewMixin, TemplateView):
         context['data'] = dom_data
 
         return context
+
+
+class CiudadesMundoView(AnalyticsViewMixin, TemplateView):
+
+    template_name = "web/bootstrap-base/listas.html"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['site_title'] = 'Ciudades Importantes del Mundo'
+        context['site_description'] = 'Lista de ciudades importantes del mundo como dominios argentinos'
+        # Lista de ciudades importantes del mundo
+        data = [
+            'amsterdam',
+            'barcelona',
+            'berlin',
+            'dubai',
+            'london',
+            'losangeles',
+            'madrid',
+            'miami',
+            'moscow',
+            'newyork',
+            'paris',
+            'roma',
+            'sydney',
+            'tokyo',
+            'vienna',
+        ]
+        dom_data = generate_lista_table(data, zonas_relevantes=['com.ar', 'ar', 'tur.ar'])
+        context['data'] = dom_data
+
+        return context
