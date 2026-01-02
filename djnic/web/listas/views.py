@@ -330,3 +330,264 @@ class FinanzasView(AnalyticsViewMixin, TemplateView):
         context['data'] = dom_data
 
         return context
+
+
+class TecnologiaView(AnalyticsViewMixin, TemplateView):
+
+    template_name = "web/bootstrap-base/listas.html"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['site_title'] = 'Dominios de Tecnología'
+        context['site_description'] = 'Lista de dominios relacionados con tecnología'
+        data = [
+            'android',
+            'app',
+            'ai',
+            'apps',
+            'cloud',
+            'codigo',
+            'cyber',
+            'data',
+            'digital',
+            'hosting',
+            'ia',
+            'internet',
+            'iphone',
+            'online',
+            'software',
+            'tech',
+            'web',
+            'wifi',
+        ]
+        dom_data = generate_lista_table(data, zonas_relevantes=['com.ar', 'ar'])
+        context['data'] = dom_data
+
+        return context
+
+
+class DeportesView(AnalyticsViewMixin, TemplateView):
+
+    template_name = "web/bootstrap-base/listas.html"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['site_title'] = 'Dominios de Deportes'
+        context['site_description'] = 'Lista de dominios relacionados con deportes'
+        data = [
+            'basket',
+            'boxeo',
+            'ciclismo',
+            'fitness',
+            'futbol',
+            'golf',
+            'gym',
+            'hockey',
+            'natacion',
+            'padel',
+            'polo',
+            'rugby',
+            'running',
+            'ski',
+            'surf',
+            'tenis',
+            'voley',
+        ]
+        dom_data = generate_lista_table(data, zonas_relevantes=['com.ar', 'ar'])
+        context['data'] = dom_data
+
+        return context
+
+
+class VerbosAccionView(AnalyticsViewMixin, TemplateView):
+
+    template_name = "web/bootstrap-base/listas.html"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['site_title'] = 'Verbos de Acción'
+        context['site_description'] = 'Lista de dominios con verbos de acción'
+        data = [
+            'alquilar',
+            'buscar',
+            'comprar',
+            'conocer',
+            'contratar',
+            'cotizar',
+            'encontrar',
+            'enviar',
+            'pagar',
+            'pedir',
+            'reservar',
+            'vender',
+            'viajar',
+        ]
+        dom_data = generate_lista_table(data, zonas_relevantes=['com.ar', 'ar'])
+        context['data'] = dom_data
+
+        return context
+
+
+class ProfesionesView(AnalyticsViewMixin, TemplateView):
+
+    template_name = "web/bootstrap-base/listas.html"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['site_title'] = 'Dominios de Profesiones'
+        context['site_description'] = 'Lista de dominios relacionados con profesiones'
+        data = [
+            'abogado',
+            'abogados',
+            'arquitecto',
+            'arquitectos',
+            'contador',
+            'contadores',
+            'dentista',
+            'dentistas',
+            'disenador',
+            'doctor',
+            'ingeniero',
+            'ingenieros',
+            'medico',
+            'medicos',
+            'escribano',
+            'nutricionista',
+            'psicologo',
+            'programador',
+            'veterinario',
+        ]
+        dom_data = generate_lista_table(data, zonas_relevantes=['com.ar', 'ar'])
+        context['data'] = dom_data
+
+        return context
+
+
+class MusicaArtesView(AnalyticsViewMixin, TemplateView):
+
+    template_name = "web/bootstrap-base/listas.html"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['site_title'] = 'Dominios de Música y Artes'
+        context['site_description'] = 'Lista de dominios relacionados con música y artes'
+        data = [
+            'arte',
+            'banda',
+            'cine',
+            'cumbia',
+            'cultura',
+            'disco',
+            'folklore',
+            'guitarra',
+            'musica',
+            'piano',
+            'radio',
+            'reggaeton',
+            'rock',
+            'teatro',
+            'tv',
+        ]
+        dom_data = generate_lista_table(data, zonas_relevantes=['com.ar', 'ar'])
+        context['data'] = dom_data
+
+        return context
+
+
+class VehiculosView(AnalyticsViewMixin, TemplateView):
+
+    template_name = "web/bootstrap-base/listas.html"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['site_title'] = 'Dominios de Vehículos'
+        context['site_description'] = 'Lista de dominios relacionados con vehículos'
+        data = [
+            'auto',
+            'autos',
+            'bici',
+            'bicicleta',
+            'camion',
+            'camioneta',
+            'moto',
+            'motos',
+            'nautica',
+            'repuestos',
+            'taller',
+            'tractor',
+            'usados',
+            'vehiculos',
+        ]
+        dom_data = generate_lista_table(data, zonas_relevantes=['com.ar', 'ar'])
+        context['data'] = dom_data
+
+        return context
+
+
+class PropiedadesView(AnalyticsViewMixin, TemplateView):
+
+    template_name = "web/bootstrap-base/listas.html"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['site_title'] = 'Dominios de Propiedades'
+        context['site_description'] = 'Lista de dominios relacionados con propiedades e inmuebles'
+        data = [
+            'alquiler',
+            'alquileres',
+            'barrio',
+            'casa',
+            'casas',
+            'departamento',
+            'edificio',
+            'inmobiliaria',
+            'inmueble',
+            'inmuebles',
+            'lote',
+            'oficina',
+            'propiedad',
+            'terreno',
+            'venta',
+        ]
+        dom_data = generate_lista_table(data, zonas_relevantes=['com.ar', 'ar'])
+        context['data'] = dom_data
+
+        return context
+
+
+class EducacionView(AnalyticsViewMixin, TemplateView):
+
+    template_name = "web/bootstrap-base/listas.html"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['site_title'] = 'Dominios de Educación'
+        context['site_description'] = 'Lista de dominios relacionados con educación'
+        data = [
+            'academia',
+            'aprende',
+            'capacitacion',
+            'clases',
+            'colegio',
+            'colegios',
+            'curso',
+            'cursos',
+            'doctorado',
+            'doctorados',
+            'educacion',
+            'escuela',
+            'escuelas',
+            'estudio',
+            'idiomas',
+            'ingles',
+            'instituto',
+            'master',
+            'maestria',
+            'maestrias',
+            'profesor',
+            'universidad',
+        ]
+        dom_data = generate_lista_table(data, zonas_relevantes=['com.ar', 'ar'])
+        context['data'] = dom_data
+
+        return context

@@ -4,12 +4,20 @@ from web.listas.views import (
     CiudadesArgentinasView,
     CiudadesMundoView,
     ComidasView,
+    DeportesView,
     DominiosUnaCaracterView,
     DominiosDosCaracteresView,
+    EducacionView,
     FinanzasView,
     FutbolistasView,
+    MusicaArtesView,
     PorteniosView,
+    ProfesionesView,
+    PropiedadesView,
     ProvinciasArgentinasListView,
+    TecnologiaView,
+    VehiculosView,
+    VerbosAccionView,
 )
 
 
@@ -24,4 +32,12 @@ urlpatterns = [
     path('bebidas', BebidasView.as_view(), name='lista-bebidas'),
     path('futbol', FutbolistasView.as_view(), name='lista-futbol'),
     path('finanzas', FinanzasView.as_view(), name='lista-finanzas'),
+    path('tecnologia', TecnologiaView.as_view(), name='lista-tecnologia'),
+    path('deportes', DeportesView.as_view(), name='lista-deportes'),
+    path('verbos', VerbosAccionView.as_view(), name='lista-verbos'),
+    path('profesiones', ProfesionesView.as_view(), name='lista-profesiones'),
+    path('musica-artes', MusicaArtesView.as_view(), name='lista-musica-artes'),
+    path('vehiculos', VehiculosView.as_view(), name='lista-vehiculos'),
+    path('propiedades', PropiedadesView.as_view(), name='lista-propiedades'),
+    path('educacion', EducacionView.as_view(), name='lista-educacion'),
 ]
