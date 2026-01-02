@@ -1,6 +1,5 @@
 from django.contrib.auth.models import User
 from django.db import models
-from enum import Enum
 
 
 class Mensaje(models.Model):

@@ -1,6 +1,5 @@
 import logging
 from rest_framework import viewsets, status
-from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.permissions import BasePermission, SAFE_METHODS
 from rest_framework.authentication import TokenAuthentication, SessionAuthentication
@@ -39,7 +38,8 @@ class MensajeDestinadoViewSet(viewsets.ModelViewSet):
         new_estado = int(request.data['estado'])
         valid_estados = [MensajeDestinado.CREATED, MensajeDestinado.READED, MensajeDestinado.DELETED]
         if new_estado not in valid_estados:
-            return Response({'error': f'{new_estado} is not a valid estado ({valid_estados})'}, status=status.HTTP_400_BAD_REQUEST)
+            data = {'error': f'{new_estado} is not a valid estado ({valid_estados})'}
+            return Response(data, status=status.HTTP_400_BAD_REQUEST)
         msg = self.get_object()
         msg.estado = new_estado
         msg.save()
