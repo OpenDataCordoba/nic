@@ -1,5 +1,10 @@
 from django.views.generic.base import TemplateView
 from django.views.generic.detail import DetailView
+from django.views import View
+from django.shortcuts import redirect, get_object_or_404
+from django.contrib import messages
+from django.contrib.contenttypes.models import ContentType
+from django.http import HttpResponseForbidden
 
 from core.views import AnalyticsViewMixin
 from dominios.models import Dominio, STATUS_DISPONIBLE
@@ -8,6 +13,7 @@ from dominios.data import (get_ultimos_registrados, get_judicializados,
                            get_primeros_registrados, get_futuros,
                            get_por_caer)
 from zonas.models import Zona
+from subscriptions.models import SubscriptionTarget, UserSubscription
 
 
 class DominioView(AnalyticsViewMixin, DetailView):
@@ -61,6 +67,26 @@ class DominioView(AnalyticsViewMixin, DetailView):
             ncambios.append(chg)
 
         context['cambios'] = ncambios
+
+        # Subscription info for staff users
+        context['is_staff'] = self.request.user.is_staff if self.request.user.is_authenticated else False
+        context['user_subscription'] = None
+        context['event_type_choices'] = UserSubscription.EVENT_TYPE_CHOICES
+        context['delivery_mode_choices'] = UserSubscription.DELIVERY_MODE_CHOICES
+
+        if context['is_staff']:
+            # Check if user has an existing subscription to this domain
+            ct = ContentType.objects.get_for_model(Dominio)
+            target = SubscriptionTarget.objects.filter(
+                content_type=ct,
+                object_id=self.object.id
+            ).first()
+
+            if target:
+                context['user_subscription'] = UserSubscription.objects.filter(
+                    user=self.request.user,
+                    target=target
+                ).first()
 
         return context
 
@@ -190,3 +216,77 @@ class PorCaerView(AnalyticsViewMixin, TemplateView):
             context['por_caer'] = context['por_caer'][:5]
 
         return context
+
+
+class SubscribeToDomainView(View):
+    """Create or update a subscription to a domain - Staff only"""
+
+    def post(self, request, uid):
+        if not request.user.is_staff:
+            return HttpResponseForbidden("Solo usuarios staff pueden realizar esta acción")
+
+        dominio = get_object_or_404(Dominio, uid=uid)
+
+        # Get or create the subscription target for this domain
+        ct = ContentType.objects.get_for_model(Dominio)
+        target, _ = SubscriptionTarget.objects.get_or_create(
+            content_type=ct,
+            object_id=dominio.id
+        )
+
+        # Get form data
+        event_types = request.POST.getlist('event_types')
+        delivery_mode = request.POST.get('delivery_mode', 'immediate')
+
+        if not event_types:
+            messages.error(request, 'Debe seleccionar al menos un tipo de evento')
+            return redirect('dominio', uid=uid)
+
+        # Create or update subscription
+        subscription, created = UserSubscription.objects.update_or_create(
+            user=request.user,
+            target=target,
+            defaults={
+                'event_types': event_types,
+                'delivery_mode': delivery_mode,
+                'is_active': True
+            }
+        )
+
+        if created:
+            messages.success(request, f'Ahora sigues el dominio {dominio.full_domain()}')
+        else:
+            messages.success(request, f'Suscripción actualizada para {dominio.full_domain()}')
+
+        return redirect('dominio', uid=uid)
+
+
+class UnsubscribeFromDomainView(View):
+    """Remove a subscription from a domain - Staff only"""
+
+    def post(self, request, uid):
+        if not request.user.is_staff:
+            return HttpResponseForbidden("Solo usuarios staff pueden realizar esta acción")
+
+        dominio = get_object_or_404(Dominio, uid=uid)
+
+        ct = ContentType.objects.get_for_model(Dominio)
+        target = SubscriptionTarget.objects.filter(
+            content_type=ct,
+            object_id=dominio.id
+        ).first()
+
+        if target:
+            deleted, _ = UserSubscription.objects.filter(
+                user=request.user,
+                target=target
+            ).delete()
+
+            if deleted:
+                messages.success(request, f'Dejaste de seguir {dominio.full_domain()}')
+            else:
+                messages.warning(request, 'No tenías una suscripción activa')
+        else:
+            messages.warning(request, 'No tenías una suscripción activa')
+
+        return redirect('dominio', uid=uid)

@@ -6,7 +6,8 @@ from .views import (HomeView, AboutView, SearchResultsView,
 from .views_dominio import (DominioView, UltimosCaidos,
                             UltimosRegistrados, Judicializados,
                             DominiosAntiguosView, DominiosVencimientoLargoView,
-                            PorCaerView)
+                            PorCaerView, SubscribeToDomainView,
+                            UnsubscribeFromDomainView)
 from .views_registrante import (RegistranteView, RubrosView,
                                 RubroView, RegistrantesAntiguosView,
                                 MayoresRegistrantesView, AddTagToRegistranteView,
@@ -40,6 +41,10 @@ urlpatterns = [
     path('renovaciones-raras', RenovacionesRarasView.as_view(), name='renovaciones-raras'),
     path('renovaciones-para-atras', RenovacionesHaciaAtrasView.as_view(), name='renovaciones-para-atras'),
     path('por-caer', PorCaerView.as_view(), name='por-caer'),
+
+    # domain subscriptions (staff only)
+    path('dominio-<str:uid>/subscribe', SubscribeToDomainView.as_view(), name='dominio-subscribe'),
+    path('dominio-<str:uid>/unsubscribe', UnsubscribeFromDomainView.as_view(), name='dominio-unsubscribe'),
 
     # registrantes
     path('registrantes-antiguos', RegistrantesAntiguosView.as_view(), name='registrantes-antiguos'),

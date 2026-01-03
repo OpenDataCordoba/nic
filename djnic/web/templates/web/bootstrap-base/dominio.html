@@ -46,5 +46,88 @@
         </div>
     </div>
 
+    {% if is_staff %}
+    <!-- STAFF ONLY - Domain Subscription Panel -->
+    <div class="row mt-4">
+        <div class="col-12">
+            <div class="card border-warning bg-light">
+                <div class="card-header bg-warning text-dark">
+                    <h4 class="mb-0">Seguir cambios en este dominio</h4>
+                </div>
+                <div class="card-body">
+                    {% if messages %}
+                        {% for message in messages %}
+                        <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                            {{ message }}
+                            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        {% endfor %}
+                    {% endif %}
+
+                    {% if user_subscription %}
+                    <!-- Current subscription info -->
+                    <div class="alert alert-info">
+                        <strong>Actualmente estas siguiendo a este dominio</strong><br>
+                        Eventos: <strong>{{ user_subscription.event_types|join:", " }}</strong><br>
+                        Entrega: <strong>{{ user_subscription.get_delivery_mode_display }}</strong>
+                    </div>
+                    {% endif %}
+
+                    <!-- Subscription form -->
+                    <form method="post" action="{% url 'dominio-subscribe' uid=dominio.uid %}">
+                        {% csrf_token %}
+
+                        <div class="form-group">
+                            <label><strong>Eventos a seguir:</strong></label>
+                            <div class="row">
+                                {% for value, label in event_type_choices %}
+                                <div class="col-md-4 col-sm-6">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox"
+                                               name="event_types" value="{{ value }}"
+                                               id="event_{{ value }}"
+                                               {% if user_subscription and value in user_subscription.event_types %}checked{% endif %}>
+                                        <label class="form-check-label" for="event_{{ value }}">
+                                            {{ label }}
+                                        </label>
+                                    </div>
+                                </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+
+                        <div class="form-group mt-3">
+                            <label for="delivery_mode"><strong>Frecuencia de entrega:</strong></label>
+                            <select name="delivery_mode" id="delivery_mode" class="form-control" style="width: 250px;">
+                                {% for value, label in delivery_mode_choices %}
+                                <option value="{{ value }}"
+                                        {% if user_subscription and user_subscription.delivery_mode == value %}selected{% endif %}>
+                                    {{ label }}
+                                </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                        <div class="mt-3">
+                            <button type="submit" class="btn btn-primary">
+                                {% if user_subscription %}Actualizar Suscripción{% else %}Seguir Dominio{% endif %}
+                            </button>
+
+                            {% if user_subscription %}
+                            <button type="submit" class="btn btn-outline-danger ml-2"
+                                    formaction="{% url 'dominio-unsubscribe' uid=dominio.uid %}"
+                                    onclick="return confirm('Dejar de seguir este dominio?');">
+                                Dejar de seguir
+                            </button>
+                            {% endif %}
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
 
 {% endblock main %}
