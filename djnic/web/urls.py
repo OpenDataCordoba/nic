@@ -11,7 +11,8 @@ from .views_dominio import (DominioView, UltimosCaidos,
 from .views_registrante import (RegistranteView, RubrosView,
                                 RubroView, RegistrantesAntiguosView,
                                 MayoresRegistrantesView, AddTagToRegistranteView,
-                                CreateAndAddTagView, RemoveTagFromRegistranteView)
+                                CreateAndAddTagView, RemoveTagFromRegistranteView,
+                                SubscribeToRegistranteView, UnsubscribeFromRegistranteView)
 from .views_dnss import HostingsView, Hostings30View, HostingView, DNSView, PerdidasView
 from .views_plataforma import (StatsReadVtoView, StatsReadGeneralView,
                                StatsRegistradosPorFechaView, StatsVencimientosPorFechaView)
@@ -56,6 +57,10 @@ urlpatterns = [
     path('registrante-<str:uid>/add-tag', AddTagToRegistranteView.as_view(), name='registrante-add-tag'),
     path('registrante-<str:uid>/create-tag', CreateAndAddTagView.as_view(), name='registrante-create-tag'),
     path('registrante-<str:uid>/remove-tag', RemoveTagFromRegistranteView.as_view(), name='registrante-remove-tag'),
+
+    # registrante subscriptions (staff only)
+    path('registrante-<str:uid>/subscribe', SubscribeToRegistranteView.as_view(), name='registrante-subscribe'),
+    path('registrante-<str:uid>/unsubscribe', UnsubscribeFromRegistranteView.as_view(), name='registrante-unsubscribe'),
 
     # Hostings
     path('hostings', HostingsView.as_view(), name='hostings'),

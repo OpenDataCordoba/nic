@@ -3,12 +3,14 @@ from django.views.generic.list import ListView
 from django.views import View
 from django.shortcuts import redirect, get_object_or_404
 from django.contrib import messages
+from django.contrib.contenttypes.models import ContentType
 from django.http import HttpResponseForbidden
 
 from core.views import AnalyticsViewMixin
 from registrantes.models import Registrante, TagForRegistrante, RegistranteTag
 from dominios.data import get_ultimos_registrados
 from registrantes.data import get_primeros_reg_creados, get_mayores_registrantes
+from subscriptions.models import SubscriptionTarget, UserSubscription, EVENT_TYPE_CHOICES
 
 
 class RegistranteView(AnalyticsViewMixin, DetailView):
@@ -29,7 +31,25 @@ class RegistranteView(AnalyticsViewMixin, DetailView):
         # Tags para usuarios staff
         context['registrante_tags'] = self.object.tags.all()
         context['all_tags'] = TagForRegistrante.objects.all().order_by('nombre')
-        context['is_staff'] = self.request.user.is_staff
+        context['is_staff'] = self.request.user.is_staff if self.request.user.is_authenticated else False
+
+        # Subscription info for staff users
+        context['user_subscription'] = None
+        context['event_type_choices'] = EVENT_TYPE_CHOICES
+        context['delivery_mode_choices'] = UserSubscription.DELIVERY_MODE_CHOICES
+
+        if context['is_staff']:
+            ct = ContentType.objects.get_for_model(Registrante)
+            target = SubscriptionTarget.objects.filter(
+                content_type=ct,
+                object_id=self.object.id
+            ).first()
+
+            if target:
+                context['user_subscription'] = UserSubscription.objects.filter(
+                    user=self.request.user,
+                    target=target
+                ).first()
 
         return context
 
@@ -179,5 +199,76 @@ class RemoveTagFromRegistranteView(View):
                 messages.warning(request, f'El registrante no tiene el tag "{tag.nombre}"')
         else:
             messages.error(request, 'Tag no especificado')
+
+        return redirect('registrante', uid=uid)
+
+
+class SubscribeToRegistranteView(View):
+    """Create or update a subscription to a registrante - Staff only"""
+
+    def post(self, request, uid):
+        if not request.user.is_staff:
+            return HttpResponseForbidden("Solo usuarios staff pueden realizar esta acción")
+
+        registrante = get_object_or_404(Registrante, uid=uid)
+
+        ct = ContentType.objects.get_for_model(Registrante)
+        target, _ = SubscriptionTarget.objects.get_or_create(
+            content_type=ct,
+            object_id=registrante.id
+        )
+
+        event_types = request.POST.getlist('event_types')
+        delivery_mode = request.POST.get('delivery_mode', 'immediate')
+
+        if not event_types:
+            messages.error(request, 'Debe seleccionar al menos un tipo de evento')
+            return redirect('registrante', uid=uid)
+
+        _, created = UserSubscription.objects.update_or_create(
+            user=request.user,
+            target=target,
+            defaults={
+                'event_types': event_types,
+                'delivery_mode': delivery_mode,
+                'is_active': True
+            }
+        )
+
+        if created:
+            messages.success(request, f'Ahora sigues al registrante {registrante.name}')
+        else:
+            messages.success(request, f'Suscripción actualizada para {registrante.name}')
+
+        return redirect('registrante', uid=uid)
+
+
+class UnsubscribeFromRegistranteView(View):
+    """Remove a subscription from a registrante - Staff only"""
+
+    def post(self, request, uid):
+        if not request.user.is_staff:
+            return HttpResponseForbidden("Solo usuarios staff pueden realizar esta acción")
+
+        registrante = get_object_or_404(Registrante, uid=uid)
+
+        ct = ContentType.objects.get_for_model(Registrante)
+        target = SubscriptionTarget.objects.filter(
+            content_type=ct,
+            object_id=registrante.id
+        ).first()
+
+        if target:
+            deleted, _ = UserSubscription.objects.filter(
+                user=request.user,
+                target=target
+            ).delete()
+
+            if deleted:
+                messages.success(request, f'Dejaste de seguir a {registrante.name}')
+            else:
+                messages.warning(request, 'No tenías una suscripción activa')
+        else:
+            messages.warning(request, 'No tenías una suscripción activa')
 
         return redirect('registrante', uid=uid)
