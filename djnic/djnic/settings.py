@@ -52,6 +52,7 @@ INSTALLED_APPS = [
     'core',
     'analytics',
     'mensajes',
+    'subscriptions',
 ]
 
 WEBPUSH_SETTINGS = {
