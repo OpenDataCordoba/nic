@@ -4,7 +4,7 @@
 
 <div class="container">
     <div class="row">
-        <div class="col-lg-4 col-md-4 col-sm-4 col-xs-4">
+        <div class="col-lg-4 col-md-5 col-sm-5 col-xs-6">
             <h2>Dominio {{ dominio.full_domain }}</h2>
 
             {% if dominio.registrante %}
@@ -27,31 +27,12 @@
                     {% endif %}</li>
             {% endfor %}
             </ul>
-        </div>
-    
-        <div class="col-lg-8 col-md-8 col-sm-8 col-xs-8">
-            <h3>Historial de lecturas</h3>
-            {% for cambio in cambios %}
-                <p><b>{{ cambio.momento }}</b> Hay cambios: <b>{{ cambio.have_changes|yesno:"si,no" }}</b></p>
-                {% if cambio.have_changes %}
-                <ul>
-                {% for campo in cambio.campos_cambiados %}
-                    <li><b>{{ campo.campo }}</b> cambio de 
-                        <b>{{ campo.anterior|default:"vacio" }}</b> a 
-                        <b>{{ campo.nuevo|default:"vacio" }}</b></li>
-                {% endfor %}
-                </ul>
-                {% endif %}
-            {% endfor %}
-        </div>
-    </div>
 
-    {% if is_staff %}
-    <!-- STAFF ONLY - Domain Subscription Panel -->
-    <div class="row mt-4">
-        <div class="col-12">
+            {% if is_staff %}
+            <!-- STAFF ONLY - Domain Subscription Panel -->
+    
             <div class="card border-warning bg-light">
-                <div class="card-header bg-warning text-dark">
+                <div class="card-header bg-primary text-dark">
                     <h4 class="mb-0">Seguir cambios en este dominio</h4>
                 </div>
                 <div class="card-body">
@@ -81,26 +62,22 @@
 
                         <div class="form-group">
                             <label><strong>Eventos a seguir:</strong></label>
-                            <div class="row">
-                                {% for value, label in event_type_choices %}
-                                <div class="col-md-4 col-sm-6">
-                                    <div class="form-check">
-                                        <input class="form-check-input" type="checkbox"
-                                               name="event_types" value="{{ value }}"
-                                               id="event_{{ value }}"
-                                               {% if user_subscription and value in user_subscription.event_types %}checked{% endif %}>
-                                        <label class="form-check-label" for="event_{{ value }}">
-                                            {{ label }}
-                                        </label>
-                                    </div>
+                            {% for value, label in event_type_choices %}
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox"
+                                            name="event_types" value="{{ value }}"
+                                            id="event_{{ value }}"
+                                            {% if user_subscription and value in user_subscription.event_types %}checked{% endif %}>
+                                    <label class="form-check-label" for="event_{{ value }}">
+                                        {{ label }}
+                                    </label>
                                 </div>
-                                {% endfor %}
-                            </div>
+                            {% endfor %}
                         </div>
 
                         <div class="form-group mt-3">
                             <label for="delivery_mode"><strong>Frecuencia de entrega:</strong></label>
-                            <select name="delivery_mode" id="delivery_mode" class="form-control" style="width: 250px;">
+                            <select name="delivery_mode" id="delivery_mode" class="form-control form-select" style="width: 250px;">
                                 {% for value, label in delivery_mode_choices %}
                                 <option value="{{ value }}"
                                         {% if user_subscription and user_subscription.delivery_mode == value %}selected{% endif %}>
@@ -126,8 +103,25 @@
                     </form>
                 </div>
             </div>
+    {% endif %}
+
+        </div>
+    
+        <div class="col-lg-8 col-md-7 col-sm-7 col-xs-6">
+            <h3>Historial de lecturas</h3>
+            {% for cambio in cambios %}
+                <p><b>{{ cambio.momento }}</b> Hay cambios: <b>{{ cambio.have_changes|yesno:"si,no" }}</b></p>
+                {% if cambio.have_changes %}
+                <ul>
+                {% for campo in cambio.campos_cambiados %}
+                    <li><b>{{ campo.campo }}</b> cambio de 
+                        <b>{{ campo.anterior|default:"vacio" }}</b> a 
+                        <b>{{ campo.nuevo|default:"vacio" }}</b></li>
+                {% endfor %}
+                </ul>
+                {% endif %}
+            {% endfor %}
         </div>
     </div>
-    {% endif %}
 
 {% endblock main %}

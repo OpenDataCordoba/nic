@@ -13,7 +13,7 @@ from dominios.data import (get_ultimos_registrados, get_judicializados,
                            get_primeros_registrados, get_futuros,
                            get_por_caer)
 from zonas.models import Zona
-from subscriptions.models import SubscriptionTarget, UserSubscription
+from subscriptions.models import SubscriptionTarget, UserSubscription, EVENT_TYPE_CHOICES
 
 
 class DominioView(AnalyticsViewMixin, DetailView):
@@ -71,7 +71,7 @@ class DominioView(AnalyticsViewMixin, DetailView):
         # Subscription info for staff users
         context['is_staff'] = self.request.user.is_staff if self.request.user.is_authenticated else False
         context['user_subscription'] = None
-        context['event_type_choices'] = UserSubscription.EVENT_TYPE_CHOICES
+        context['event_type_choices'] = EVENT_TYPE_CHOICES
         context['delivery_mode_choices'] = UserSubscription.DELIVERY_MODE_CHOICES
 
         if context['is_staff']:

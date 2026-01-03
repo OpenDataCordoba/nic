@@ -6,7 +6,7 @@ from django.contrib.contenttypes.models import ContentType
 
 
 EVENT_TYPE_CHOICES = [
-        ('registered', 'Dominio Registerado'),
+        ('registered', 'Dominio Registrado'),
         ('renewed', 'Dominio Renovado'),
         ('expired', 'Dominio Expirado'),
         ('dropped', 'Dominio Caido'),
