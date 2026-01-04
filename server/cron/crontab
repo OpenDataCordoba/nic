@@ -7,3 +7,8 @@
 0 3 * * * cd /PATH/nic/djnic/ && . /PATH/env/bin/activate && /PATH/env/bin/python manage.py cache_hosting_stats > /PATH/nic/cache_hosting.log
 
 0 2 * * 3 /PATH/nic/server/scripts/backup-db.sh --backup-dir /some-folder
+
+*/5 * * * * cd /PATH/nic/djnic/ && . /PATH/env/bin/activate && /PATH/env/bin/python manage.py process_events
+
+# Send notifications via Telegram
+*/1 * * * * cd /PATH/nic/djnic/ && . /PATH/env/bin/activate && /PATH/env/bin/python manage.py send_notifications
