@@ -9,12 +9,12 @@ Handles incoming messages from Telegram:
 """
 import json
 import logging
-from django.http import HttpResponse
+from django.http import JsonResponse, HttpResponse
 from django.views import View
 from django.views.decorators.csrf import csrf_exempt
 from django.utils.decorators import method_decorator
 from django.conf import settings
-
+import requests
 from channels.models import TelegramChannel, TelegramLinkToken, TelegramMessage
 from channels.services.telegram import telegram_sender
 
@@ -320,8 +320,6 @@ def setup_telegram_webhook(request):
     Should be called once during deployment.
     Access: Admin only.
     """
-    from django.http import JsonResponse
-    import requests
 
     # Require staff/admin user
     if not request.user.is_authenticated or not request.user.is_staff:

@@ -4,7 +4,7 @@ Telegram notification sender service.
 import logging
 from typing import Dict, Any
 from django.conf import settings
-
+import requests
 from subscriptions.models import UserNotification
 from channels.models import TelegramChannel, TelegramMessage, NotificationChannel
 from channels.services import NotificationSender, NotificationRegistry
@@ -81,8 +81,6 @@ class TelegramSender(NotificationSender):
                 'success': False,
                 'error': 'TELEGRAM_BOT_TOKEN not configured'
             }
-
-        import requests
 
         message = self.format_message(notification)
         url = f"{self.api_base}{self.bot_token}/sendMessage"

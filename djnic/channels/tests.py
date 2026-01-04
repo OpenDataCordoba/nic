@@ -8,15 +8,13 @@ from datetime import timedelta
 from django.test import TestCase, Client, override_settings
 from django.contrib.auth.models import User
 from django.utils import timezone
-from django.urls import reverse
 
 from channels.models import (
-    TelegramChannel, TelegramLinkToken, ChannelDelivery, NotificationChannel
+    TelegramChannel, TelegramLinkToken, NotificationChannel,
+    TelegramMessage
 )
-from channels.services import NotificationRegistry
 from channels.services.telegram import TelegramSender
-from subscriptions.models import UserNotification, Event
-from django.contrib.contenttypes.models import ContentType
+from subscriptions.models import UserNotification
 
 
 class TelegramChannelModelTest(TestCase):
@@ -313,3 +311,381 @@ class ChannelAPITest(TestCase):
         self.assertFalse(
             TelegramChannel.objects.filter(user=self.user).exists()
         )
+
+
+class TelegramMessageModelTest(TestCase):
+    """Tests for TelegramMessage model."""
+
+    def setUp(self):
+        self.user = User.objects.create_user(
+            username='testuser',
+            email='test@example.com',
+            password='testpass123'
+        )
+        self.channel = TelegramChannel.objects.create(
+            user=self.user,
+            chat_id=123456789,
+            is_active=True,
+            is_verified=True,
+        )
+
+    def test_create_incoming_message(self):
+        message = TelegramMessage.objects.create(
+            channel=self.channel,
+            chat_id=123456789,
+            direction=TelegramMessage.DIRECTION_IN,
+            text='/start',
+            telegram_message_id=100,
+            raw_data={'message': {'text': '/start'}}
+        )
+
+        self.assertEqual(message.direction, 'in')
+        self.assertEqual(message.text, '/start')
+        self.assertIsNotNone(message.raw_data)
+
+    def test_create_outgoing_message(self):
+        message = TelegramMessage.objects.create(
+            channel=self.channel,
+            chat_id=123456789,
+            direction=TelegramMessage.DIRECTION_OUT,
+            text='Welcome!',
+            telegram_message_id=101,
+        )
+
+        self.assertEqual(message.direction, 'out')
+        self.assertIsNone(message.raw_data)
+
+    def test_message_without_channel(self):
+        """Messages can be created without a linked channel."""
+        message = TelegramMessage.objects.create(
+            channel=None,
+            chat_id=999999999,
+            direction=TelegramMessage.DIRECTION_IN,
+            text='/start',
+        )
+
+        self.assertIsNone(message.channel)
+        self.assertEqual(message.chat_id, 999999999)
+
+    def test_str_representation(self):
+        message_in = TelegramMessage.objects.create(
+            channel=self.channel,
+            chat_id=123456789,
+            direction=TelegramMessage.DIRECTION_IN,
+            text='Hello bot',
+        )
+        message_out = TelegramMessage.objects.create(
+            channel=self.channel,
+            chat_id=123456789,
+            direction=TelegramMessage.DIRECTION_OUT,
+            text='Hello user',
+        )
+
+        self.assertIn('←', str(message_in))
+        self.assertIn('→', str(message_out))
+
+    def test_long_text_truncated_in_str(self):
+        long_text = 'A' * 100
+        message = TelegramMessage.objects.create(
+            channel=self.channel,
+            chat_id=123456789,
+            direction=TelegramMessage.DIRECTION_IN,
+            text=long_text,
+        )
+
+        self.assertIn('...', str(message))
+        self.assertLess(len(str(message)), len(long_text) + 20)
+
+
+class WebhookSecurityTest(TestCase):
+    """Tests for webhook security features."""
+
+    def setUp(self):
+        self.client = Client()
+
+    @override_settings(TELEGRAM_WEBHOOK_SECRET='test-secret-123')
+    def test_webhook_rejects_missing_secret(self):
+        """Webhook should reject requests without secret header."""
+        response = self.client.post(
+            '/channels/telegram/webhook/',
+            data=json.dumps({
+                'message': {
+                    'chat': {'id': 123456789, 'type': 'private'},
+                    'text': '/start'
+                }
+            }),
+            content_type='application/json'
+        )
+
+        self.assertEqual(response.status_code, 403)
+
+    @override_settings(TELEGRAM_WEBHOOK_SECRET='test-secret-123')
+    def test_webhook_rejects_wrong_secret(self):
+        """Webhook should reject requests with wrong secret."""
+        response = self.client.post(
+            '/channels/telegram/webhook/',
+            data=json.dumps({
+                'message': {
+                    'chat': {'id': 123456789, 'type': 'private'},
+                    'text': '/start'
+                }
+            }),
+            content_type='application/json',
+            HTTP_X_TELEGRAM_BOT_API_SECRET_TOKEN='wrong-secret'
+        )
+
+        self.assertEqual(response.status_code, 403)
+
+    @override_settings(TELEGRAM_WEBHOOK_SECRET='test-secret-123')
+    @patch('channels.views.telegram_sender.send_raw_message')
+    def test_webhook_accepts_correct_secret(self, mock_send):
+        """Webhook should accept requests with correct secret."""
+        mock_send.return_value = {'success': True}
+
+        response = self.client.post(
+            '/channels/telegram/webhook/',
+            data=json.dumps({
+                'message': {
+                    'chat': {'id': 123456789, 'type': 'private'},
+                    'from': {'id': 123456789, 'first_name': 'Test'},
+                    'text': '/start'
+                }
+            }),
+            content_type='application/json',
+            HTTP_X_TELEGRAM_BOT_API_SECRET_TOKEN='test-secret-123'
+        )
+
+        self.assertEqual(response.status_code, 200)
+
+    @override_settings(TELEGRAM_WEBHOOK_SECRET=None)
+    @patch('channels.views.telegram_sender.send_raw_message')
+    def test_webhook_allows_no_secret_when_not_configured(self, mock_send):
+        """Webhook should work without secret when not configured."""
+        mock_send.return_value = {'success': True}
+
+        response = self.client.post(
+            '/channels/telegram/webhook/',
+            data=json.dumps({
+                'message': {
+                    'chat': {'id': 123456789, 'type': 'private'},
+                    'from': {'id': 123456789, 'first_name': 'Test'},
+                    'text': '/start'
+                }
+            }),
+            content_type='application/json'
+        )
+
+        self.assertEqual(response.status_code, 200)
+
+
+class SetupWebhookSecurityTest(TestCase):
+    """Tests for setup_telegram_webhook endpoint security."""
+
+    def setUp(self):
+        self.client = Client()
+        self.admin_user = User.objects.create_user(
+            username='admin',
+            email='admin@example.com',
+            password='adminpass123',
+            is_staff=True
+        )
+        self.normal_user = User.objects.create_user(
+            username='normaluser',
+            email='normal@example.com',
+            password='normalpass123',
+            is_staff=False
+        )
+
+    def test_setup_webhook_rejects_anonymous(self):
+        """Setup webhook should reject anonymous users."""
+        response = self.client.get('/channels/telegram/setup-webhook/')
+
+        self.assertEqual(response.status_code, 403)
+
+    def test_setup_webhook_rejects_non_staff(self):
+        """Setup webhook should reject non-staff users."""
+        self.client.login(username='normaluser', password='normalpass123')
+
+        response = self.client.get('/channels/telegram/setup-webhook/')
+
+        self.assertEqual(response.status_code, 403)
+
+    @override_settings(TELEGRAM_BOT_TOKEN=None)
+    def test_setup_webhook_requires_token_config(self):
+        """Setup webhook should require TELEGRAM_BOT_TOKEN."""
+        self.client.login(username='admin', password='adminpass123')
+
+        response = self.client.get('/channels/telegram/setup-webhook/')
+
+        self.assertEqual(response.status_code, 400)
+        data = response.json()
+        self.assertIn('error', data)
+
+    @patch('channels.views.requests.post')
+    @override_settings(
+        TELEGRAM_BOT_TOKEN='test-token',
+        TELEGRAM_WEBHOOK_URL='https://example.com/webhook/',
+        TELEGRAM_WEBHOOK_SECRET='test-secret'
+    )
+    def test_setup_webhook_success(self, mock_post):
+        """Setup webhook should succeed for admin with config."""
+        mock_response = MagicMock()
+        mock_response.json.return_value = {'ok': True}
+        mock_post.return_value = mock_response
+
+        self.client.login(username='admin', password='adminpass123')
+
+        response = self.client.get('/channels/telegram/setup-webhook/')
+
+        self.assertEqual(response.status_code, 200)
+        data = response.json()
+        self.assertTrue(data['success'])
+
+        # Verify secret was included in payload
+        call_args = mock_post.call_args
+        self.assertEqual(call_args[1]['json']['secret_token'], 'test-secret')
+
+
+class MessageLoggingTest(TestCase):
+    """Tests for message logging functionality."""
+
+    def setUp(self):
+        self.client = Client()
+        self.user = User.objects.create_user(
+            username='testuser',
+            email='test@example.com',
+            password='testpass123'
+        )
+        self.channel = TelegramChannel.objects.create(
+            user=self.user,
+            chat_id=123456789,
+            is_active=True,
+            is_verified=True,
+        )
+        self.sender = TelegramSender()
+
+    @patch('channels.views.telegram_sender.send_raw_message')
+    def test_incoming_message_logged(self, mock_send):
+        """Incoming messages should be saved to database."""
+        mock_send.return_value = {'success': True, 'message_id': 200}
+
+        self.client.post(
+            '/channels/telegram/webhook/',
+            data=json.dumps({
+                'message': {
+                    'message_id': 100,
+                    'chat': {'id': 123456789, 'type': 'private'},
+                    'from': {'id': 123456789, 'first_name': 'Test'},
+                    'text': '/status'
+                }
+            }),
+            content_type='application/json'
+        )
+
+        # Check incoming message was saved
+        incoming = TelegramMessage.objects.filter(
+            chat_id=123456789,
+            direction=TelegramMessage.DIRECTION_IN
+        ).first()
+
+        self.assertIsNotNone(incoming)
+        self.assertEqual(incoming.text, '/status')
+        self.assertEqual(incoming.telegram_message_id, 100)
+        self.assertIsNotNone(incoming.raw_data)
+        self.assertEqual(incoming.channel, self.channel)
+
+    @patch('channels.views.telegram_sender.send_raw_message')
+    def test_incoming_message_logged_without_channel(self, mock_send):
+        """Incoming messages from unlinked users should also be saved."""
+        mock_send.return_value = {'success': True, 'message_id': 200}
+
+        self.client.post(
+            '/channels/telegram/webhook/',
+            data=json.dumps({
+                'message': {
+                    'message_id': 100,
+                    'chat': {'id': 999999999, 'type': 'private'},
+                    'from': {'id': 999999999, 'first_name': 'Unknown'},
+                    'text': '/start'
+                }
+            }),
+            content_type='application/json'
+        )
+
+        incoming = TelegramMessage.objects.filter(
+            chat_id=999999999,
+            direction=TelegramMessage.DIRECTION_IN
+        ).first()
+
+        self.assertIsNotNone(incoming)
+        self.assertIsNone(incoming.channel)  # No channel for unlinked user
+
+    @patch('channels.services.telegram.requests.post')
+    @override_settings(TELEGRAM_BOT_TOKEN='test-token')
+    def test_outgoing_notification_logged(self, mock_post):
+        """Outgoing notifications should be saved to database."""
+        mock_response = MagicMock()
+        mock_response.json.return_value = {
+            'ok': True,
+            'result': {'message_id': 12345}
+        }
+        mock_post.return_value = mock_response
+
+        notification = UserNotification.objects.create(
+            user=self.user,
+            title='Test Notification',
+            event_data={'description': 'Test'},
+        )
+
+        self.sender.send(self.channel, notification)
+
+        outgoing = TelegramMessage.objects.filter(
+            chat_id=123456789,
+            direction=TelegramMessage.DIRECTION_OUT
+        ).first()
+
+        self.assertIsNotNone(outgoing)
+        self.assertEqual(outgoing.telegram_message_id, 12345)
+        self.assertEqual(outgoing.channel, self.channel)
+        self.assertIn('Test Notification', outgoing.text)
+
+    @patch('channels.services.telegram.requests.post')
+    @override_settings(TELEGRAM_BOT_TOKEN='test-token')
+    def test_outgoing_raw_message_logged(self, mock_post):
+        """Outgoing raw messages should be saved to database."""
+        mock_response = MagicMock()
+        mock_response.json.return_value = {
+            'ok': True,
+            'result': {'message_id': 54321}
+        }
+        mock_post.return_value = mock_response
+
+        self.sender.send_raw_message(123456789, 'Hello from bot!')
+
+        outgoing = TelegramMessage.objects.filter(
+            chat_id=123456789,
+            direction=TelegramMessage.DIRECTION_OUT,
+            text='Hello from bot!'
+        ).first()
+
+        self.assertIsNotNone(outgoing)
+        self.assertEqual(outgoing.telegram_message_id, 54321)
+
+    @patch('channels.services.telegram.requests.post')
+    @override_settings(TELEGRAM_BOT_TOKEN='test-token')
+    def test_failed_send_not_logged(self, mock_post):
+        """Failed sends should not create message records."""
+        mock_response = MagicMock()
+        mock_response.json.return_value = {
+            'ok': False,
+            'error_code': 400,
+            'description': 'Bad Request'
+        }
+        mock_post.return_value = mock_response
+
+        initial_count = TelegramMessage.objects.count()
+
+        self.sender.send_raw_message(123456789, 'This will fail')
+
+        # No new message should be created
+        self.assertEqual(TelegramMessage.objects.count(), initial_count)

@@ -1,6 +1,9 @@
 from .settings import *
 
 
+# Disable Telegram webhook secret for tests (specific tests override this)
+TELEGRAM_WEBHOOK_SECRET = None
+
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
