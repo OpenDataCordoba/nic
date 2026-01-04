@@ -1,4 +1,7 @@
+from io import StringIO
 from django.test import TestCase
+from django.core.management import call_command
+from django.contrib.auth.models import User
 from django.contrib.contenttypes.models import ContentType
 from django.utils import timezone
 
@@ -6,7 +9,8 @@ from dominios.models import Dominio, STATUS_DISPONIBLE, STATUS_NO_DISPONIBLE
 from zonas.models import Zona
 from registrantes.models import Registrante
 from subscriptions.models import (
-    Event, EVENT_DROPPED, EVENT_REGISTERED, EVENT_RENEWED,
+    Event, SubscriptionTarget, UserSubscription, UserNotification,
+    EVENT_DROPPED, EVENT_REGISTERED, EVENT_RENEWED,
     EVENT_REGISTRANT_CHANGED, EVENT_DNS_CHANGED
 )
 from subscriptions.events import (
@@ -621,3 +625,273 @@ class NoDuplicateEventsTestCase(TestCase):
         # Should only have 1 DROPPED event, not 2
         dropped_events = [e for e in domain_events if e.event_type == EVENT_DROPPED]
         self.assertEqual(len(dropped_events), 1)
+
+
+class ProcessEventsCommandTestCase(TestCase):
+    """Tests for the process_events management command."""
+
+    @classmethod
+    def setUpTestData(cls):
+        cls.zona = Zona.objects.create(nombre='com.ar', tz='America/Argentina/Buenos_Aires')
+        cls.user = User.objects.create_user(
+            username='testuser',
+            email='test@example.com',
+            password='testpass123'
+        )
+        cls.registrante = Registrante.objects.create(
+            name='Test Company',
+            legal_uid='30-99999999-9',
+            created=timezone.now(),
+            changed=timezone.now()
+        )
+
+    def setUp(self):
+        Event.objects.all().delete()
+        UserNotification.objects.all().delete()
+        SubscriptionTarget.objects.all().delete()
+        UserSubscription.objects.all().delete()
+
+        self.dominio = Dominio.objects.create(
+            nombre='subscribed',
+            zona=self.zona,
+            estado=STATUS_NO_DISPONIBLE,
+            registrante=self.registrante,
+            expire=timezone.now()
+        )
+
+    def test_command_with_no_events(self):
+        """Command should handle case with no unprocessed events."""
+        out = StringIO()
+        call_command('process_events', stdout=out)
+        self.assertIn('No unprocessed events', out.getvalue())
+
+    def test_command_processes_events(self):
+        """Command should process events and create notifications."""
+        # Create subscription target and subscription
+        ct = ContentType.objects.get_for_model(Dominio)
+        target = SubscriptionTarget.objects.create(
+            content_type=ct,
+            object_id=self.dominio.id
+        )
+        UserSubscription.objects.create(
+            user=self.user,
+            target=target,
+            event_types=[EVENT_DROPPED, EVENT_RENEWED],
+            delivery_mode='immediate',
+            is_active=True
+        )
+
+        # Create an unprocessed event
+        event = Event.objects.create(
+            event_type=EVENT_DROPPED,
+            content_type=ct,
+            object_id=self.dominio.id,
+            event_data={
+                'domain': self.dominio.full_domain(),
+                'description': 'El dominio cayó'
+            },
+            processed=False
+        )
+
+        # Run command
+        out = StringIO()
+        call_command('process_events', stdout=out)
+
+        # Verify event was processed
+        event.refresh_from_db()
+        self.assertTrue(event.processed)
+
+        # Verify notification was created
+        notifications = UserNotification.objects.filter(user=self.user)
+        self.assertEqual(notifications.count(), 1)
+        self.assertEqual(notifications[0].event, event)
+        self.assertIn('cayó', notifications[0].title)
+
+    def test_command_respects_event_type_filter(self):
+        """Command should only notify for subscribed event types."""
+        ct = ContentType.objects.get_for_model(Dominio)
+        target = SubscriptionTarget.objects.create(
+            content_type=ct,
+            object_id=self.dominio.id
+        )
+        # Subscribe only to RENEWED events
+        UserSubscription.objects.create(
+            user=self.user,
+            target=target,
+            event_types=[EVENT_RENEWED],
+            delivery_mode='immediate',
+            is_active=True
+        )
+
+        # Create a DROPPED event (not subscribed)
+        Event.objects.create(
+            event_type=EVENT_DROPPED,
+            content_type=ct,
+            object_id=self.dominio.id,
+            event_data={'description': 'Domain dropped'},
+            processed=False
+        )
+
+        # Run command
+        out = StringIO()
+        call_command('process_events', stdout=out)
+
+        # No notification should be created
+        self.assertEqual(UserNotification.objects.count(), 0)
+
+    def test_command_skips_inactive_subscriptions(self):
+        """Command should not notify inactive subscriptions."""
+        ct = ContentType.objects.get_for_model(Dominio)
+        target = SubscriptionTarget.objects.create(
+            content_type=ct,
+            object_id=self.dominio.id
+        )
+        UserSubscription.objects.create(
+            user=self.user,
+            target=target,
+            event_types=[EVENT_DROPPED],
+            delivery_mode='immediate',
+            is_active=False  # Inactive!
+        )
+
+        Event.objects.create(
+            event_type=EVENT_DROPPED,
+            content_type=ct,
+            object_id=self.dominio.id,
+            event_data={'description': 'Domain dropped'},
+            processed=False
+        )
+
+        out = StringIO()
+        call_command('process_events', stdout=out)
+
+        # No notification for inactive subscription
+        self.assertEqual(UserNotification.objects.count(), 0)
+
+    def test_command_dry_run(self):
+        """Dry run should not create notifications or mark events processed."""
+        ct = ContentType.objects.get_for_model(Dominio)
+        target = SubscriptionTarget.objects.create(
+            content_type=ct,
+            object_id=self.dominio.id
+        )
+        UserSubscription.objects.create(
+            user=self.user,
+            target=target,
+            event_types=[EVENT_DROPPED],
+            delivery_mode='immediate',
+            is_active=True
+        )
+
+        event = Event.objects.create(
+            event_type=EVENT_DROPPED,
+            content_type=ct,
+            object_id=self.dominio.id,
+            event_data={'description': 'Domain dropped'},
+            processed=False
+        )
+
+        out = StringIO()
+        call_command('process_events', '--dry-run', stdout=out)
+
+        # Event should NOT be marked processed
+        event.refresh_from_db()
+        self.assertFalse(event.processed)
+
+        # No notification should be created
+        self.assertEqual(UserNotification.objects.count(), 0)
+
+        # Output should mention dry run
+        self.assertIn('DRY RUN', out.getvalue())
+        self.assertIn('Would notify', out.getvalue())
+
+    def test_command_multiple_subscribers(self):
+        """Command should notify all matching subscribers."""
+        user2 = User.objects.create_user(
+            username='testuser2',
+            email='test2@example.com',
+            password='testpass123'
+        )
+
+        ct = ContentType.objects.get_for_model(Dominio)
+        target = SubscriptionTarget.objects.create(
+            content_type=ct,
+            object_id=self.dominio.id
+        )
+
+        # Two users subscribed
+        UserSubscription.objects.create(
+            user=self.user,
+            target=target,
+            event_types=[EVENT_DROPPED],
+            is_active=True
+        )
+        UserSubscription.objects.create(
+            user=user2,
+            target=target,
+            event_types=[EVENT_DROPPED],
+            is_active=True
+        )
+
+        Event.objects.create(
+            event_type=EVENT_DROPPED,
+            content_type=ct,
+            object_id=self.dominio.id,
+            event_data={'description': 'Domain dropped'},
+            processed=False
+        )
+
+        out = StringIO()
+        call_command('process_events', stdout=out)
+
+        # Both users should get notifications
+        self.assertEqual(UserNotification.objects.count(), 2)
+        self.assertTrue(UserNotification.objects.filter(user=self.user).exists())
+        self.assertTrue(UserNotification.objects.filter(user=user2).exists())
+
+    def test_command_no_subscription_target(self):
+        """Command should handle events for objects without subscription targets."""
+        ct = ContentType.objects.get_for_model(Dominio)
+
+        # Create event but NO subscription target
+        event = Event.objects.create(
+            event_type=EVENT_DROPPED,
+            content_type=ct,
+            object_id=self.dominio.id,
+            event_data={'description': 'Domain dropped'},
+            processed=False
+        )
+
+        out = StringIO()
+        call_command('process_events', stdout=out)
+
+        # Event should still be marked processed
+        event.refresh_from_db()
+        self.assertTrue(event.processed)
+
+        # No notifications created
+        self.assertEqual(UserNotification.objects.count(), 0)
+
+    def test_command_limit_parameter(self):
+        """Command should respect the limit parameter."""
+        ct = ContentType.objects.get_for_model(Dominio)
+
+        # Create 5 events
+        for i in range(5):
+            Event.objects.create(
+                event_type=EVENT_DROPPED,
+                content_type=ct,
+                object_id=self.dominio.id,
+                event_data={'description': f'Event {i}'},
+                processed=False
+            )
+
+        out = StringIO()
+        call_command('process_events', '--limit=2', stdout=out)
+
+        # Only 2 events should be processed
+        processed_count = Event.objects.filter(processed=True).count()
+        self.assertEqual(processed_count, 2)
+
+        unprocessed_count = Event.objects.filter(processed=False).count()
+        self.assertEqual(unprocessed_count, 3)
