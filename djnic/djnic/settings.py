@@ -53,6 +53,7 @@ INSTALLED_APPS = [
     'analytics',
     'mensajes',
     'subscriptions',
+    'channels',
 ]
 
 WEBPUSH_SETTINGS = {
@@ -60,6 +61,17 @@ WEBPUSH_SETTINGS = {
     "VAPID_PRIVATE_KEY": "Vapid Private Key",
     "VAPID_ADMIN_EMAIL": "admin@example.com"
 }
+
+# Site settings for notifications
+SITE_NAME = 'ArDomNews'
+SITE_BASE_URL = 'https://nic.opendatacordoba.org'  # Update in local_settings.py
+
+# Telegram Bot Settings
+# Get these from @BotFather on Telegram
+TELEGRAM_BOT_TOKEN = None  # Set in local_settings.py: 'your-bot-token'
+TELEGRAM_BOT_NAME = 'ArDomNewsBot'  # Your bot's username
+TELEGRAM_WEBHOOK_URL = f'{SITE_BASE_URL}/channels/telegram/webhook/'
+TELEGRAM_WEBHOOK_SECRET = 'Change-me-01234'  # Set in local_settings.py: random string (1-256 chars, A-Za-z0-9_-)
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',

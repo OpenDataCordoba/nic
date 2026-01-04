@@ -35,6 +35,9 @@ urlpatterns = [
     # webpush
     path('webpush/', include('webpush.urls')),
 
+    # notification channels (telegram, etc.)
+    path('channels/', include('channels.urls')),
+
     # all auth
     path('accounts/', include('allauth.urls')),
 

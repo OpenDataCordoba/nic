@@ -13,7 +13,7 @@ EVENT_DNS_CHANGED = 'dns_changed'
 EVENT_REGISTRANT_CHANGED = 'registrant_changed'
 
 EVENT_TYPE_CHOICES = [
-        (EVENT_DROPPED, 'Dominio Registrado'),
+        (EVENT_REGISTERED, 'Dominio Registrado'),
         (EVENT_RENEWED, 'Dominio Renovado'),
         (EVENT_EXPIRED, 'Dominio Expirado'),
         (EVENT_DROPPED, 'Dominio Caido'),
