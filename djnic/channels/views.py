@@ -347,4 +347,11 @@ def setup_telegram_webhook(request):
     if data.get('ok'):
         return JsonResponse({'success': True, 'message': 'Webhook set successfully'})
     else:
-        return JsonResponse({'error': data.get('description')}, status=400)
+        return JsonResponse(
+            {
+                'error': data.get('description'),
+                'webhook_url': webhook_url,
+                'full_data_str': str(data),
+            },
+            status=400
+        )
