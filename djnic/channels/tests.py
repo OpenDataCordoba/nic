@@ -689,3 +689,470 @@ class MessageLoggingTest(TestCase):
 
         # No new message should be created
         self.assertEqual(TelegramMessage.objects.count(), initial_count)
+
+
+class TelegramBotCommandsTest(TestCase):
+    """Comprehensive tests for Telegram bot commands."""
+
+    def setUp(self):
+        self.client = Client()
+        self.user = User.objects.create_user(
+            username='testuser',
+            email='test@example.com',
+            password='testpass123'
+        )
+
+    def _send_command(self, chat_id, text, first_name='Test', username=None):
+        """Helper to send a command to the webhook."""
+        from_user = {'id': chat_id, 'first_name': first_name}
+        if username:
+            from_user['username'] = username
+
+        return self.client.post(
+            '/channels/telegram/webhook/',
+            data=json.dumps({
+                'message': {
+                    'message_id': 100,
+                    'chat': {'id': chat_id, 'type': 'private'},
+                    'from': from_user,
+                    'text': text
+                }
+            }),
+            content_type='application/json'
+        )
+
+    # /start command tests
+    @patch('channels.views.telegram_sender.send_raw_message')
+    def test_start_command_unlinked_user(self, mock_send):
+        """Test /start for user without linked account."""
+        mock_send.return_value = {'success': True}
+
+        response = self._send_command(123456789, '/start')
+
+        self.assertEqual(response.status_code, 200)
+        mock_send.assert_called_once()
+
+        # Check message contains welcome info
+        call_args = mock_send.call_args
+        message = call_args[0][1]
+        self.assertIn('Bienvenido', message)
+        self.assertIn('/link', message)
+
+    @patch('channels.views.telegram_sender.send_raw_message')
+    def test_start_command_linked_user(self, mock_send):
+        """Test /start for user with linked account."""
+        mock_send.return_value = {'success': True}
+
+        # Create linked channel
+        TelegramChannel.objects.create(
+            user=self.user,
+            chat_id=123456789,
+            is_active=True,
+            is_verified=True,
+        )
+
+        response = self._send_command(123456789, '/start', first_name='Juan')
+
+        self.assertEqual(response.status_code, 200)
+        mock_send.assert_called_once()
+
+        # Check message confirms linked status
+        call_args = mock_send.call_args
+        message = call_args[0][1]
+        self.assertIn('Hola', message)
+        self.assertIn('testuser', message)
+        self.assertIn('vinculada', message)
+
+    @patch('channels.views.telegram_sender.send_raw_message')
+    def test_start_with_deep_link_token(self, mock_send):
+        """Test /start with deep link token (same as /link)."""
+        mock_send.return_value = {'success': True}
+
+        token = TelegramLinkToken.generate_token(self.user)
+
+        response = self._send_command(123456789, f'/start {token.token}', username='tg_user')
+
+        self.assertEqual(response.status_code, 200)
+
+        # Channel should be created
+        channel = TelegramChannel.objects.filter(chat_id=123456789).first()
+        self.assertIsNotNone(channel)
+        self.assertTrue(channel.is_verified)
+
+    # /link command tests
+    @patch('channels.views.telegram_sender.send_raw_message')
+    def test_link_without_token(self, mock_send):
+        """Test /link without providing a token."""
+        mock_send.return_value = {'success': True}
+
+        response = self._send_command(123456789, '/link')
+
+        self.assertEqual(response.status_code, 200)
+
+        call_args = mock_send.call_args
+        message = call_args[0][1]
+        self.assertIn('proporcionar', message)
+        self.assertIn('TU_CODIGO', message)
+
+    @patch('channels.views.telegram_sender.send_raw_message')
+    def test_link_with_invalid_token(self, mock_send):
+        """Test /link with invalid token."""
+        mock_send.return_value = {'success': True}
+
+        response = self._send_command(123456789, '/link INVALIDTOKEN123')
+
+        self.assertEqual(response.status_code, 200)
+
+        call_args = mock_send.call_args
+        message = call_args[0][1]
+        self.assertIn('inválido', message.lower())
+
+    @patch('channels.views.telegram_sender.send_raw_message')
+    def test_link_with_expired_token(self, mock_send):
+        """Test /link with expired token."""
+        mock_send.return_value = {'success': True}
+
+        # Create expired token
+        token = TelegramLinkToken.generate_token(self.user)
+        token.expires_at = timezone.now() - timedelta(hours=1)
+        token.save()
+
+        response = self._send_command(123456789, f'/link {token.token}')
+
+        self.assertEqual(response.status_code, 200)
+
+        call_args = mock_send.call_args
+        message = call_args[0][1]
+        self.assertIn('expirado', message.lower())
+
+    @patch('channels.views.telegram_sender.send_raw_message')
+    def test_link_already_linked_to_another_user(self, mock_send):
+        """Test /link when chat is already linked to another user."""
+        mock_send.return_value = {'success': True}
+
+        # Create existing channel for another user
+        other_user = User.objects.create_user(
+            username='otheruser',
+            email='other@example.com',
+            password='otherpass123'
+        )
+        TelegramChannel.objects.create(
+            user=other_user,
+            chat_id=123456789,
+            is_active=True,
+            is_verified=True,
+        )
+
+        # Try to link to our user
+        token = TelegramLinkToken.generate_token(self.user)
+
+        response = self._send_command(123456789, f'/link {token.token}')
+
+        self.assertEqual(response.status_code, 200)
+
+        call_args = mock_send.call_args
+        message = call_args[0][1]
+        self.assertIn('vinculado a otra cuenta', message)
+        self.assertIn('/unlink', message)
+
+    @patch('channels.views.telegram_sender.send_raw_message')
+    def test_link_success(self, mock_send):
+        """Test successful /link command."""
+        mock_send.return_value = {'success': True}
+
+        token = TelegramLinkToken.generate_token(self.user)
+
+        response = self._send_command(123456789, f'/link {token.token}', username='tg_user')
+
+        self.assertEqual(response.status_code, 200)
+
+        # Verify channel created correctly
+        channel = TelegramChannel.objects.filter(chat_id=123456789).first()
+        self.assertIsNotNone(channel)
+        self.assertEqual(channel.user, self.user)
+        self.assertTrue(channel.is_verified)
+        self.assertEqual(channel.username, 'tg_user')
+
+        # Verify token marked as used
+        token.refresh_from_db()
+        self.assertTrue(token.used)
+
+        # Verify success message
+        call_args = mock_send.call_args
+        message = call_args[0][1]
+        self.assertIn('exitosamente', message)
+
+    # /unlink command tests
+    @patch('channels.views.telegram_sender.send_raw_message')
+    def test_unlink_not_linked(self, mock_send):
+        """Test /unlink when not linked."""
+        mock_send.return_value = {'success': True}
+
+        response = self._send_command(123456789, '/unlink')
+
+        self.assertEqual(response.status_code, 200)
+
+        call_args = mock_send.call_args
+        message = call_args[0][1]
+        self.assertIn('no está vinculado', message)
+
+    @patch('channels.views.telegram_sender.send_raw_message')
+    def test_unlink_success(self, mock_send):
+        """Test successful /unlink command."""
+        mock_send.return_value = {'success': True}
+
+        # Create linked channel
+        TelegramChannel.objects.create(
+            user=self.user,
+            chat_id=123456789,
+            is_active=True,
+            is_verified=True,
+        )
+
+        response = self._send_command(123456789, '/unlink')
+
+        self.assertEqual(response.status_code, 200)
+
+        # Channel should be deleted
+        self.assertFalse(TelegramChannel.objects.filter(chat_id=123456789).exists())
+
+        call_args = mock_send.call_args
+        message = call_args[0][1]
+        self.assertIn('desvinculado', message)
+
+    # /status command tests
+    @patch('channels.views.telegram_sender.send_raw_message')
+    def test_status_not_linked(self, mock_send):
+        """Test /status when not linked."""
+        mock_send.return_value = {'success': True}
+
+        response = self._send_command(123456789, '/status')
+
+        self.assertEqual(response.status_code, 200)
+
+        call_args = mock_send.call_args
+        message = call_args[0][1]
+        self.assertIn('No vinculado', message)
+
+    @patch('channels.views.telegram_sender.send_raw_message')
+    def test_status_linked(self, mock_send):
+        """Test /status when linked."""
+        mock_send.return_value = {'success': True}
+
+        TelegramChannel.objects.create(
+            user=self.user,
+            chat_id=123456789,
+            is_active=True,
+            is_verified=True,
+            last_sent_at=timezone.now(),
+        )
+
+        response = self._send_command(123456789, '/status')
+
+        self.assertEqual(response.status_code, 200)
+
+        call_args = mock_send.call_args
+        message = call_args[0][1]
+        self.assertIn('testuser', message)
+        self.assertIn('Activo', message)
+        self.assertIn('Verificado', message)
+
+    # /suscripciones command tests
+    @patch('channels.views.telegram_sender.send_raw_message')
+    def test_suscripciones_not_linked(self, mock_send):
+        """Test /suscripciones when not linked."""
+        mock_send.return_value = {'success': True}
+
+        response = self._send_command(123456789, '/suscripciones')
+
+        self.assertEqual(response.status_code, 200)
+
+        call_args = mock_send.call_args
+        message = call_args[0][1]
+        self.assertIn('no está vinculado', message)
+
+    @patch('channels.views.telegram_sender.send_raw_message')
+    def test_suscripciones_no_subscriptions(self, mock_send):
+        """Test /suscripciones when linked but no subscriptions."""
+        mock_send.return_value = {'success': True}
+
+        TelegramChannel.objects.create(
+            user=self.user,
+            chat_id=123456789,
+            is_active=True,
+            is_verified=True,
+        )
+
+        response = self._send_command(123456789, '/suscripciones')
+
+        self.assertEqual(response.status_code, 200)
+
+        call_args = mock_send.call_args
+        message = call_args[0][1]
+        self.assertIn('No tienes suscripciones', message)
+
+    @patch('channels.views.telegram_sender.send_raw_message')
+    def test_suscripciones_with_domain_subscription(self, mock_send):
+        """Test /suscripciones with domain subscriptions."""
+        mock_send.return_value = {'success': True}
+
+        from dominios.models import Dominio, Zona
+        from subscriptions.models import SubscriptionTarget, UserSubscription
+        from django.contrib.contenttypes.models import ContentType
+
+        TelegramChannel.objects.create(
+            user=self.user,
+            chat_id=123456789,
+            is_active=True,
+            is_verified=True,
+        )
+
+        # Create a domain and subscription
+        zona = Zona.objects.create(nombre='ar')
+        dominio = Dominio.objects.create(
+            nombre='example',
+            zona=zona,
+        )
+
+        domain_ct = ContentType.objects.get_for_model(Dominio)
+        target = SubscriptionTarget.objects.create(
+            content_type=domain_ct,
+            object_id=dominio.id
+        )
+
+        UserSubscription.objects.create(
+            user=self.user,
+            target=target,
+            event_types=['dropped', 'registered'],
+            delivery_mode='immediate',
+            is_active=True,
+        )
+
+        response = self._send_command(123456789, '/suscripciones')
+
+        self.assertEqual(response.status_code, 200)
+
+        call_args = mock_send.call_args
+        message = call_args[0][1]
+        self.assertIn('Dominios:', message)
+        self.assertIn('example.ar', message)
+        self.assertIn('Total:', message)
+        self.assertIn('1 suscripciones', message)
+
+    @patch('channels.views.telegram_sender.send_raw_message')
+    def test_suscripciones_with_registrant_subscription(self, mock_send):
+        """Test /suscripciones with registrant subscriptions."""
+        mock_send.return_value = {'success': True}
+
+        from dominios.models import Registrante
+        from subscriptions.models import SubscriptionTarget, UserSubscription
+        from django.contrib.contenttypes.models import ContentType
+
+        TelegramChannel.objects.create(
+            user=self.user,
+            chat_id=123456789,
+            is_active=True,
+            is_verified=True,
+        )
+
+        # Create a registrant and subscription
+        registrante = Registrante.objects.create(
+            name='ACME Corporation',
+        )
+
+        registrant_ct = ContentType.objects.get_for_model(Registrante)
+        target = SubscriptionTarget.objects.create(
+            content_type=registrant_ct,
+            object_id=registrante.id
+        )
+
+        UserSubscription.objects.create(
+            user=self.user,
+            target=target,
+            event_types=['new_domain'],
+            delivery_mode='daily',
+            is_active=True,
+        )
+
+        response = self._send_command(123456789, '/suscripciones')
+
+        self.assertEqual(response.status_code, 200)
+
+        call_args = mock_send.call_args
+        message = call_args[0][1]
+        self.assertIn('Registrantes:', message)
+        self.assertIn('ACME Corporation', message)
+
+    # /help command tests
+    @patch('channels.views.telegram_sender.send_raw_message')
+    def test_help_command(self, mock_send):
+        """Test /help command."""
+        mock_send.return_value = {'success': True}
+
+        response = self._send_command(123456789, '/help')
+
+        self.assertEqual(response.status_code, 200)
+
+        call_args = mock_send.call_args
+        message = call_args[0][1]
+        self.assertIn('Comandos disponibles', message)
+        self.assertIn('/start', message)
+        self.assertIn('/link', message)
+        self.assertIn('/unlink', message)
+        self.assertIn('/status', message)
+        self.assertIn('/suscripciones', message)
+        self.assertIn('/help', message)
+
+    # Unknown command test
+    @patch('channels.views.telegram_sender.send_raw_message')
+    def test_unknown_command(self, mock_send):
+        """Test unknown command."""
+        mock_send.return_value = {'success': True}
+
+        response = self._send_command(123456789, '/unknowncommand')
+
+        self.assertEqual(response.status_code, 200)
+
+        call_args = mock_send.call_args
+        message = call_args[0][1]
+        self.assertIn('no reconocido', message)
+        self.assertIn('/help', message)
+
+    # Edge cases
+    @patch('channels.views.telegram_sender.send_raw_message')
+    def test_command_with_bot_mention(self, mock_send):
+        """Test command with @botname suffix."""
+        mock_send.return_value = {'success': True}
+
+        response = self._send_command(123456789, '/help@ArDomNewsBot')
+
+        self.assertEqual(response.status_code, 200)
+
+        call_args = mock_send.call_args
+        message = call_args[0][1]
+        self.assertIn('Comandos disponibles', message)
+
+    def test_non_command_message_ignored(self):
+        """Test that non-command messages don't trigger commands."""
+        response = self._send_command(123456789, 'Hello, how are you?')
+
+        self.assertEqual(response.status_code, 200)
+
+    def test_group_chat_ignored(self):
+        """Test that group chats are ignored."""
+        response = self.client.post(
+            '/channels/telegram/webhook/',
+            data=json.dumps({
+                'message': {
+                    'message_id': 100,
+                    'chat': {'id': -123456789, 'type': 'group'},
+                    'from': {'id': 111, 'first_name': 'Test'},
+                    'text': '/start'
+                }
+            }),
+            content_type='application/json'
+        )
+
+        self.assertEqual(response.status_code, 200)
+        # No channel should be created for group chats
+        self.assertFalse(TelegramChannel.objects.exists())
