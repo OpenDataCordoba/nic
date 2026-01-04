@@ -128,7 +128,7 @@ class Event(models.Model):
         ]
 
     def __str__(self):
-        return f"{self.get_event_type_display()} - {self.content_object} at {self.occurred_at}"
+        return f"{self.get_event_type_display()} - {self.content_object} at {self.created_at}"
 
 
 class UserNotification(models.Model):
