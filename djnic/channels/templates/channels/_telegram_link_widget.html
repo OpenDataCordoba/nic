@@ -1,0 +1,250 @@
+<!-- Telegram Notification Channel Widget -->
+<div class="card border-info mt-3">
+    <div class="card-header bg-info text-white">
+        <h5 class="mb-0">
+            Notificaciones por Telegram
+        </h5>
+    </div>
+    <div class="card-body">
+        <!-- Status display (loaded via JS) -->
+        <div id="telegram-status">
+            <div class="text-center">
+                <div class="spinner-border spinner-border-sm" role="status">
+                    <span class="visually-hidden">Cargando...</span>
+                </div>
+                Verificando estado...
+            </div>
+        </div>
+
+        <!-- Link form (shown when not linked) -->
+        <div id="telegram-link-form" style="display: none;">
+            <p>Recibe notificaciones instantáneas en Telegram:</p>
+            <button type="button" class="btn btn-primary" id="generate-telegram-token">
+                Vincular Telegram
+            </button>
+        </div>
+
+        <!-- Linked status (shown when linked) -->
+        <div id="telegram-linked-status" style="display: none;">
+            <div class="alert alert-success mb-3">
+                <strong>Telegram vinculado</strong><br>
+                <span id="telegram-name"></span>
+            </div>
+            <div class="form-check mb-3">
+                <input class="form-check-input" type="checkbox" id="telegram-active-toggle">
+                <label class="form-check-label" for="telegram-active-toggle">
+                    Notificaciones activas
+                </label>
+            </div>
+            <button type="button" class="btn btn-outline-danger btn-sm" id="unlink-telegram">
+                Desvincular
+            </button>
+        </div>
+
+        <!-- Token display modal trigger -->
+        <div id="telegram-token-display" style="display: none;">
+            <div class="alert alert-warning">
+                <h6><strong>Tu código de vinculación:</strong></h6>
+                <div class="input-group mb-2">
+                    <input type="text" class="form-control" id="telegram-token-value" readonly>
+                    <div class="input-group-append">
+                        <button class="btn btn-outline-secondary" type="button" id="copy-token-btn">
+                            Copiar
+                        </button>
+                    </div>
+                </div>
+                <small class="text-muted">
+                    Expira: <span id="telegram-token-expires"></span>
+                </small>
+            </div>
+
+            <div class="alert alert-info">
+                <h6><strong>Pasos para vincular:</strong></h6>
+                <ol class="mb-0">
+                    <li>Abre Telegram en tu teléfono o computadora</li>
+                    <li>Busca el bot: <a href="https://t.me/ArDomNewsBot" target="_blank"><strong>@ArDomNewsBot</strong></a></li>
+                    <li>Envía el comando: <code>/link <span id="telegram-token-inline"></span></code></li>
+                </ol>
+            </div>
+
+            <button type="button" class="btn btn-secondary btn-sm" id="cancel-link">
+                Cancelar
+            </button>
+        </div>
+    </div>
+</div>
+
+<script>
+(function() {
+    const API_BASE = '/channels/api/telegram';
+    let currentStatus = null;
+
+    // DOM elements
+    const statusDiv = document.getElementById('telegram-status');
+    const linkFormDiv = document.getElementById('telegram-link-form');
+    const linkedStatusDiv = document.getElementById('telegram-linked-status');
+    const tokenDisplayDiv = document.getElementById('telegram-token-display');
+
+    // Load current status
+    function loadStatus() {
+        fetch(`${API_BASE}/status/`)
+            .then(r => r.json())
+            .then(data => {
+                currentStatus = data;
+                statusDiv.style.display = 'none';
+
+                if (data.linked) {
+                    showLinkedStatus(data);
+                } else {
+                    showLinkForm();
+                }
+            })
+            .catch(err => {
+                statusDiv.innerHTML = '<div class="alert alert-danger">Error al cargar estado</div>';
+            });
+    }
+
+    function showLinkForm() {
+        linkFormDiv.style.display = 'block';
+        linkedStatusDiv.style.display = 'none';
+        tokenDisplayDiv.style.display = 'none';
+    }
+
+    function showLinkedStatus(data) {
+        linkFormDiv.style.display = 'none';
+        linkedStatusDiv.style.display = 'block';
+        tokenDisplayDiv.style.display = 'none';
+
+        document.getElementById('telegram-name').textContent = data.telegram_name || 'Cuenta vinculada';
+        const activeToggle = document.getElementById('telegram-active-toggle');
+        activeToggle.checked = data.is_active;
+    }
+
+    function showTokenDisplay(tokenData) {
+        linkFormDiv.style.display = 'none';
+        linkedStatusDiv.style.display = 'none';
+        tokenDisplayDiv.style.display = 'block';
+
+        document.getElementById('telegram-token-value').value = tokenData.token;
+        document.getElementById('telegram-token-inline').textContent = tokenData.token;
+
+        const expiresDate = new Date(tokenData.expires_at);
+        document.getElementById('telegram-token-expires').textContent = expiresDate.toLocaleString('es-AR');
+    }
+
+    // Generate token
+    document.getElementById('generate-telegram-token').addEventListener('click', function() {
+        fetch(`${API_BASE}/link-token/`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': getCookie('csrftoken')
+            }
+        })
+        .then(r => r.json())
+        .then(data => {
+            showTokenDisplay(data);
+        })
+        .catch(err => {
+            alert('Error al generar el código. Intenta nuevamente.');
+        });
+    });
+
+    // Copy token
+    document.getElementById('copy-token-btn').addEventListener('click', function() {
+        const tokenInput = document.getElementById('telegram-token-value');
+        tokenInput.select();
+        document.execCommand('copy');
+
+        this.textContent = '¡Copiado!';
+        setTimeout(() => {
+            this.textContent = 'Copiar';
+        }, 2000);
+    });
+
+    // Cancel link
+    document.getElementById('cancel-link').addEventListener('click', function() {
+        loadStatus();
+    });
+
+    // Toggle notifications
+    document.getElementById('telegram-active-toggle').addEventListener('change', function() {
+        const action = this.checked ? 'enable' : 'disable';
+
+        fetch(`${API_BASE}/toggle/`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': getCookie('csrftoken')
+            },
+            body: JSON.stringify({ action: action })
+        })
+        .then(r => r.json())
+        .then(data => {
+            // Success - checkbox already updated
+        })
+        .catch(err => {
+            // Revert checkbox on error
+            this.checked = !this.checked;
+            alert('Error al actualizar configuración');
+        });
+    });
+
+    // Unlink
+    document.getElementById('unlink-telegram').addEventListener('click', function() {
+        if (!confirm('¿Seguro que deseas desvincular tu cuenta de Telegram?')) {
+            return;
+        }
+
+        fetch(`${API_BASE}/unlink/`, {
+            method: 'DELETE',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': getCookie('csrftoken')
+            }
+        })
+        .then(r => r.json())
+        .then(data => {
+            loadStatus();
+        })
+        .catch(err => {
+            alert('Error al desvincular cuenta');
+        });
+    });
+
+    // Helper to get CSRF token
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+
+    // Initialize
+    loadStatus();
+
+    // Refresh status every 10 seconds when showing token (to detect when user links)
+    setInterval(function() {
+        if (tokenDisplayDiv.style.display === 'block') {
+            // Check if user has linked yet
+            fetch(`${API_BASE}/status/`)
+                .then(r => r.json())
+                .then(data => {
+                    if (data.linked) {
+                        // User linked! Show success and refresh
+                        alert('¡Telegram vinculado exitosamente!');
+                        loadStatus();
+                    }
+                });
+        }
+    }, 10000);
+})();
+</script>
