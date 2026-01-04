@@ -260,3 +260,64 @@ class TelegramLinkToken(models.Model):
         """Check if token is still valid."""
         from django.utils import timezone
         return not self.used and self.expires_at > timezone.now()
+
+
+class TelegramMessage(models.Model):
+    """
+    Registro de mensajes intercambiados con el bot de Telegram.
+    Guarda tanto mensajes entrantes (del usuario) como salientes (del bot).
+    """
+    DIRECTION_IN = 'in'
+    DIRECTION_OUT = 'out'
+
+    DIRECTION_CHOICES = [
+        (DIRECTION_IN, 'Recibido'),
+        (DIRECTION_OUT, 'Enviado'),
+    ]
+
+    channel = models.ForeignKey(
+        TelegramChannel,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='messages',
+        help_text='Canal vinculado (puede ser null si el usuario no está vinculado)'
+    )
+    chat_id = models.BigIntegerField(
+        db_index=True,
+        help_text='Telegram chat ID (guardado aunque no haya channel)'
+    )
+    direction = models.CharField(
+        max_length=10,
+        choices=DIRECTION_CHOICES,
+        db_index=True
+    )
+    text = models.TextField(
+        blank=True,
+        help_text='Contenido del mensaje'
+    )
+    telegram_message_id = models.BigIntegerField(
+        null=True,
+        blank=True,
+        help_text='ID del mensaje en Telegram'
+    )
+    raw_data = models.JSONField(
+        null=True,
+        blank=True,
+        help_text='Update completo de Telegram (solo para mensajes entrantes)'
+    )
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        verbose_name = 'Telegram Message'
+        verbose_name_plural = 'Telegram Messages'
+        ordering = ['-created_at']
+        indexes = [
+            models.Index(fields=['chat_id', 'created_at']),
+            models.Index(fields=['channel', 'created_at']),
+        ]
+
+    def __str__(self):
+        direction_arrow = '→' if self.direction == self.DIRECTION_OUT else '←'
+        text_preview = self.text[:50] + '...' if len(self.text) > 50 else self.text
+        return f"{direction_arrow} {self.chat_id}: {text_preview}"

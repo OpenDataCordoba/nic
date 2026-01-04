@@ -1,7 +1,7 @@
 from django.contrib import admin
 from django.utils.html import format_html
 
-from .models import TelegramChannel, ChannelDelivery, TelegramLinkToken
+from .models import TelegramChannel, ChannelDelivery, TelegramLinkToken, TelegramMessage
 
 
 @admin.register(TelegramChannel)
@@ -83,3 +83,49 @@ class TelegramLinkTokenAdmin(admin.ModelAdmin):
     search_fields = ['user__username', 'token']
     readonly_fields = ['uid', 'created_at']
     raw_id_fields = ['user']
+
+
+@admin.register(TelegramMessage)
+class TelegramMessageAdmin(admin.ModelAdmin):
+    list_display = [
+        'direction_icon', 'chat_id', 'channel_user', 'text_preview', 'created_at'
+    ]
+    list_filter = ['direction', 'created_at']
+    search_fields = ['chat_id', 'text', 'channel__user__username']
+    readonly_fields = ['channel', 'chat_id', 'direction', 'text', 'telegram_message_id', 'raw_data', 'created_at']
+    raw_id_fields = ['channel']
+    date_hierarchy = 'created_at'
+
+    fieldsets = (
+        (None, {
+            'fields': ('channel', 'chat_id', 'direction')
+        }),
+        ('Mensaje', {
+            'fields': ('text', 'telegram_message_id')
+        }),
+        ('Raw Data', {
+            'fields': ('raw_data',),
+            'classes': ('collapse',)
+        }),
+        ('Timestamps', {
+            'fields': ('created_at',),
+        }),
+    )
+
+    def direction_icon(self, obj):
+        if obj.direction == TelegramMessage.DIRECTION_IN:
+            return format_html('<span title="Recibido">←</span>')
+        return format_html('<span title="Enviado">→</span>')
+    direction_icon.short_description = ''
+
+    def channel_user(self, obj):
+        if obj.channel and obj.channel.user:
+            return obj.channel.user.username
+        return '-'
+    channel_user.short_description = 'Usuario'
+
+    def text_preview(self, obj):
+        if len(obj.text) > 80:
+            return obj.text[:80] + '...'
+        return obj.text
+    text_preview.short_description = 'Texto'

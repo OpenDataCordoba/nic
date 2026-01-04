@@ -6,7 +6,7 @@ from typing import Dict, Any
 from django.conf import settings
 
 from subscriptions.models import UserNotification
-from channels.models import TelegramChannel, NotificationChannel
+from channels.models import TelegramChannel, TelegramMessage, NotificationChannel
 from channels.services import NotificationSender, NotificationRegistry
 
 
@@ -21,7 +21,7 @@ class TelegramSender(NotificationSender):
     channel_type = NotificationChannel.CHANNEL_TYPE_TELEGRAM
 
     def __init__(self):
-        self.bot_token = getattr(settings, 'TELEGRAM_BOT_TOKEN', None)
+        self.bot_token = settings.TELEGRAM_BOT_TOKEN
         self.api_base = 'https://api.telegram.org/bot'
 
     def get_active_channels(self, user):
@@ -57,18 +57,18 @@ class TelegramSender(NotificationSender):
             if domain_url:
                 # Make domain clickable
                 full_url = self._build_full_url(domain_url)
-                parts.append(f"\n🌐 <a href=\"{full_url}\">{self._escape_html(domain)}</a>")
+                parts.append(f"\n<a href=\"{full_url}\">{self._escape_html(domain)}</a>")
 
         # Add relevant dates/changes
         anterior = event_data.get('anterior', '')
         nuevo = event_data.get('nuevo', '')
         if anterior or nuevo:
             if anterior and nuevo:
-                parts.append(f"\n📝 {self._escape_html(anterior)} → {self._escape_html(nuevo)}")
+                parts.append(f"\n{self._escape_html(anterior)} → {self._escape_html(nuevo)}")
 
         # Footer with timestamp
         if notification.event_date:
-            parts.append(f"\n\n📅 {notification.event_date.strftime('%d/%m/%Y')}")
+            parts.append(f"\n\n{notification.event_date.strftime('%d/%m/%Y')}")
 
         return ''.join(parts)
 
@@ -104,6 +104,7 @@ class TelegramSender(NotificationSender):
                     f"Sent Telegram notification to chat {channel.chat_id}, "
                     f"message_id: {message_id}"
                 )
+                self._save_outgoing_message(channel.chat_id, message, message_id, channel)
                 return {
                     'success': True,
                     'external_id': str(message_id)
@@ -158,7 +159,9 @@ class TelegramSender(NotificationSender):
             data = response.json()
 
             if data.get('ok'):
-                return {'success': True, 'message_id': data['result']['message_id']}
+                message_id = data['result']['message_id']
+                self._save_outgoing_message(chat_id, text, message_id)
+                return {'success': True, 'message_id': message_id}
             else:
                 return {'success': False, 'error': data.get('description', 'Unknown error')}
 
@@ -184,6 +187,21 @@ class TelegramSender(NotificationSender):
         if path.startswith('http'):
             return path
         return f"{base_url.rstrip('/')}{path}"
+
+    def _save_outgoing_message(self, chat_id: int, text: str, message_id: int, channel: TelegramChannel = None):
+        """Save an outgoing message to the database."""
+        try:
+            if channel is None:
+                channel = TelegramChannel.objects.filter(chat_id=chat_id).first()
+            TelegramMessage.objects.create(
+                channel=channel,
+                chat_id=chat_id,
+                direction=TelegramMessage.DIRECTION_OUT,
+                text=text,
+                telegram_message_id=message_id
+            )
+        except Exception as e:
+            logger.error(f"Error saving outgoing message: {e}")
 
 
 # Register the Telegram sender

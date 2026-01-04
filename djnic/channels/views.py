@@ -15,7 +15,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django.utils.decorators import method_decorator
 from django.conf import settings
 
-from channels.models import TelegramChannel, TelegramLinkToken
+from channels.models import TelegramChannel, TelegramLinkToken, TelegramMessage
 from channels.services.telegram import telegram_sender
 
 
@@ -64,9 +64,28 @@ class TelegramWebhookView(View):
 
         text = message.get('text', '').strip()
         from_user = message.get('from', {})
+        message_id = message.get('message_id')
+
+        # Save incoming message
+        self._save_incoming_message(chat_id, text, message_id, data)
 
         if text.startswith('/'):
             self.handle_command(chat_id, text, from_user)
+
+    def _save_incoming_message(self, chat_id, text, message_id, raw_data):
+        """Save an incoming message to the database."""
+        try:
+            channel = TelegramChannel.objects.filter(chat_id=chat_id).first()
+            TelegramMessage.objects.create(
+                channel=channel,
+                chat_id=chat_id,
+                direction=TelegramMessage.DIRECTION_IN,
+                text=text,
+                telegram_message_id=message_id,
+                raw_data=raw_data
+            )
+        except Exception as e:
+            logger.error(f"Error saving incoming message: {e}")
 
     def handle_command(self, chat_id, text, from_user):
         """Route commands to handlers."""
@@ -308,9 +327,9 @@ def setup_telegram_webhook(request):
     if not request.user.is_authenticated or not request.user.is_staff:
         return JsonResponse({'error': 'Admin access required'}, status=403)
 
-    bot_token = getattr(settings, 'TELEGRAM_BOT_TOKEN', None)
-    webhook_url = getattr(settings, 'TELEGRAM_WEBHOOK_URL', None)
-    webhook_secret = getattr(settings, 'TELEGRAM_WEBHOOK_SECRET', None)
+    bot_token = settings.TELEGRAM_BOT_TOKEN
+    webhook_url = settings.TELEGRAM_WEBHOOK_URL
+    webhook_secret = settings.TELEGRAM_WEBHOOK_SECRET
 
     if not bot_token or not webhook_url:
         return JsonResponse({
