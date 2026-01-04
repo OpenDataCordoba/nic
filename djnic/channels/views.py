@@ -102,6 +102,7 @@ class TelegramWebhookView(View):
             '/link': self.cmd_link,
             '/unlink': self.cmd_unlink,
             '/status': self.cmd_status,
+            '/suscripciones': self.cmd_suscripciones,
             '/help': self.cmd_help,
         }
 
@@ -129,6 +130,7 @@ class TelegramWebhookView(View):
                 f"en {site_name}.\n\n"
                 f"Recibirás notificaciones aquí cuando haya cambios en tus suscripciones.\n\n"
                 f"Comandos disponibles:\n"
+                f"/suscripciones - Ver tus suscripciones\n"
                 f"/status - Ver estado de tu cuenta\n"
                 f"/unlink - Desvincular tu cuenta\n"
                 f"/help - Ver ayuda"
@@ -277,6 +279,77 @@ class TelegramWebhookView(View):
 
         telegram_sender.send_raw_message(chat_id, message)
 
+    def cmd_suscripciones(self, chat_id, args, from_user):
+        """Handle /suscripciones command - list user's active subscriptions."""
+        channel = TelegramChannel.objects.filter(chat_id=chat_id).first()
+
+        if not channel:
+            telegram_sender.send_raw_message(
+                chat_id,
+                "Tu Telegram no está vinculado a ninguna cuenta.\n\n"
+                "Usa /link para vincular primero."
+            )
+            return
+
+        # Get active subscriptions
+        from subscriptions.models import UserSubscription
+
+        subscriptions = UserSubscription.objects.filter(
+            user=channel.user,
+            is_active=True
+        ).select_related('target')
+
+        if not subscriptions.exists():
+            site_name = getattr(settings, 'SITE_NAME', 'NIC')
+            telegram_sender.send_raw_message(
+                chat_id,
+                f"No tienes suscripciones activas.\n\n"
+                f"Visita {site_name} para seguir dominios o registrantes."
+            )
+            return
+
+        # Build message with subscriptions
+        message_parts = ["<b>Tus suscripciones activas:</b>\n"]
+
+        # Group by target type
+        domain_subs = []
+        registrant_subs = []
+
+        for sub in subscriptions:
+            target = sub.target
+            if target.target_type == 'domain':
+                domain_subs.append(sub)
+            elif target.target_type == 'registrant':
+                registrant_subs.append(sub)
+
+        # Add domain subscriptions
+        if domain_subs:
+            message_parts.append("\n<b>Dominios:</b>")
+            for sub in domain_subs:
+                events = ", ".join(sub.event_types) if sub.event_types else "todos"
+                delivery = sub.get_delivery_mode_display()
+                message_parts.append(
+                    f"• <b>{self._escape(sub.target.target_identifier)}</b>\n"
+                    f"  Eventos: {events}\n"
+                    f"  Entrega: {delivery}"
+                )
+
+        # Add registrant subscriptions
+        if registrant_subs:
+            message_parts.append("\n<b>Registrantes:</b>")
+            for sub in registrant_subs:
+                events = ", ".join(sub.event_types) if sub.event_types else "todos"
+                delivery = sub.get_delivery_mode_display()
+                message_parts.append(
+                    f"• <b>{self._escape(sub.target.target_identifier)}</b>\n"
+                    f"  Eventos: {events}\n"
+                    f"  Entrega: {delivery}"
+                )
+
+        message_parts.append(f"\n<b>Total:</b> {subscriptions.count()} suscripciones")
+
+        telegram_sender.send_raw_message(chat_id, "\n".join(message_parts))
+
     def cmd_help(self, chat_id, args, from_user):
         """Handle /help command."""
         site_name = getattr(settings, 'SITE_NAME', 'NIC')
@@ -287,6 +360,7 @@ class TelegramWebhookView(View):
             "/link &lt;código&gt; - Vincular tu cuenta\n"
             "/unlink - Desvincular tu cuenta\n"
             "/status - Ver estado de vinculación\n"
+            "/suscripciones - Ver tus suscripciones activas\n"
             "/help - Ver esta ayuda\n\n"
             f"Para gestionar tus suscripciones, visita tu perfil en {site_name}."
         )
