@@ -75,7 +75,7 @@ class EventAdmin(admin.ModelAdmin):
             'fields': ('event_type', 'content_type', 'object_id', 'content_object')
         }),
         ('Event Details', {
-            'fields': ('event_data', 'created_at', 'processed')
+            'fields': ('event_data', 'processed')
         }),
         ('Metadata', {
             'fields': ('uid', 'created_at'),
