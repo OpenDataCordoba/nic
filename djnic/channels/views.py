@@ -311,25 +311,35 @@ class TelegramWebhookView(View):
         # Build message with subscriptions
         message_parts = ["<b>Tus suscripciones activas:</b>\n"]
 
-        # Group by target type
+        # Group by target type using content_type
+        from dominios.models import Dominio, Registrante
+        from django.contrib.contenttypes.models import ContentType
+
+        domain_ct = ContentType.objects.get_for_model(Dominio)
+        registrant_ct = ContentType.objects.get_for_model(Registrante)
+
         domain_subs = []
         registrant_subs = []
+        other_subs = []
 
         for sub in subscriptions:
-            target = sub.target
-            if target.target_type == 'domain':
+            if sub.target.content_type == domain_ct:
                 domain_subs.append(sub)
-            elif target.target_type == 'registrant':
+            elif sub.target.content_type == registrant_ct:
                 registrant_subs.append(sub)
+            else:
+                other_subs.append(sub)
 
         # Add domain subscriptions
         if domain_subs:
             message_parts.append("\n<b>Dominios:</b>")
             for sub in domain_subs:
+                obj = sub.target.content_object
+                name = obj.full_domain if obj else "?"
                 events = ", ".join(sub.event_types) if sub.event_types else "todos"
                 delivery = sub.get_delivery_mode_display()
                 message_parts.append(
-                    f"• <b>{self._escape(sub.target.target_identifier)}</b>\n"
+                    f"• <b>{self._escape(name)}</b>\n"
                     f"  Eventos: {events}\n"
                     f"  Entrega: {delivery}"
                 )
@@ -338,10 +348,26 @@ class TelegramWebhookView(View):
         if registrant_subs:
             message_parts.append("\n<b>Registrantes:</b>")
             for sub in registrant_subs:
+                obj = sub.target.content_object
+                name = obj.name if obj else "?"
                 events = ", ".join(sub.event_types) if sub.event_types else "todos"
                 delivery = sub.get_delivery_mode_display()
                 message_parts.append(
-                    f"• <b>{self._escape(sub.target.target_identifier)}</b>\n"
+                    f"• <b>{self._escape(name)}</b>\n"
+                    f"  Eventos: {events}\n"
+                    f"  Entrega: {delivery}"
+                )
+
+        # Add other subscriptions if any
+        if other_subs:
+            message_parts.append("\n<b>Otras:</b>")
+            for sub in other_subs:
+                obj = sub.target.content_object
+                name = str(obj) if obj else "?"
+                events = ", ".join(sub.event_types) if sub.event_types else "todos"
+                delivery = sub.get_delivery_mode_display()
+                message_parts.append(
+                    f"• <b>{self._escape(name)}</b>\n"
                     f"  Eventos: {events}\n"
                     f"  Entrega: {delivery}"
                 )
