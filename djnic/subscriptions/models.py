@@ -5,13 +5,20 @@ from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.contenttypes.models import ContentType
 
 
+EVENT_DROPPED = 'dropped'
+EVENT_REGISTERED = 'registered'
+EVENT_RENEWED = 'renewed'
+EVENT_EXPIRED = 'expired'
+EVENT_DNS_CHANGED = 'dns_changed'
+EVENT_REGISTRANT_CHANGED = 'registrant_changed'
+
 EVENT_TYPE_CHOICES = [
-        ('registered', 'Dominio Registrado'),
-        ('renewed', 'Dominio Renovado'),
-        ('expired', 'Dominio Expirado'),
-        ('dropped', 'Dominio Caido'),
-        ('dns_changed', 'DNS Cambiado'),
-        ('registrant_changed', 'Registrante Cambiado'),
+        (EVENT_DROPPED, 'Dominio Registrado'),
+        (EVENT_RENEWED, 'Dominio Renovado'),
+        (EVENT_EXPIRED, 'Dominio Expirado'),
+        (EVENT_DROPPED, 'Dominio Caido'),
+        (EVENT_DNS_CHANGED, 'DNS Cambiado'),
+        (EVENT_REGISTRANT_CHANGED, 'Registrante Cambiado'),
     ]
 
 

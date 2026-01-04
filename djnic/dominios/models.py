@@ -1,5 +1,4 @@
 from datetime import timedelta
-from random import randint
 import logging
 import pytz
 import uuid
@@ -12,6 +11,7 @@ from cambios.models import CambiosDominio, CampoCambio
 from zonas.models import Zona
 from registrantes.models import Registrante
 from dnss.models import DNS
+from subscriptions.events import register_events
 
 
 STATUS_DISPONIBLE = 'disponible'
@@ -139,11 +139,14 @@ class Dominio(models.Model):
         self.next_update_priority = timezone.now() + timedelta(days=15)
 
         cambios = []
-        # is already exist analyze and register changes
+        # if already exist analyze and register changes
         if not just_created:
             cambios = self.apply_new_version(whoare_object=wa)
+            register_events(dominio=self, cambios=cambios)
         else:
             self.data_updated = timezone.now()
+            # El dominio esta pelado, solo nombre y zona
+            # No podemos registrar eventos todavia
 
         self.estado = STATUS_DISPONIBLE if wa.domain.is_free else STATUS_NO_DISPONIBLE
 
@@ -165,6 +168,17 @@ class Dominio(models.Model):
         self.expire = wa.domain.expire
 
         self.save()
+
+        if just_created:
+            # Ahora si podemos registrar el evento de nuevo dominio (nuevo para nuestra base)
+            new_legal_uid = '' if wa.registrant is None else wa.registrant.legal_uid
+            new_reg_name = '' if wa.registrant is None else wa.registrant.name
+            cambios_tmp = [
+                {"campo": "estado", "anterior": STATUS_DISPONIBLE, "nuevo": STATUS_NO_DISPONIBLE},
+                {"campo": "registrant_legal_uid", "anterior": "", "nuevo": new_legal_uid},
+                {"campo": "registrant_name", "anterior": "", "nuevo": new_reg_name},
+            ]
+            register_events(dominio=self, cambios=cambios_tmp)
 
         orden = 1
         for ns in wa.dnss:
